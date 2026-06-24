@@ -101,7 +101,7 @@
 
   // ── State (persisted, mirrors the original DCLogic) ──────────────────────
   var state = {
-    lang:  (function(){ try{ return localStorage.getItem('pb_lang') || 'en'; }catch(e){ return 'en'; } })(),
+    lang:  (function(){ try{ return localStorage.getItem('pb_lang') || ((navigator.language||'en').toLowerCase().slice(0,2)==='pt' ? 'pt' : 'en'); }catch(e){ return 'en'; } })(),
     theme: (function(){ try{ return localStorage.getItem('pb_theme') || 'light'; }catch(e){ return 'light'; } })(),
     openApp: null,
     journeyOpen: null,
@@ -319,6 +319,10 @@
 
   function page1Widgets(m){
     var L = m.L;
+    // temperature: Fahrenheit for US-style regions (from the browser locale), Celsius elsewhere
+    var tC = 31;
+    var region = ((navigator.language || 'en').split('-')[1] || '').toUpperCase();
+    var temp = (['US','LR','KY','BS','BZ','PW','FM','MH'].indexOf(region) >= 0) ? Math.round(tC*9/5 + 32) + '°F' : tC + '°C';
     var rays = '';
     for(var r=0;r<8;r++){ rays += '<span style="position:absolute;left:50%;top:50%;width:3px;height:11px;background:#ffd34d;border-radius:2px;transform:translate(-50%,-50%) rotate('+(r*45)+'deg) translateY(-30px);"></span>'; }
     var weather = '<div style="border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(160deg,#4f9bff,#9ed0ff 58%,#ffd9a8);padding:16px 18px;box-shadow:0 6px 18px rgba(0,0,0,.18);min-height:112px;">'
@@ -328,7 +332,7 @@
       + '</div>'
       + '<div style="position:relative;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.28);">'
       +   '<div style="font-size:13px;font-weight:800;letter-spacing:.3px;">Fortaleza</div>'
-      +   '<div style="font-size:42px;font-weight:800;line-height:1.05;margin:2px 0;">31°</div>'
+      +   '<div style="font-size:42px;font-weight:800;line-height:1.05;margin:2px 0;">'+temp+'</div>'
       +   '<div style="font-size:12px;font-weight:700;">'+esc(L('Sunny · all year 🌴','Ensolarado · o ano todo 🌴'))+'</div>'
       + '</div></div>';
 
@@ -339,7 +343,7 @@
       +   '<div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:flex-end;justify-content:center;gap:3px;padding:8px 0;flex:none;">'+bars+'</div>'
       +   '<div style="min-width:0;flex:1;">'
       +     '<div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent);">'+esc(L('Now coding to','Programando ao som de'))+'</div>'
-      +     '<div style="font-size:14px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(L('Lo-fi & rain','Lo-fi & chuva'))+' 🌧️</div>'
+      +     '<div style="font-size:14px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(L('Smooth jazz','Jazz suave'))+' 🎷</div>'
       +     '<div style="height:4px;border-radius:2px;background:var(--border);margin-top:8px;position:relative;overflow:hidden;"><div style="position:absolute;left:0;top:0;bottom:0;width:62%;background:var(--accent);border-radius:2px;"></div></div>'
       +   '</div>'
       + '</div></div>';
