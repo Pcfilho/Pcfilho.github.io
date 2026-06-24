@@ -37,8 +37,9 @@ notifications, frosted "OK" pill), and a Konami-code confetti easter egg
 - **No em-dashes** in user-facing copy (the long dash, Unicode U+2014). Use a
   period, comma, or middot "·". Paulo treats that dash as a sign of AI-written
   text.
-- Keep paths **relative** (`assets/...`, not `/assets/...`) so the site works
-  under the GitHub Pages subpath `/portfolio-LP/`.
+- Keep paths **relative** (`assets/...`, not `/assets/...`). The site is served
+  at the root `https://pcfilho.github.io/` (user-site repo `Pcfilho.github.io`);
+  relative paths also keep it portable if it ever moves to a subpath.
 - **External links and documents open in a new tab** (`target="_blank"
   rel="noopener noreferrer"`) so a visitor never loses the portfolio. In-page
   anchors (`#about`, `#contact`, `#roadmap`) and `mailto:` / `tel:` stay
@@ -70,5 +71,6 @@ Chrome over the DevTools Protocol (`--remote-debugging-port`) and dispatching
 
 ## Deploy
 
-GitHub Pages from `main` (root). `.nojekyll` disables Jekyll so files serve
-as-is. No build, no env vars.
+Live at https://pcfilho.github.io/ — GitHub Pages from `main` (root), user-site
+repo `Pcfilho.github.io`. `.nojekyll` disables Jekyll so files serve as-is. No
+build, no env vars. `main` is protected (no force-push, no deletion).

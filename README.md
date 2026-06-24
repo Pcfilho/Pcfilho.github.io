@@ -37,15 +37,10 @@ python3 -m http.server 8000   # then visit http://localhost:8000
 
 ## Deploy (GitHub Pages)
 
-The site is plain static files, so GitHub Pages serves it directly:
-
-1. Settings > Pages > Build and deployment.
-2. Source: **Deploy from a branch**.
-3. Branch: **`main`**, folder: **`/ (root)`**, then Save.
-
-A `.nojekyll` file is included so Pages serves every file as-is without a Jekyll
-build. All paths are relative, so it works under the project subpath
-(`/portfolio-LP/`).
+Live at **https://pcfilho.github.io/** — served by GitHub Pages from the `main`
+branch root. This is the user-site repo (`Pcfilho.github.io`). A `.nojekyll`
+file disables Jekyll so every file is served as-is. No build step. All paths are
+relative, so the site stays portable.
 
 ## Files
 
