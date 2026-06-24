@@ -31,7 +31,7 @@
     --ios-dock:rgba(20,18,30,.5); --ios-dock-brd:rgba(255,255,255,.12);
   }
   html{scroll-behavior:smooth;}
-  html,body{margin:0;padding:0;background:var(--bg);}
+  html,body{margin:0;padding:0;background:var(--bg);overflow-x:hidden;}
   *{box-sizing:border-box;}
   section[id]{scroll-margin-top:96px;}
   body *{transition:background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease;}
@@ -64,7 +64,10 @@
     .pb-about > div:first-child{justify-self:center;}
     .pb-skills-grid{grid-template-columns:1fr !important;}
   }
-  @media (max-width:380px){
+  @media (max-width:500px){
+    .pb-hero{padding-left:14px !important;padding-right:14px !important;}
+  }
+  @media (max-width:360px){
     .pb-hero > div:last-child > div{width:300px !important;height:618px !important;}
   }
 
@@ -403,7 +406,7 @@
     if(!app) return phoneHomeView(m);
 
     var stores = app.stores.map(function(st){
-      return '<a href="'+st.url+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-size:12.5px;font-weight:700;color:#fff;background:var(--text);border-radius:11px;padding:10px 14px;">'+esc(st.label)+' ↗</a>';
+      return '<a href="'+st.url+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-size:12.5px;font-weight:700;color:var(--bg);background:var(--text);border-radius:11px;padding:10px 14px;">'+esc(st.label)+' ↗</a>';
     }).join('');
     var reviewBadge = app.review ? '<span style="font-size:12.5px;font-weight:700;color:var(--dim);background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:10px 14px;">'+esc(m.t.inReview)+'</span>' : '';
 
@@ -587,14 +590,7 @@
     var track = document.getElementById('pb-track');
     if(!pager || !track) return;
     var startX=0, startY=0, dx=0, vpW=0, dragging=false, decided=false, horizontal=false, moved=false;
-    track.addEventListener('pointerdown', function(e){
-      if(state.editMode) return;
-      if(e.button !== undefined && e.button !== 0) return;
-      startX=e.clientX; startY=e.clientY; dx=0; dragging=true; decided=false; horizontal=false; moved=false;
-      vpW = pager.clientWidth || 1;
-      track.style.transition = 'none';
-    });
-    track.addEventListener('pointermove', function(e){
+    function onMove(e){
       if(!dragging) return;
       dx = e.clientX - startX;
       var dy = e.clientY - startY;
@@ -602,18 +598,21 @@
         if(Math.abs(dx) > 7 || Math.abs(dy) > 7){ decided=true; horizontal = Math.abs(dx) > Math.abs(dy); }
         else return;
       }
-      if(!horizontal) return;
-      e.preventDefault();
+      if(!horizontal) return;            // vertical intent: let the page scroll
+      if(e.cancelable) e.preventDefault();
       if(Math.abs(dx) > 9) moved = true;
       var pos = -state.page*vpW + dx;
       var min = -vpW, max = 0;
       if(pos > max) pos = max + (pos-max)*0.32;
       if(pos < min) pos = min + (pos-min)*0.32;
       track.style.transform = 'translateX(' + pos + 'px)';
-    });
-    var end = function(e){
+    }
+    function onUp(){
       if(!dragging) return;
       dragging = false;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
       if(horizontal){
         var th = vpW * 0.2, np = state.page;
         if(dx < -th && state.page < 1) np = 1;
@@ -623,12 +622,21 @@
         track.style.transition = 'transform .3s ease';
         track.style.transform = 'translateX(-' + (state.page*50) + '%)';
       }
-      if(moved){ pager._drag = true; setTimeout(function(){ pager._drag = false; }, 60); }
-    };
-    track.addEventListener('pointerup', end);
-    track.addEventListener('pointercancel', end);
-    // swallow the click that follows a real drag so it doesn't open an app
-    track.addEventListener('click', function(e){ if(pager._drag){ e.stopPropagation(); e.preventDefault(); } }, true);
+      if(moved){ pager._swiped = true; setTimeout(function(){ pager._swiped = false; }, 60); }
+    }
+    track.addEventListener('pointerdown', function(e){
+      if(state.editMode) return;
+      if(e.button !== undefined && e.button !== 0) return;
+      startX=e.clientX; startY=e.clientY; dx=0; dragging=true; decided=false; horizontal=false; moved=false;
+      vpW = pager.clientWidth || 1;
+      track.style.transition = 'none';
+      // listen on window so the swipe keeps working when the finger leaves the phone
+      window.addEventListener('pointermove', onMove, {passive:false});
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
+    // swallow the click that follows a real swipe so it doesn't open an app
+    track.addEventListener('click', function(e){ if(pager._swiped){ e.stopPropagation(); e.preventDefault(); } }, true);
   }
 
   // ── iOS edit mode: long-press to jiggle, drag to rearrange ───────────────
