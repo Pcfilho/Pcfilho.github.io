@@ -76,13 +76,6 @@
   @keyframes pb-eq{0%,100%{transform:scaleY(.28)}50%{transform:scaleY(1)}}
   .pb-dot{transition:width .3s ease, opacity .3s ease;}
   .pb-app, .pb-dock{ touch-action:manipulation; }
-  /* iOS WebKit traps page scrolling inside the phone's positioned subtree.
-     On touch devices (home screen only, set via the pb-scrollthru class in JS)
-     let drags fall through so the page scrolls; taps on the app icons, dock and
-     page dots stay live. The open-app modal keeps full interaction because the
-     class is only added when no app is open. */
-  .pb-scrollthru{ pointer-events:none; }
-  .pb-scrollthru button, .pb-scrollthru a{ pointer-events:auto; }
   @media (prefers-reduced-motion:reduce){
     [style*="pb-spin"],[style*="pb-eq"]{animation:none !important;}
   }
@@ -109,10 +102,14 @@
     return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
   }); };
 
-  // Touch devices only: iOS WebKit traps page scrolling inside the phone's
-  // positioned subtree, so we make the home screen transparent to touch (see
-  // the .pb-scrollthru rule). Desktop keeps the full drag/hover interactions.
+  // On touch devices the phone's two home pages must NOT be internal scroll
+  // containers: an overflow-y:auto subtree captures the vertical pan on iOS
+  // WebKit and the page can't scroll over the phone. So on touch we drop their
+  // inner scroll (overflow-y:hidden) and the pan chains to the document; every
+  // tap still works and the pager keeps horizontal swipes (touch-action:pan-y).
+  // Desktop keeps overflow-y:auto so the mouse wheel can scroll inside the phone.
   var PB_TOUCH = (typeof matchMedia === 'function' && matchMedia('(pointer:coarse)').matches) || ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  var PB_HOME_OVERFLOW = PB_TOUCH ? 'hidden' : 'auto';
 
   // ── State (persisted, mirrors the original DCLogic) ──────────────────────
   var state = {
@@ -319,7 +316,7 @@
         + '</div>';
     }).join('');
     var gridLabel = edit ? m.L('Drag to rearrange','Arraste pra reorganizar') : m.t.shippedApps;
-    return '<div style="height:100%;overflow-x:hidden;overflow-y:auto;padding:58px 18px 124px;">'
+    return '<div style="height:100%;overflow-x:hidden;overflow-y:'+PB_HOME_OVERFLOW+';padding:58px 18px 124px;">'
       + '<div onclick="PB.goAbout()" title="'+esc(m.L('About me','Sobre mim'))+'" style="cursor:pointer;background:var(--ios-glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--ios-glass-brd);border-radius:24px;padding:16px;margin-bottom:22px;box-shadow:0 8px 24px rgba(0,0,0,.2);">'
       +   '<div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;">'
       +     '<div style="width:50px;height:50px;border-radius:50%;border:2px solid rgba(255,255,255,.6);overflow:hidden;flex:none;position:relative;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:17px;">PB</span><img src="assets/portrait.webp" alt="Paulo Barroso" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
@@ -372,7 +369,7 @@
       + '<div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:10px;">'+esc(L('My supervisors 🐾','Meus supervisores 🐾'))+'</div>'
       + '<div style="display:flex;justify-content:space-around;">'+petThumb('bull','Bull')+petThumb('timtim','TimTim')+'</div></div>';
 
-    return '<div style="height:100%;overflow-x:hidden;overflow-y:auto;padding:58px 18px 124px;">'
+    return '<div style="height:100%;overflow-x:hidden;overflow-y:'+PB_HOME_OVERFLOW+';padding:58px 18px 124px;">'
       + '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:1px;text-transform:uppercase;padding:0 6px 14px;text-shadow:0 1px 3px rgba(0,0,0,.3);">'+esc(L('Off the clock','Fora do expediente'))+'</div>'
       + '<div style="display:flex;flex-direction:column;gap:14px;">'+weather+coding+pets+'</div></div>';
   }
@@ -465,7 +462,7 @@
       +   '</div>'
       +   '<div style="font-size:13.5px;color:var(--dim);margin-top:22px;">'+esc(m.t.tapHint)+'</div>'
       + '</div>'
-      + '<div class="pb-phonewrap'+((PB_TOUCH && !state.openApp)?' pb-scrollthru':'')+'" style="justify-self:center;">'
+      + '<div class="pb-phonewrap" style="justify-self:center;">'
       +   '<div style="width:330px;height:680px;background:#0b0b0d;border-radius:52px;padding:11px;box-shadow:0 44px 90px rgba(124,92,255,.30),0 22px 60px rgba(255,106,26,.24),0 0 0 2px rgba(0,0,0,.2);position:relative;">'
       +     '<button onclick="PB.poke(event)" aria-label="Dynamic Island" style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#0b0b0d;border:none;border-radius:999px;z-index:7;cursor:pointer;padding:0;"></button>'
       +     '<div id="pb-screen" style="width:100%;height:100%;border-radius:42px;overflow:hidden;position:relative;background:var(--wall) center/cover;">'+phoneScreen+'</div>'
