@@ -1,52 +1,60 @@
-# Paulo Barroso — Portfolio
+# Paulo Barroso · Portfolio
 
-A single-page, bilingual (EN/PT) developer portfolio with an interactive iPhone
-mockup, a career roadmap, a toolbox, an off-duty section, and a contact CTA.
+An interactive, bilingual (EN/PT) developer portfolio with a fully playable
+iPhone mockup, a career roadmap, a toolbox, an off-duty section, and a contact
+call to action.
 
-Implemented from the Claude Design source `Portfolio.dc.html`. The `.dc.html`
-prototype (custom `<x-dc>` / `<sc-if>` / `<sc-for>` templating + a `DCLogic`
-state class) was converted into a self-contained static site driven by vanilla
-JavaScript.
-
-## Run
-
-No build step. It's a static file — open it directly or serve it:
-
-```bash
-# option A: just open it
-open index.html
-
-# option B: serve (recommended, matches production)
-python3 -m http.server 8000
-# then visit http://localhost:8000
-```
-
-## Deploy
-
-Drop the folder on any static host — GitHub Pages, Netlify, Vercel, or
-Cloudflare Pages. No server or environment variables required.
+Implemented from the Claude Design source `Portfolio.dc.html` and converted into
+a self-contained static site driven by vanilla JavaScript. No framework, no
+build step.
 
 ## Features
 
 - **Bilingual** EN / PT, toggled in the top nav and persisted to `localStorage`.
-- **Light / dark** theme, persisted to `localStorage`, smooth CSS-variable transitions.
-- **Interactive iPhone mockup** — tap any app icon to open its case study
-  (problem / build / impact + store links), tap *Back* to return home.
-- **Journey timeline** — tap any role to expand the full CV details and tool tags.
-- Responsive: columns stack on small screens; respects `prefers-reduced-motion`.
+- **Light / dark** theme, persisted, with smooth CSS-variable transitions.
+- **Interactive iPhone**
+  - Live status-bar clock.
+  - Swipeable two-page home (apps + "off the clock" widgets) with page dots.
+  - Tappable Dynamic Island.
+  - Tap an app icon to open its case study (problem / build / impact + store
+    links); tap Back to return.
+  - **iOS-style edit mode:** long-press to jiggle, drag to rearrange the apps
+    (order is persisted), an in-phone push notification if you try to delete
+    one, and a frosted "OK" pill to finish.
+- **Journey timeline** with expandable roles and tool tags.
+- A **Konami-code** confetti easter egg (arrows + B + A).
+- Responsive; respects `prefers-reduced-motion`.
+
+## Run
+
+```bash
+# just open it
+open index.html
+
+# or serve (matches production)
+python3 -m http.server 8000   # then visit http://localhost:8000
+```
+
+## Deploy (GitHub Pages)
+
+The site is plain static files, so GitHub Pages serves it directly:
+
+1. Settings > Pages > Build and deployment.
+2. Source: **Deploy from a branch**.
+3. Branch: **`main`**, folder: **`/ (root)`**, then Save.
+
+A `.nojekyll` file is included so Pages serves every file as-is without a Jekyll
+build. All paths are relative, so it works under the project subpath
+(`/portfolio-LP/`).
 
 ## Files
 
 ```
 index.html      # the whole app (markup + styles + logic)
-assets/         # images (all real, no placeholders)
-  pluma.webp, collective.webp, ploomes.webp, agrolite.webp, daily.webp   # app icons
-  wall.webp        # iPhone wallpaper
-  portrait.webp    # head shot (phone profile card + About section)
-  bull.webp        # Bull (French Bulldog) — background knocked out
-  timtim.webp      # TimTim (rescued cat) — background knocked out
+assets/         # images: app icons, wallpaper, portrait, pet cutouts
+.nojekyll       # disable Jekyll on GitHub Pages
+CLAUDE.md       # notes for AI-assisted edits
 ```
 
-Each `<image-slot>` still has a graceful fallback (monogram / person glyph / pet
-emoji) wired via `onerror`, so a missing or broken image never leaves a blank
-box. To swap any image, just replace the file in `assets/` — no code changes.
+Every image has an `onerror` fallback (monogram / person glyph), so a missing
+file never leaves a blank box. To swap any image, replace the file in `assets/`.
