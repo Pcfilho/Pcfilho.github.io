@@ -31,7 +31,11 @@
     --ios-dock:rgba(20,18,30,.5); --ios-dock-brd:rgba(255,255,255,.12);
   }
   html{scroll-behavior:smooth;}
-  html,body{margin:0;padding:0;background:var(--bg);overflow-x:hidden;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  /* iOS fix: overflow-x:hidden forces used overflow-y to auto, turning html+body
+     into nested scroll containers (page rubber-bands and snaps back on iOS).
+     overflow-x:clip clips horizontally without making body a scroll container. */
+  body{overflow-x:clip;}
   *{box-sizing:border-box;}
   section[id]{scroll-margin-top:96px;}
   body *{transition:background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease;}
