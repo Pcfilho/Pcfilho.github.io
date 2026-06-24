@@ -37,7 +37,7 @@ python3 -m http.server 8000   # then visit http://localhost:8000
 
 ## Deploy (GitHub Pages)
 
-Live at **https://pcfilho.github.io/** — served by GitHub Pages from the `main`
+Live at **https://pcfilho.github.io/**, served by GitHub Pages from the `main`
 branch root. This is the user-site repo (`Pcfilho.github.io`). A `.nojekyll`
 file disables Jekyll so every file is served as-is. No build step. All paths are
 relative, so the site stays portable.

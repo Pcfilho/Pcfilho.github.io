@@ -71,6 +71,6 @@ Chrome over the DevTools Protocol (`--remote-debugging-port`) and dispatching
 
 ## Deploy
 
-Live at https://pcfilho.github.io/ — GitHub Pages from `main` (root), user-site
+Live at https://pcfilho.github.io/ via GitHub Pages from `main` (root), user-site
 repo `Pcfilho.github.io`. `.nojekyll` disables Jekyll so files serve as-is. No
 build, no env vars. `main` is protected (no force-push, no deletion).
