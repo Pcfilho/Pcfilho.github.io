@@ -76,6 +76,13 @@
   @keyframes pb-eq{0%,100%{transform:scaleY(.28)}50%{transform:scaleY(1)}}
   .pb-dot{transition:width .3s ease, opacity .3s ease;}
   .pb-app, .pb-dock{ touch-action:manipulation; }
+  /* iOS WebKit traps page scrolling inside the phone's positioned subtree.
+     On touch devices (home screen only, set via the pb-scrollthru class in JS)
+     let drags fall through so the page scrolls; taps on the app icons, dock and
+     page dots stay live. The open-app modal keeps full interaction because the
+     class is only added when no app is open. */
+  .pb-scrollthru{ pointer-events:none; }
+  .pb-scrollthru button, .pb-scrollthru a{ pointer-events:auto; }
   @media (prefers-reduced-motion:reduce){
     [style*="pb-spin"],[style*="pb-eq"]{animation:none !important;}
   }
@@ -101,6 +108,11 @@
   var esc = function(s){ return String(s).replace(/[&<>"']/g, function(c){
     return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
   }); };
+
+  // Touch devices only: iOS WebKit traps page scrolling inside the phone's
+  // positioned subtree, so we make the home screen transparent to touch (see
+  // the .pb-scrollthru rule). Desktop keeps the full drag/hover interactions.
+  var PB_TOUCH = (typeof matchMedia === 'function' && matchMedia('(pointer:coarse)').matches) || ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 
   // ── State (persisted, mirrors the original DCLogic) ──────────────────────
   var state = {
@@ -453,7 +465,7 @@
       +   '</div>'
       +   '<div style="font-size:13.5px;color:var(--dim);margin-top:22px;">'+esc(m.t.tapHint)+'</div>'
       + '</div>'
-      + '<div style="justify-self:center;">'
+      + '<div class="pb-phonewrap'+((PB_TOUCH && !state.openApp)?' pb-scrollthru':'')+'" style="justify-self:center;">'
       +   '<div style="width:330px;height:680px;background:#0b0b0d;border-radius:52px;padding:11px;box-shadow:0 44px 90px rgba(124,92,255,.30),0 22px 60px rgba(255,106,26,.24),0 0 0 2px rgba(0,0,0,.2);position:relative;">'
       +     '<button onclick="PB.poke(event)" aria-label="Dynamic Island" style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#0b0b0d;border:none;border-radius:999px;z-index:7;cursor:pointer;padding:0;"></button>'
       +     '<div id="pb-screen" style="width:100%;height:100%;border-radius:42px;overflow:hidden;position:relative;background:var(--wall) center/cover;">'+phoneScreen+'</div>'
