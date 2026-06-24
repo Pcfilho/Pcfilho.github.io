@@ -39,6 +39,10 @@ notifications, frosted "OK" pill), and a Konami-code confetti easter egg
   text.
 - Keep paths **relative** (`assets/...`, not `/assets/...`) so the site works
   under the GitHub Pages subpath `/portfolio-LP/`.
+- **External links and documents open in a new tab** (`target="_blank"
+  rel="noopener noreferrer"`) so a visitor never loses the portfolio. In-page
+  anchors (`#about`, `#contact`, `#roadmap`) and `mailto:` / `tel:` stay
+  same-tab (they do not navigate away).
 - Match the existing inline-style approach; do not introduce a framework or
   build tooling without asking.
 
