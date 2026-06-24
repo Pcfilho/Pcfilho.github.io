@@ -1,0 +1,6 @@
+# OS
+.DS_Store
+
+# local preview / throwaway artifacts
+_preview_variant.html
+*.log
