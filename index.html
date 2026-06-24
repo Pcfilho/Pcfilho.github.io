@@ -188,7 +188,7 @@
           L('Set up continuous delivery with CodePush (OTA updates) and store publishing for the App Store and Play Store.','Montei entrega contínua com CodePush (atualizações OTA) e publicação na App Store e Play Store.')
         ],
         tools:['React Native','TypeScript','Expo','Redux','CodePush']},
-      {year:'2021', org:'Agrolite', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'01/2021 – 05/2023', domain:L('Agritech · IoT','Agritech · IoT'),
+      {year:'2021', org:'Agrolite', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'01/2021 – 05/2023', domain:L('Agritech · IoT','Agritech · IoT'), appKey:'agrolite',
         details:[
           L('Built an offline-first architecture for the Farm Operations app in Kotlin, with full offline use and reliable sync.','Construí uma arquitetura offline-first para o app de Operações da Fazenda em Kotlin, com uso totalmente offline e sincronização confiável.'),
           L('Connected proprietary farm hardware in real time with custom Bluetooth and WebSocket native modules.','Conectei hardware agrícola proprietário em tempo real com módulos nativos de Bluetooth e WebSocket sob medida.'),
@@ -197,7 +197,7 @@
           L('Added Firebase Crashlytics and Analytics for better error and performance visibility.','Adicionei Firebase Crashlytics e Analytics para mais visibilidade de erros e performance.')
         ],
         tools:['React Native','Kotlin','TypeScript','Reanimated','React Navigation','Firebase','AWS']},
-      {year:'2023', org:'Ploomes', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'05/2023 – 01/2026', domain:L('CRM · Sales','CRM · Vendas'),
+      {year:'2023', org:'Ploomes', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'05/2023 – 01/2026', domain:L('CRM · Sales','CRM · Vendas'), appKey:'ploomes',
         details:[
           L('Built a solid offline architecture with RealmDB and OData, cutting support tickets by 90% and keeping reliable sync in low-connectivity places.','Construí uma arquitetura offline sólida com RealmDB e OData, cortando os tickets de suporte em 90% e mantendo sincronização confiável em locais de baixa conectividade.'),
           L('Improved core flows with React Native, Reanimated and Gesture Handler for CRUD, charts and maps.','Melhorei os fluxos principais com React Native, Reanimated e Gesture Handler para CRUD, gráficos e mapas.'),
@@ -206,7 +206,7 @@
           L('Streamlined CI/CD with Bitrise, CodePush and GitHub Actions, cutting deploy time by 70%.','Otimizei o CI/CD com Bitrise, CodePush e GitHub Actions, cortando o tempo de deploy em 70%.')
         ],
         tools:['React Native','TypeScript','Redux','RealmDB','Jest','Maestro','Bitrise','CodePush','Zustand']},
-      {year:'2026', org:'Collective Health', role:L('React Native Engineer','Engenheiro React Native'), period:'01/2026 – 06/2026', domain:L('Health · Fintech','Saúde · Fintech'),
+      {year:'2026', org:'Collective Health', role:L('React Native Engineer','Engenheiro React Native'), period:L('01/2026 – Present','01/2026 – Atual'), domain:L('Health · Fintech','Saúde · Fintech'), current:true, appKey:'collective',
         details:[
           L('Built the mobile E2E testing program from scratch with Maestro and a custom Node mock server, with reusable flows covering critical member journeys on iOS and Android.','Construí o programa de testes E2E mobile do zero com Maestro e um servidor mock em Node, com fluxos reutilizáveis cobrindo jornadas críticas dos membros no iOS e Android.'),
           L('Led the React Native 0.83 upgrade, clearing hundreds of type and hook-rule issues to get the app ready for Fabric, TurboModules and the React Compiler.','Liderei o upgrade do React Native 0.83, resolvendo centenas de problemas de tipos e regras de hooks para deixar o app pronto para Fabric, TurboModules e React Compiler.'),
@@ -215,7 +215,7 @@
           L('Expanded AI claim search across Medical, Dental and Vision, with i18n, accessibility and design-system work.','Expandi a busca de sinistros com IA em Medical, Dental e Vision, com i18n, acessibilidade e design system.')
         ],
         tools:['React Native','TypeScript','Zustand','Maestro','TurboModules','Swift','Kotlin','Sentry','Firebase','UJET','Fabric','React Compiler']},
-      {year:'2026', org:L('Fintech Freelance','Fintech Freelance'), role:L('Mobile Developer','Desenvolvedor Mobile'), period:L('03/2026 – Present','03/2026 – Atual'), domain:'Fintech', current:true,
+      {year:'2026', org:L('Fintech Freelance','Fintech Freelance'), role:L('Mobile Developer','Desenvolvedor Mobile'), period:L('03/2026 – Present','03/2026 – Atual'), domain:'Fintech', appKey:'pluma',
         details:[
           L('Shipped Pluma Finance, a personal-finance iOS app, from zero to production with React Native and Expo.','Publiquei o Pluma Finance, um app de finanças pessoais para iOS, do zero à produção com React Native e Expo.'),
           L('Built Supabase auth (PKCE, TOTP 2FA) and Open Finance with Pluggy, on a network-aware tRPC and TanStack Query data layer.','Construí auth Supabase (PKCE, 2FA TOTP) e Open Finance com Pluggy, sobre uma camada de dados tRPC e TanStack Query atenta à rede.'),
@@ -483,9 +483,21 @@
         var tools = j.tools.map(function(tool){
           return '<span style="font-size:11.5px;font-weight:600;color:var(--dim);background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:4px 9px;">'+esc(tool)+'</span>';
         }).join('');
+        var stores = '';
+        if(j.appKey){
+          var ap = null;
+          for(var z=0;z<m.apps.length;z++){ if(m.apps[z].key===j.appKey){ ap=m.apps[z]; break; } }
+          if(ap && ap.stores.length){
+            stores = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">'
+              + ap.stores.map(function(st){ return '<a href="'+st.url+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-size:12px;font-weight:700;color:var(--bg);background:var(--text);border-radius:10px;padding:7px 13px;">'+esc(st.label)+' ↗</a>'; }).join('')
+              + '</div>';
+          }
+        }
         detail = '<div style="animation:pb-fade .42s cubic-bezier(.22,1,.36,1);padding-top:6px;">'
           + '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;">'+lis+'</ul>'
-          + '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;">'+tools+'</div></div>';
+          + '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;">'+tools+'</div>'
+          + stores
+          + '</div>';
       }
       return '<div style="display:grid;grid-template-columns:64px 1fr;gap:16px;">'
         + '<div style="text-align:right;font-family:\'Bricolage Grotesque\',sans-serif;font-size:16px;font-weight:800;color:var(--accent);padding-top:14px;">'+esc(j.year)+'</div>'
