@@ -34,8 +34,9 @@ notifications, frosted "OK" pill), and a Konami-code confetti easter egg
 ## Conventions
 
 - **Bilingual** EN/PT through `L(en, pt)`. Add both languages for any new copy.
-- **No em-dashes ("—")** in user-facing copy. Use a period, comma, or middot
-  "·". Paulo treats "—" as a sign of AI-written text.
+- **No em-dashes** in user-facing copy (the long dash, Unicode U+2014). Use a
+  period, comma, or middot "·". Paulo treats that dash as a sign of AI-written
+  text.
 - Keep paths **relative** (`assets/...`, not `/assets/...`) so the site works
   under the GitHub Pages subpath `/portfolio-LP/`.
 - Match the existing inline-style approach; do not introduce a framework or
