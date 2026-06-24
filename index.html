@@ -814,7 +814,7 @@
       if(!frame || frame.querySelector('.pb-island')) return;
       var el = document.createElement('div');
       el.className = 'pb-island';
-      el.textContent = state.lang==='pt' ? '🎧 codando • lo-fi' : '🎧 coding • lo-fi';
+      el.textContent = state.lang==='pt' ? '🎧 codando • jazz' : '🎧 coding • jazz';
       el.style.cssText = 'position:absolute;top:18px;left:50%;transform:translateX(-50%) scale(.85);background:#0b0b0d;color:#fff;font-size:12px;font-weight:700;padding:9px 16px;border-radius:999px;z-index:8;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.55);font-family:Manrope,system-ui,sans-serif;opacity:0;transition:opacity .25s ease, transform .4s cubic-bezier(.22,1,.36,1);';
       frame.appendChild(el);
       requestAnimationFrame(function(){ el.style.opacity='1'; el.style.transform='translateX(-50%) scale(1)'; });
