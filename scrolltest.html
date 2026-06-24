@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paulo Barroso · Senior Mobile Engineer</title>
+<meta name="description" content="Paulo Barroso, senior mobile engineer from Fortaleza, Brazil. I ship React Native apps to the stores in fintech, CRM, health and IoT, and I fix the ones everyone else gave up on.">
+<meta name="theme-color" content="#ff6a1a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Paulo Barroso · Senior Mobile Engineer">
+<meta property="og:description" content="I ship mobile apps, and I fix the ones everyone else gave up on.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23ff6a1a'/%3E%3Ctext x='50' y='68' font-family='Arial,sans-serif' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3EPB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f0ea; --panel:#ffffff; --panel2:#faf6f0; --text:#1c1814; --dim:#736a5e;
+    --border:#e7e0d5; --accent:#ff6a1a; --accent2:#ff8a3d; --accent-soft:rgba(255,106,26,.12);
+    --shadow:rgba(70,52,32,.13);
+    --wall:url('assets/wall.webp');
+    --ios-glass:rgba(255,255,255,.2); --ios-glass-brd:rgba(255,255,255,.32);
+    --ios-dock:rgba(255,255,255,.2); --ios-dock-brd:rgba(255,255,255,.28);
+  }
+  :root[data-theme="dark"]{
+    --bg:#14110d; --panel:#1f1a15; --panel2:#251f18; --text:#f3eee6; --dim:#a59b8c;
+    --border:#322b22; --accent:#ff7e33; --accent2:#ffa869; --accent-soft:rgba(255,126,51,.16);
+    --shadow:rgba(0,0,0,.5);
+    --wall:url('assets/wall.webp');
+    --ios-glass:rgba(28,26,38,.45); --ios-glass-brd:rgba(255,255,255,.14);
+    --ios-dock:rgba(20,18,30,.5); --ios-dock-brd:rgba(255,255,255,.12);
+  }
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  /* iOS fix: overflow-x:hidden forces used overflow-y to auto, turning html+body
+     into nested scroll containers (page rubber-bands and snaps back on iOS).
+     overflow-x:clip clips horizontally without making body a scroll container. */
+  body{overflow-x:clip;}
+  *{box-sizing:border-box;}
+  section[id]{scroll-margin-top:96px;}
+  body *{transition:background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease;}
+  ::selection{background:var(--accent);color:#fff;}
+  @keyframes pb-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,106,26,.45)}70%{box-shadow:0 0 0 9px rgba(255,106,26,0)}}
+  @keyframes pb-fade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pb-reveal{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+  section ~ section{animation:pb-reveal both;animation-timeline:view();animation-range:entry 0% cover 28%;}
+  @media (prefers-reduced-motion:reduce){section ~ section{animation:none;} html{scroll-behavior:auto;}}
+
+  /* hover behaviours (ported from the design's style-hover hints) */
+  .pb-cta{transition:transform .2s ease, box-shadow .2s ease;}
+  .pb-cta-primary:hover{transform:translateY(-2px);box-shadow:0 16px 32px var(--accent-soft);}
+  .pb-cta-ghost:hover{transform:translateY(-2px);}
+  .pb-app{transition:transform .18s ease;}
+  .pb-app:hover{transform:translateY(-4px) scale(1.05);}
+  .pb-dock{transition:transform .18s ease;}
+  .pb-dock:hover{transform:translateY(-4px) scale(1.06);}
+  .pb-pet-img{transition:transform .35s cubic-bezier(.22,1,.36,1);}
+  .pb-pet:hover .pb-pet-img{transform:scale(1.06) translateY(-2px);}
+  button{font-family:'Manrope',system-ui,sans-serif;}
+  a{-webkit-tap-highlight-color:transparent;}
+  img{-webkit-user-drag:none;user-select:none;}
+  .pb-appicon img{pointer-events:none;}
+
+  /* responsive: the source was a fixed-size preview; stack columns on small screens */
+  @media (max-width:820px){
+    .pb-hero{grid-template-columns:1fr !important;gap:36px !important;padding-top:96px !important;}
+    .pb-about{grid-template-columns:1fr !important;text-align:center;gap:22px !important;}
+    .pb-about > div:first-child{justify-self:center;}
+    .pb-skills-grid{grid-template-columns:1fr !important;}
+  }
+  @media (max-width:500px){
+    .pb-hero{padding-left:14px !important;padding-right:14px !important;}
+  }
+  @media (max-width:360px){
+    .pb-hero > div:last-child > div{width:300px !important;height:618px !important;}
+  }
+
+  /* phone "liveliness" */
+  @keyframes pb-spin{to{transform:rotate(360deg)}}
+  @keyframes pb-eq{0%,100%{transform:scaleY(.28)}50%{transform:scaleY(1)}}
+  .pb-dot{transition:width .3s ease, opacity .3s ease;}
+  .pb-app, .pb-dock{ touch-action:manipulation; }
+  @media (prefers-reduced-motion:reduce){
+    [style*="pb-spin"],[style*="pb-eq"]{animation:none !important;}
+  }
+
+  /* iOS-style edit (jiggle) mode */
+  @keyframes pb-jigA{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.7deg)}}
+  @keyframes pb-jigB{0%,100%{transform:rotate(1.5deg)}50%{transform:rotate(-1.8deg)}}
+  .pb-jig{animation:pb-jigA .3s ease-in-out infinite;}
+  .pb-appicon:nth-child(2n) .pb-jig{animation-name:pb-jigB;animation-duration:.34s;}
+  .pb-appicon:nth-child(3n) .pb-jig{animation-duration:.27s;}
+  .pb-appicon{transition:transform .2s cubic-bezier(.2,.8,.2,1);}
+  @keyframes pb-deny{0%,100%{transform:translateX(0)}15%{transform:translateX(-5px)}30%{transform:translateX(5px)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+  .pb-deny{animation:pb-deny .42s ease;}
+  @media (prefers-reduced-motion:reduce){ .pb-jig{animation:none !important;} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+"use strict";
+(function(){
+  var esc = function(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  }); };
+
+  // On touch devices the phone's two home pages must NOT be internal scroll
+  // containers: an overflow-y:auto subtree captures the vertical pan on iOS
+  // WebKit and the page can't scroll over the phone. So on touch we drop their
+  // inner scroll (overflow-y:hidden) and the pan chains to the document; every
+  // tap still works and the pager keeps horizontal swipes (touch-action:pan-y).
+  // Desktop keeps overflow-y:auto so the mouse wheel can scroll inside the phone.
+  var PB_TOUCH = (typeof matchMedia === 'function' && matchMedia('(pointer:coarse)').matches) || ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  var PB_HOME_OVERFLOW = PB_TOUCH ? 'hidden' : 'auto';
+
+  // ── State (persisted, mirrors the original DCLogic) ──────────────────────
+  var state = {
+    lang:  (function(){ try{ return localStorage.getItem('pb_lang') || ((navigator.language||'en').toLowerCase().slice(0,2)==='pt' ? 'pt' : 'en'); }catch(e){ return 'en'; } })(),
+    theme: (function(){ try{ return localStorage.getItem('pb_theme') || 'light'; }catch(e){ return 'light'; } })(),
+    openApp: null,
+    journeyOpen: null,
+    page: 0,
+    editMode: false,
+    appOrder: (function(){ try{ var v=JSON.parse(localStorage.getItem('pb_apporder')); return (v&&v.length)?v:null; }catch(e){ return null; } })()
+  };
+  function save(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+  // ── Data model (bilingual EN / PT) ───────────────────────────────────────
+  function model(){
+    var isPT = state.lang === 'pt';
+    var L = function(en,pt){ return isPT ? pt : en; };
+    // years of experience since the first role (June 2020), so the copy never goes stale
+    var exp = (function(){ var n = new Date().getFullYear() - 2020; if(new Date().getMonth() < 5) n--; return n; })();
+
+    var t = {
+      openRemote: L('Open to remote roles worldwide','Aberto a vagas remotas no mundo todo'),
+      heroLine: L('I ship mobile apps, and I fix the ones everyone else gave up on.','Eu publico apps mobile, e resolvo os que todo mundo desistiu.'),
+      roleShort: L('Senior Mobile Engineer','Engenheiro Mobile Sênior'),
+      seeWork: L('See the work','Ver os trabalhos'),
+      ctaContact: L('Get in touch','Falar comigo'),
+      downloadCV: L('Download CV','Baixar CV'),
+      tapHint: L('The phone is interactive. Tap any app to open its story, or swipe for more.','O celular é interativo. Toque em qualquer app pra ver a história, ou arraste pro lado pra ver mais.'),
+      shippedApps: L('Shipped apps','Apps publicados'),
+      back: L('Back','Voltar'),
+      lblProblem: L('The problem','O problema'),
+      lblBuild: L('What I built','O que construí'),
+      lblImpact: L('Impact','Impacto'),
+      inReview: L('In review','Em análise'),
+      current: L('Now','Agora'),
+      viewDetails: L('View details','Ver detalhes'),
+      hideDetails: L('Hide','Recolher'),
+      secAbout: L('About','Sobre'),
+      about: L("I'm Paulo, a senior mobile engineer from Fortaleza, Brazil. For "+exp+"+ years I have shipped React Native apps to the stores in fintech, CRM, health and IoT. I like picking up the problems other teams gave up on and getting them done. When I am off the clock, you will find me at the cinema or with my pets.","Sou o Paulo, engenheiro mobile sênior de Fortaleza, Brasil. Faz "+exp+"+ anos que publico apps React Native nas lojas em fintech, CRM, saúde e IoT. Gosto de pegar os problemas que os outros times desistiram e resolver de verdade. Quando não tô trabalhando, tô no cinema ou com meus pets."),
+      secJourney: L('My journey','Minha trajetória'),
+      secJourneySub: L('Tap any role to open the full details from my CV.','Toque em qualquer experiência para abrir os detalhes completos do meu CV.'),
+      secSkills: L('Toolbox','Stack'),
+      secOffduty: L('Off-duty','Fora do expediente'),
+      offdutyLine: L('When I am not shipping code, I am at the cinema or with these two.','Quando não tô publicando código, tô no cinema ou com esses dois.'),
+      secContact: L("Let's build something",'Vamos construir algo'),
+      contactLine: L('Open to senior mobile roles. Remote, freelance, or here in Fortaleza, Brazil.','Aberto a vagas mobile sênior. Remoto, freelance, ou aqui em Fortaleza, Brasil.'),
+      footerLine: L('Built in Fortaleza, Ceará 🌴 · supervised by 2 pets','Feito em Fortaleza, Ceará 🌴 · supervisionado por 2 pets')
+    };
+
+    var mk = function(ios,android){ var a=[]; if(ios) a.push({label:'App Store',url:ios}); if(android) a.push({label:'Google Play',url:android}); return a; };
+
+    var apps = [
+      {key:'pluma', name:'Pluma Finance', short:'Pluma', mono:'P', icon:'assets/pluma.webp', domain:'Fintech', year:'2026', live:true, iconBg:'linear-gradient(135deg,#8b6cff,#5b8cff)',
+        cs:{ problem:L('People manage money across several banks with no single, trustworthy view.','As pessoas cuidam do dinheiro em vários bancos sem uma visão única e confiável.'),
+             build:L('A personal-finance iOS app built from scratch to the App Store: Supabase auth (PKCE, TOTP 2FA), Open Finance with Pluggy, tRPC and TanStack Query, a native Liquid Glass UI, RevenueCat, and a full EAS Build and OTA pipeline on GitHub Actions.','App de finanças pessoais feito do zero até a App Store: auth Supabase (PKCE, 2FA TOTP), Open Finance com Pluggy, tRPC e TanStack Query, UI nativa Liquid Glass, RevenueCat e pipeline completo EAS Build e OTA no GitHub Actions.'),
+             impact:L('Live on the App Store. I built the whole app with an AI coding workflow (Claude Code).','No ar na App Store. Construí o app inteiro com um fluxo de código com IA (Claude Code).') },
+        stores:mk('https://apps.apple.com/app/id6759451648',null)},
+      {key:'collective', name:'Collective Health', short:'Collective', mono:'C', icon:'assets/collective.webp', domain:L('Health','Saúde'), year:'2026', live:true, iconBg:'linear-gradient(135deg,#2dd4bf,#0ea5a3)',
+        cs:{ problem:L('Members could not reliably reach support, and the app had no automated test safety net.','Os membros não conseguiam suporte confiável e o app não tinha rede de testes automatizados.'),
+             build:L('I built the mobile E2E testing from scratch with Maestro and a custom Node mock server, led the React Native 0.83 upgrade for Fabric, TurboModules and the React Compiler, and owned chat and notifications with UJET (Google CCAI), Customer.io and Firebase.','Criei os testes E2E mobile do zero com Maestro e um servidor mock em Node, liderei o upgrade do React Native 0.83 para Fabric, TurboModules e React Compiler, e assumi chat e notificações com UJET (Google CCAI), Customer.io e Firebase.'),
+             impact:L('Brought back the main activation path on iOS and cut the user impact reported in the Play Console.','Trouxe de volta o caminho principal de ativação no iOS e reduzi o impacto reportado no Play Console.') },
+        stores:mk('https://apps.apple.com/app/id1032100065','https://play.google.com/store/apps/details?id=com.collectivehealth.member')},
+      {key:'ploomes', name:'Ploomes CRM', short:'Ploomes', mono:'P', icon:'assets/ploomes.webp', domain:L('CRM · Sales','CRM · Vendas'), year:'2023', live:true, iconBg:'linear-gradient(135deg,#4f8cff,#2563eb)',
+        cs:{ problem:L('Sales reps in the field lost data and trust in low-connectivity areas.','Vendedores em campo perdiam dados e confiança em áreas de baixa conectividade.'),
+             build:L('An offline architecture with RealmDB and OData, an offline-cached universal search, a Jest and Maestro test pipeline, and Bitrise and CodePush CI/CD.','Arquitetura offline com RealmDB e OData, busca universal com cache offline, pipeline de testes Jest e Maestro, e CI/CD Bitrise e CodePush.'),
+             impact:L('90% fewer support tickets, 40% fewer regressions and 70% faster deploys for more than 5,000 daily users.','90% menos tickets, 40% menos regressões e deploys 70% mais rápidos para mais de 5.000 usuários diários.') },
+        stores:mk('https://apps.apple.com/app/id1405137541','https://play.google.com/store/apps/details?id=com.ploomes.mobileapp')},
+      {key:'agrolite', name:'Agrolite Gestor', short:'Agrolite', mono:'A', icon:'assets/agrolite.webp', domain:L('Agritech · IoT','Agritech · IoT'), year:'2021', live:true, iconBg:'linear-gradient(135deg,#5bd07a,#27a34a)',
+        cs:{ problem:L('Farms run offline and depend on proprietary hardware.','Fazendas operam offline e dependem de hardware proprietário.'),
+             build:L('An offline-first architecture, custom Bluetooth and WebSocket native modules, and a redesigned dashboard with charts, goals and camera grids.','Arquitetura offline-first, módulos nativos de Bluetooth e WebSocket sob medida, e dashboard redesenhado com gráficos, metas e grid de câmeras.'),
+             impact:L('22% more app usage and reliable real-time control of farm hardware.','22% mais uso e controle confiável em tempo real do hardware agrícola.') },
+        stores:mk('https://apps.apple.com/app/id1607414504','https://play.google.com/store/apps/details?id=com.agrolitemanager')},
+      {key:'daily', name:'Daily Logs', short:'Daily Logs', mono:'D', icon:'assets/daily.webp', domain:L('Fitness','Fitness'), year:'2025', review:true, iconBg:'linear-gradient(135deg,#ff9d4d,#ff6a1a)',
+        cs:{ problem:L('Workout trackers break offline and ignore native iOS features.','Apps de treino quebram offline e ignoram recursos nativos do iOS.'),
+             build:L('Offline-first with expo-SQLite and Drizzle (128+ exercises), a Swift module for Live Activities, Dynamic Island and WidgetKit, and a Liquid Glass UI in three languages.','Offline-first com expo-SQLite e Drizzle (128+ exercícios), módulo Swift para Live Activities, Dynamic Island e WidgetKit, e UI Liquid Glass em três idiomas.'),
+             impact:L('Submitted to the App Store and currently in review. I built it with an AI coding workflow (Claude Code).','Enviado à App Store e em análise. Construí com um fluxo de código com IA (Claude Code).') },
+        stores:[]}
+    ];
+
+    var journey = [
+      {year:'2020', org:'Freelance', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'06/2020 – 01/2021', domain:L('Startups & MVPs','Startups & MVPs'),
+        details:[
+          L('Built mobile apps for small companies and early-stage startups with React Native and TypeScript, turning product ideas into apps ready for the market.','Construí apps mobile para pequenas empresas e startups iniciantes com React Native e TypeScript, transformando ideias de produto em apps prontos para o mercado.'),
+          L('Worked directly with founders and designers to shape scalable app structures and deliver MVPs and production releases.','Trabalhei diretamente com fundadores e designers para desenhar estruturas escaláveis e entregar MVPs e versões de produção.'),
+          L('Set up continuous delivery with CodePush (OTA updates) and store publishing for the App Store and Play Store.','Montei entrega contínua com CodePush (atualizações OTA) e publicação na App Store e Play Store.')
+        ],
+        tools:['React Native','TypeScript','Expo','Redux','CodePush']},
+      {year:'2021', org:'Agrolite', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'01/2021 – 05/2023', domain:L('Agritech · IoT','Agritech · IoT'), appKey:'agrolite',
+        details:[
+          L('Built an offline-first architecture for the Farm Operations app in Kotlin, with full offline use and reliable sync.','Construí uma arquitetura offline-first para o app de Operações da Fazenda em Kotlin, com uso totalmente offline e sincronização confiável.'),
+          L('Connected proprietary farm hardware in real time with custom Bluetooth and WebSocket native modules.','Conectei hardware agrícola proprietário em tempo real com módulos nativos de Bluetooth e WebSocket sob medida.'),
+          L('Rebuilt the home dashboard in React Native with charts, goal tracking and camera grids, raising app usage by 22%.','Refiz o dashboard inicial em React Native com gráficos, acompanhamento de metas e grid de câmeras, aumentando o uso do app em 22%.'),
+          L('Improved navigation and form screens with React Navigation, Reanimated and Gesture Handler.','Melhorei a navegação e as telas de formulário com React Navigation, Reanimated e Gesture Handler.'),
+          L('Added Firebase Crashlytics and Analytics for better error and performance visibility.','Adicionei Firebase Crashlytics e Analytics para mais visibilidade de erros e performance.')
+        ],
+        tools:['React Native','Kotlin','TypeScript','Reanimated','React Navigation','Firebase','AWS']},
+      {year:'2023', org:'Ploomes', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'05/2023 – 01/2026', domain:L('CRM · Sales','CRM · Vendas'), appKey:'ploomes',
+        details:[
+          L('Built a solid offline architecture with RealmDB and OData, cutting support tickets by 90% and keeping reliable sync in low-connectivity places.','Construí uma arquitetura offline sólida com RealmDB e OData, cortando os tickets de suporte em 90% e mantendo sincronização confiável em locais de baixa conectividade.'),
+          L('Improved core flows with React Native, Reanimated and Gesture Handler for CRUD, charts and maps.','Melhorei os fluxos principais com React Native, Reanimated e Gesture Handler para CRUD, gráficos e mapas.'),
+          L('Created an offline-cached universal search handling 30+ queries per user a day for more than 5,000 active users.','Criei uma busca universal com cache offline que aguenta 30+ consultas por usuário por dia para mais de 5.000 usuários ativos.'),
+          L('Set up automated testing with Jest and Maestro, lowering regressions by 40%.','Montei testes automatizados com Jest e Maestro, reduzindo regressões em 40%.'),
+          L('Streamlined CI/CD with Bitrise, CodePush and GitHub Actions, cutting deploy time by 70%.','Otimizei o CI/CD com Bitrise, CodePush e GitHub Actions, cortando o tempo de deploy em 70%.')
+        ],
+        tools:['React Native','TypeScript','Redux','RealmDB','Jest','Maestro','Bitrise','CodePush','Zustand']},
+      {year:'2026', org:'Collective Health', role:L('React Native Engineer','Engenheiro React Native'), period:L('01/2026 – Present','01/2026 – Atual'), domain:L('Health · Fintech','Saúde · Fintech'), current:true, appKey:'collective',
+        details:[
+          L('Built the mobile E2E testing program from scratch with Maestro and a custom Node mock server, with reusable flows covering critical member journeys on iOS and Android.','Construí o programa de testes E2E mobile do zero com Maestro e um servidor mock em Node, com fluxos reutilizáveis cobrindo jornadas críticas dos membros no iOS e Android.'),
+          L('Led the React Native 0.83 upgrade, clearing hundreds of type and hook-rule issues to get the app ready for Fabric, TurboModules and the React Compiler.','Liderei o upgrade do React Native 0.83, resolvendo centenas de problemas de tipos e regras de hooks para deixar o app pronto para Fabric, TurboModules e React Compiler.'),
+          L('Owned chat and notifications with UJET (Google Cloud CCAI), Customer.io and Firebase, bringing back the main activation path on iOS.','Assumi chat e notificações com UJET (Google Cloud CCAI), Customer.io e Firebase, trazendo de volta o caminho principal de ativação no iOS.'),
+          L('Fixed production crashes and Android 15 edge-to-edge issues across React Native, Kotlin and Gradle.','Corrigi crashes de produção e problemas de edge-to-edge no Android 15 em React Native, Kotlin e Gradle.'),
+          L('Expanded AI claim search across Medical, Dental and Vision, with i18n, accessibility and design-system work.','Expandi a busca de sinistros com IA em Medical, Dental e Vision, com i18n, acessibilidade e design system.')
+        ],
+        tools:['React Native','TypeScript','Zustand','Maestro','TurboModules','Swift','Kotlin','Sentry','Firebase','UJET','Fabric','React Compiler']},
+      {year:'2026', org:L('Fintech Freelance','Fintech Freelance'), role:L('Mobile Developer','Desenvolvedor Mobile'), period:L('03/2026 – Present','03/2026 – Atual'), domain:'Fintech', appKey:'pluma',
+        details:[
+          L('Shipped Pluma Finance, a personal-finance iOS app, from zero to production with React Native and Expo.','Publiquei o Pluma Finance, um app de finanças pessoais para iOS, do zero à produção com React Native e Expo.'),
+          L('Built Supabase auth (PKCE, TOTP 2FA) and Open Finance with Pluggy, on a network-aware tRPC and TanStack Query data layer.','Construí auth Supabase (PKCE, 2FA TOTP) e Open Finance com Pluggy, sobre uma camada de dados tRPC e TanStack Query atenta à rede.'),
+          L('Delivered a native iOS Liquid Glass UI with Reanimated, RevenueCat subscriptions, Sentry, and a full EAS Build and OTA pipeline on GitHub Actions, tested with Jest and Maestro.','Entreguei uma UI nativa iOS Liquid Glass com Reanimated, assinaturas RevenueCat, Sentry, e um pipeline completo EAS Build e OTA no GitHub Actions, testado com Jest e Maestro.')
+        ],
+        tools:['React Native','Expo','EAS','Supabase','RevenueCat','Sentry','Jest','Maestro','GitHub Actions','Claude']}
+    ];
+
+    var heroStats = [
+      {v:'90%', l:L('fewer tickets','menos tickets')},
+      {v:'70%', l:L('faster deploys','deploys + rápidos')},
+      {v:'120k+', l:L('users reached','usuários alcançados')}
+    ];
+
+    var skills = [
+      {g:L('Languages','Linguagens'), items:['React Native','TypeScript','Swift','Kotlin','JavaScript']},
+      {g:L('State & Data','Estado & Dados'), items:['Zustand','Redux','React Query','RealmDB','Drizzle','OData']},
+      {g:L('Platform','Plataforma'), items:['Expo / EAS','Reanimated','TurboModules','Fabric','React Compiler']},
+      {g:L('Quality & CI','Qualidade & CI'), items:['Jest','Maestro','Bitrise','GitHub Actions','CodePush','Sentry']}
+    ];
+
+    var pets = [
+      {key:'bull', name:'Bull', kind:L('French Bulldog','Bulldogue Francês')},
+      {key:'timtim', name:'TimTim', kind:L('Rescued street cat','Gato de rua resgatado')}
+    ];
+
+    var motto = { text:'It is not enough for code to work.', author:'Robert C. Martin' };
+
+    return { t:t, isPT:isPT, L:L, exp:exp, apps:apps, journey:journey, heroStats:heroStats, skills:skills, pets:pets, motto:motto };
+  }
+
+  // ── Render helpers ───────────────────────────────────────────────────────
+  var PERSON_SVG = '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.85"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a7 7 0 0 1 14 0v1"></path></svg>';
+
+  function navView(m){
+    var enOn = !m.isPT, ptOn = m.isPT;
+    var langBtn = function(label, on, action){
+      return '<button onclick="PB.'+action+'()" style="flex:none;cursor:pointer;border:none;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:800;'
+        + (on ? 'background:var(--accent);color:#fff;' : 'background:transparent;color:var(--dim);') + '">'+label+'</button>';
+    };
+    return '<div style="position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;gap:6px;align-items:center;background:var(--panel);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--border);border-radius:999px;padding:5px 5px 5px 14px;box-shadow:0 12px 40px var(--shadow);">'
+      + '<span style="font-weight:800;font-size:13px;letter-spacing:-.3px;margin-right:6px;">Paulo Barroso</span>'
+      + '<button id="pb-theme-btn" onclick="PB.toggleTheme()" title="theme" style="flex:none;cursor:pointer;border:none;border-radius:999px;width:34px;height:34px;font-size:15px;background:var(--panel2);color:var(--text);display:flex;align-items:center;justify-content:center;">'+(state.theme==='dark'?'☀':'☾')+'</button>'
+      + langBtn('EN', enOn, 'setEN')
+      + langBtn('PT', ptOn, 'setPT')
+      + '</div>';
+  }
+
+  function orderedApps(m){
+    var byKey = {}; m.apps.forEach(function(a){ byKey[a.key]=a; });
+    var keys = state.appOrder;
+    if(keys && keys.length===m.apps.length && keys.every(function(k){ return byKey[k]; })) return keys.map(function(k){ return byKey[k]; });
+    return m.apps;
+  }
+
+  function statusBarView(){
+    var batt = '<span style="display:inline-block;width:17px;height:11px;border:1.5px solid #fff;border-radius:3px;position:relative;"><span style="position:absolute;inset:1.5px;background:#fff;border-radius:1px;"></span></span>';
+    var wifi = '<svg width="16" height="12" viewBox="0 0 16 12" fill="#fff" style="opacity:.95"><path d="M8 2.2C5.2 2.2 2.7 3.3 1 5.1l1.4 1.4C3.8 5 5.8 4.1 8 4.1s4.2.9 5.6 2.4L15 5.1C13.3 3.3 10.8 2.2 8 2.2z"/><path d="M8 6c-1.5 0-2.9.6-3.8 1.6L5.6 9C6.2 8.4 7.1 8 8 8s1.8.4 2.4 1l1.4-1.4C10.9 6.6 9.5 6 8 6z"/><circle cx="8" cy="10.4" r="1.2"/></svg>';
+    var sig = '<svg width="17" height="11" viewBox="0 0 17 11" fill="#fff"><rect x="0" y="7.5" width="3" height="3.5" rx="1"/><rect x="4.6" y="5" width="3" height="6" rx="1"/><rect x="9.2" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.8" y="0" width="3" height="11" rx="1"/></svg>';
+    var right = state.editMode
+      ? '<button onclick="PB.exitEdit(event)" style="pointer-events:auto;cursor:pointer;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.18);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#fff;font-weight:800;font-size:12px;letter-spacing:.2px;padding:5px 15px;border-radius:999px;font-family:Manrope,system-ui,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.3);text-shadow:none;">OK</button>'
+      : '<span style="display:flex;align-items:center;gap:6px;">'+sig+wifi+batt+'</span>';
+    return '<div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;color:#fff;font-size:14px;font-weight:700;padding:26px 24px 0;text-shadow:0 1px 3px rgba(0,0,0,.3);z-index:6;pointer-events:none;">'
+      + '<span id="pb-clock">9:41</span>'
+      + right + '</div>';
+  }
+
+  function page0Apps(m){
+    var stats = m.heroStats.map(function(s){
+      return '<div style="flex:1;background:rgba(255,255,255,.18);border-radius:12px;padding:8px 6px;text-align:center;">'
+        + '<div style="font-size:17px;font-weight:800;color:#fff;line-height:1;">'+esc(s.v)+'</div>'
+        + '<div style="font-size:8.5px;color:rgba(255,255,255,.88);font-weight:600;margin-top:3px;line-height:1.15;">'+esc(s.l)+'</div></div>';
+    }).join('');
+    var edit = state.editMode;
+    var icons = orderedApps(m).map(function(app){
+      var del = edit ? '<button class="pb-del" onclick="PB.tryDelete(\''+app.key+'\',event)" aria-label="remove" style="position:absolute;top:-7px;left:-7px;z-index:4;width:22px;height:22px;border-radius:50%;border:none;background:#ededed;color:#222;font-size:18px;font-weight:800;line-height:0;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:0;">−</button>' : '';
+      return '<div class="pb-appicon" data-key="'+app.key+'" style="position:relative;display:flex;justify-content:center;">'
+        + '<div class="'+(edit?'pb-jig':'')+'" style="display:flex;flex-direction:column;align-items:center;gap:7px;width:60px;">'
+        +   '<div style="position:relative;width:60px;height:60px;">'+del
+        +     '<button onclick="PB.openApp(\''+app.key+'\')" class="pb-app" style="display:block;width:60px;height:60px;border:none;background:none;padding:0;cursor:pointer;">'
+        +       '<div style="width:60px;height:60px;border-radius:15px;background:'+app.iconBg+';box-shadow:0 5px 14px rgba(0,0,0,.3);overflow:hidden;position:relative;">'
+        +         '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:24px;">'+esc(app.mono)+'</div>'
+        +         '<img src="'+app.icon+'" alt="'+esc(app.name)+'" draggable="false" style="position:absolute;inset:0;width:60px;height:60px;object-fit:cover;" onerror="this.remove()">'
+        +       '</div>'
+        +     '</button>'
+        +   '</div>'
+        +   '<span style="font-size:10.5px;color:#fff;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.5);text-align:center;line-height:1.1;">'+esc(app.short)+'</span>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    var gridLabel = edit ? m.L('Drag to rearrange','Arraste pra reorganizar') : m.t.shippedApps;
+    return '<div style="height:100%;overflow-x:hidden;overflow-y:'+PB_HOME_OVERFLOW+';padding:58px 18px 124px;">'
+      + '<div onclick="PB.goAbout()" title="'+esc(m.L('About me','Sobre mim'))+'" style="cursor:pointer;background:var(--ios-glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--ios-glass-brd);border-radius:24px;padding:16px;margin-bottom:22px;box-shadow:0 8px 24px rgba(0,0,0,.2);">'
+      +   '<div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;">'
+      +     '<div style="width:50px;height:50px;border-radius:50%;border:2px solid rgba(255,255,255,.6);overflow:hidden;flex:none;position:relative;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:17px;">PB</span><img src="assets/portrait.webp" alt="Paulo Barroso" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
+      +     '<div style="min-width:0;"><div style="font-size:17px;font-weight:800;color:#fff;line-height:1.1;">Paulo Barroso</div><div style="font-size:12px;color:rgba(255,255,255,.88);font-weight:600;">'+esc(m.t.roleShort)+'</div><div style="font-size:10.5px;color:rgba(255,255,255,.72);font-weight:600;margin-top:1px;">'+m.exp+'+ '+esc(m.L('years shipping','anos publicando'))+'</div></div>'
+      +   '</div>'
+      +   '<div style="display:flex;gap:7px;">'+stats+'</div>'
+      + '</div>'
+      + '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:1px;text-transform:uppercase;padding:0 6px 12px;text-shadow:0 1px 3px rgba(0,0,0,.3);">'+esc(gridLabel)+'</div>'
+      + '<div id="pb-appgrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px 8px;">'+icons+'</div>'
+      + '</div>';
+  }
+
+  function page1Widgets(m){
+    var L = m.L;
+    // temperature: Fahrenheit for US-style regions (from the browser locale), Celsius elsewhere
+    var tC = 31;
+    var region = ((navigator.language || 'en').split('-')[1] || '').toUpperCase();
+    var temp = (['US','LR','KY','BS','BZ','PW','FM','MH'].indexOf(region) >= 0) ? Math.round(tC*9/5 + 32) + '°F' : tC + '°C';
+    var rays = '';
+    for(var r=0;r<8;r++){ rays += '<span style="position:absolute;left:50%;top:50%;width:3px;height:11px;background:#ffd34d;border-radius:2px;transform:translate(-50%,-50%) rotate('+(r*45)+'deg) translateY(-30px);"></span>'; }
+    var weather = '<div style="border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(160deg,#4f9bff,#9ed0ff 58%,#ffd9a8);padding:16px 18px;box-shadow:0 6px 18px rgba(0,0,0,.18);min-height:112px;">'
+      + '<div style="position:absolute;top:-14px;right:-14px;width:82px;height:82px;">'
+      +   '<div style="position:absolute;inset:0;animation:pb-spin 16s linear infinite;">'+rays+'</div>'
+      +   '<div style="position:absolute;inset:20px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff8dc,#ffce47);box-shadow:0 0 22px rgba(255,200,60,.75);"></div>'
+      + '</div>'
+      + '<div style="position:relative;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.28);">'
+      +   '<div style="font-size:13px;font-weight:800;letter-spacing:.3px;">Fortaleza</div>'
+      +   '<div style="font-size:42px;font-weight:800;line-height:1.05;margin:2px 0;">'+temp+'</div>'
+      +   '<div style="font-size:12px;font-weight:700;">'+esc(L('Sunny · all year 🌴','Ensolarado · o ano todo 🌴'))+'</div>'
+      + '</div></div>';
+
+    var bars = '';
+    for(var i=0;i<5;i++){ bars += '<span style="width:4px;height:20px;border-radius:2px;background:#fff;display:block;transform-origin:bottom;animation:pb-eq '+(0.7+i*0.13).toFixed(2)+'s ease-in-out '+(i*0.09).toFixed(2)+'s infinite;"></span>'; }
+    var coding = '<div style="border-radius:20px;background:var(--panel2);border:1px solid var(--border);padding:14px 16px;box-shadow:0 6px 18px var(--shadow);">'
+      + '<div style="display:flex;align-items:center;gap:12px;">'
+      +   '<div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:flex-end;justify-content:center;gap:3px;padding:8px 0;flex:none;">'+bars+'</div>'
+      +   '<div style="min-width:0;flex:1;">'
+      +     '<div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent);">'+esc(L('Now coding to','Programando ao som de'))+'</div>'
+      +     '<div style="font-size:14px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(L('Smooth jazz','Jazz suave'))+' 🎷</div>'
+      +     '<div style="height:4px;border-radius:2px;background:var(--border);margin-top:8px;position:relative;overflow:hidden;"><div style="position:absolute;left:0;top:0;bottom:0;width:62%;background:var(--accent);border-radius:2px;"></div></div>'
+      +   '</div>'
+      + '</div></div>';
+
+    var petThumb = function(key,name){
+      return '<div style="text-align:center;">'
+        + '<div style="width:64px;height:64px;border-radius:50%;margin:0 auto 6px;overflow:hidden;background:radial-gradient(circle at 50% 35%,var(--accent-soft),var(--panel2));position:relative;"><img src="assets/'+key+'.webp" alt="'+esc(name)+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;" onerror="this.remove()"></div>'
+        + '<div style="font-size:11.5px;font-weight:700;color:var(--text);">'+esc(name)+'</div></div>';
+    };
+    var pets = '<div style="border-radius:20px;background:var(--panel);border:1px solid var(--border);padding:14px 16px;box-shadow:0 6px 18px var(--shadow);">'
+      + '<div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:10px;">'+esc(L('My supervisors 🐾','Meus supervisores 🐾'))+'</div>'
+      + '<div style="display:flex;justify-content:space-around;">'+petThumb('bull','Bull')+petThumb('timtim','TimTim')+'</div></div>';
+
+    return '<div style="height:100%;overflow-x:hidden;overflow-y:'+PB_HOME_OVERFLOW+';padding:58px 18px 124px;">'
+      + '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:1px;text-transform:uppercase;padding:0 6px 14px;text-shadow:0 1px 3px rgba(0,0,0,.3);">'+esc(L('Off the clock','Fora do expediente'))+'</div>'
+      + '<div style="display:flex;flex-direction:column;gap:14px;">'+weather+coding+pets+'</div></div>';
+  }
+
+  function dotsView(){
+    var dot = function(i){ var on = state.page===i;
+      return '<button data-pbdot="'+i+'" onclick="PB.goPage('+i+')" class="pb-dot" aria-label="page '+(i+1)+'" style="cursor:pointer;border:none;padding:0;height:6px;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.45);width:'+(on?'18px':'6px')+';opacity:'+(on?'1':'.45')+';"></button>';
+    };
+    return '<div style="position:absolute;left:0;right:0;bottom:114px;display:flex;gap:6px;justify-content:center;z-index:5;">'+dot(0)+dot(1)+'</div>';
+  }
+
+  function dockView(){
+    var dockIcon = function(href, attrs, grad, svg){
+      return '<a href="'+href+'" '+attrs+' class="pb-dock" style="width:54px;height:54px;border-radius:15px;background:'+grad+';display:flex;align-items:center;justify-content:center;text-decoration:none;">'+svg+'</a>';
+    };
+    var s = function(p){ return '<svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+    return '<div style="position:absolute;left:14px;right:14px;bottom:26px;height:78px;background:var(--ios-dock);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--ios-dock-brd);border-radius:28px;display:flex;align-items:center;justify-content:space-around;padding:0 16px;box-shadow:0 8px 24px rgba(0,0,0,.22);z-index:5;">'
+      + dockIcon('mailto:paulo.dev.85@gmail.com','title="Email"','linear-gradient(135deg,#ff8a3d,#ff6a1a)', s('<rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>'))
+      + dockIcon('https://www.linkedin.com/in/paulo-cesar-barroso/','target="_blank" rel="noopener noreferrer" title="LinkedIn"','linear-gradient(135deg,#4f9bff,#1f6fe0)', s('<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle>'))
+      + dockIcon('tel:+5585999209820','title="Call"','linear-gradient(135deg,#5bd07a,#27a34a)', s('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>'))
+      + dockIcon('#roadmap','title="Work" onclick="PB.closeApp()"','linear-gradient(135deg,#a78bff,#7c5cff)', s('<rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>'))
+      + '</div>';
+  }
+
+  function phoneHomeView(m){
+    return '<div style="position:absolute;inset:0;">'
+      + statusBarView()
+      + '<div id="pb-pager" style="position:absolute;inset:0;overflow:hidden;">'
+      +   '<div id="pb-track" style="position:absolute;inset:0;width:200%;display:flex;transform:translateX(-'+(state.page*50)+'%);transition:transform .42s cubic-bezier(.22,1,.36,1);touch-action:pan-y;">'
+      +     '<div style="width:50%;height:100%;position:relative;">'+page0Apps(m)+'</div>'
+      +     '<div style="width:50%;height:100%;position:relative;">'+page1Widgets(m)+'</div>'
+      +   '</div>'
+      + '</div>'
+      + dotsView()
+      + dockView()
+      + '<div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:124px;height:5px;border-radius:3px;background:rgba(255,255,255,.75);z-index:6;"></div>'
+      + '</div>';
+  }
+
+  function phoneAppView(m){
+    var app = null;
+    for(var i=0;i<m.apps.length;i++){ if(m.apps[i].key===state.openApp){ app=m.apps[i]; break; } }
+    if(!app) return phoneHomeView(m);
+
+    var stores = app.stores.map(function(st){
+      return '<a href="'+st.url+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-size:12.5px;font-weight:700;color:var(--bg);background:var(--text);border-radius:11px;padding:10px 14px;">'+esc(st.label)+' ↗</a>';
+    }).join('');
+    var reviewBadge = app.review ? '<span style="font-size:12.5px;font-weight:700;color:var(--dim);background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:10px 14px;">'+esc(m.t.inReview)+'</span>' : '';
+
+    var block = function(label, body, accent){
+      if(accent){
+        return '<div style="background:var(--accent-soft);border-radius:14px;padding:12px 14px;">'
+          + '<div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;">'+esc(label)+'</div>'
+          + '<div style="font-size:13.5px;line-height:1.5;color:var(--text);font-weight:600;">'+esc(body)+'</div></div>';
+      }
+      return '<div><div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:5px;">'+esc(label)+'</div>'
+        + '<div style="font-size:13.5px;line-height:1.5;color:var(--text);">'+esc(body)+'</div></div>';
+    };
+
+    return '<div style="position:absolute;inset:0;background:var(--panel);display:flex;flex-direction:column;padding:50px 0 0;animation:pb-fade .42s cubic-bezier(.22,1,.36,1);">'
+      + '<div style="display:flex;align-items:center;gap:6px;padding:6px 16px 12px;border-bottom:1px solid var(--border);">'
+      +   '<button onclick="PB.closeApp()" style="cursor:pointer;border:none;background:none;color:var(--accent);font-size:14px;font-weight:700;display:flex;align-items:center;gap:3px;padding:4px;">‹ '+esc(m.t.back)+'</button>'
+      + '</div>'
+      + '<div style="flex:1;overflow-y:auto;padding:18px 18px 34px;">'
+      +   '<div style="display:flex;align-items:center;gap:13px;margin-bottom:18px;">'
+      +     '<div style="width:58px;height:58px;border-radius:14px;background:'+app.iconBg+';overflow:hidden;flex:none;box-shadow:0 4px 12px var(--shadow);position:relative;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:22px;">'+esc(app.mono)+'</div><img src="'+app.icon+'" alt="'+esc(app.name)+'" style="position:absolute;inset:0;width:58px;height:58px;object-fit:cover;" onerror="this.remove()"></div>'
+      +     '<div><div style="font-size:18px;font-weight:800;color:var(--text);line-height:1.1;">'+esc(app.name)+'</div><div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:2px;">'+esc(app.domain)+' · '+esc(app.year)+'</div></div>'
+      +   '</div>'
+      +   '<div style="display:flex;flex-direction:column;gap:15px;">'
+      +     block(m.t.lblProblem, app.cs.problem, false)
+      +     block(m.t.lblBuild, app.cs.build, false)
+      +     block(m.t.lblImpact, app.cs.impact, true)
+      +   '</div>'
+      +   '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;">'+stores+reviewBadge+'</div>'
+      + '</div>'
+      + '<div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);width:124px;height:5px;border-radius:3px;background:var(--dim);opacity:.5;"></div>'
+      + '</div>';
+  }
+
+  function heroView(m){
+    var phoneScreen = state.openApp ? phoneAppView(m) : phoneHomeView(m);
+    return '<section style="max-width:1140px;margin:0 auto;padding:118px 24px 40px;display:grid;grid-template-columns:1.05fr 350px;gap:48px;align-items:center;" class="pb-hero">'
+      + '<div>'
+      +   '<div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;margin-bottom:22px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:pb-pulse 2.2s infinite;"></span>'+esc(m.t.openRemote)+'</div>'
+      +   '<h1 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(34px,5.2vw,60px);line-height:1.03;font-weight:800;letter-spacing:-1.5px;margin:0 0 22px;">'+esc(m.t.heroLine)+'</h1>'
+      +   '<div style="border-left:3px solid var(--accent);padding-left:16px;margin-bottom:28px;"><div style="font-family:\'Instrument Serif\',serif;font-style:italic;font-size:22px;line-height:1.3;color:var(--text);">“'+esc(m.motto.text)+'”</div><div style="font-size:13px;color:var(--dim);font-weight:600;margin-top:4px;">'+esc(m.motto.author)+'</div></div>'
+      +   '<div style="display:flex;gap:12px;flex-wrap:wrap;">'
+      +     '<a href="#roadmap" class="pb-cta pb-cta-primary" style="text-decoration:none;font-weight:700;font-size:15px;background:var(--accent);color:#fff;padding:14px 24px;border-radius:14px;box-shadow:0 10px 26px var(--accent-soft);">'+esc(m.t.seeWork)+'</a>'
+      +     '<a href="#contact" class="pb-cta pb-cta-ghost" style="text-decoration:none;font-weight:700;font-size:15px;background:var(--panel);color:var(--text);padding:14px 24px;border-radius:14px;border:1px solid var(--border);">'+esc(m.t.ctaContact)+'</a>'
+      +   '</div>'
+      +   '<div style="font-size:13.5px;color:var(--dim);margin-top:22px;">'+esc(m.t.tapHint)+'</div>'
+      + '</div>'
+      + '<div class="pb-phonewrap" style="justify-self:center;">'
+      +   '<div style="width:330px;height:680px;background:#0b0b0d;border-radius:52px;padding:11px;box-shadow:0 44px 90px rgba(124,92,255,.30),0 22px 60px rgba(255,106,26,.24),0 0 0 2px rgba(0,0,0,.2);position:relative;">'
+      +     '<button onclick="PB.poke(event)" aria-label="Dynamic Island" style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#0b0b0d;border:none;border-radius:999px;z-index:7;cursor:pointer;padding:0;"></button>'
+      +     '<div id="pb-screen" style="width:100%;height:100%;border-radius:42px;overflow:hidden;position:relative;background:var(--wall) center/cover;">'+phoneScreen+'</div>'
+      +   '</div>'
+      + '</div>'
+      + '</section>';
+  }
+
+  function aboutView(m){
+    return '<section id="about" style="max-width:980px;margin:0 auto;padding:50px 24px 0;">'
+      + '<div style="background:var(--panel);border:1px solid var(--border);border-radius:28px;padding:36px;display:grid;grid-template-columns:160px 1fr;gap:32px;align-items:center;box-shadow:0 16px 40px var(--shadow);" class="pb-about">'
+      +   '<div style="position:relative;width:160px;height:190px;border-radius:24px;overflow:hidden;border:1px solid var(--border);background:linear-gradient(160deg,#ff8a3d 0%,#e0533a 50%,#9b4bd6 100%);flex:none;display:flex;align-items:center;justify-content:center;">'+PERSON_SVG+'<img src="assets/portrait.webp" alt="Paulo Barroso" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
+      +   '<div><div style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">'+esc(m.t.secAbout)+'</div><p style="font-size:17px;line-height:1.6;color:var(--text);margin:0;">'+esc(m.t.about)+'</p></div>'
+      + '</div></section>';
+  }
+
+  function journeyView(m){
+    var items = m.journey.map(function(j,i){
+      var expanded = state.journeyOpen===i;
+      var currentBadge = j.current ? '<span style="font-size:10px;font-weight:800;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:999px;">'+esc(m.t.current)+'</span>' : '';
+      var toggleLabel = expanded ? esc(m.t.hideDetails)+' ▾' : esc(m.t.viewDetails)+' ▸';
+      var detail = '';
+      if(expanded){
+        var lis = j.details.map(function(d){
+          return '<li style="font-size:14px;line-height:1.55;color:var(--text);padding-left:18px;position:relative;"><span style="position:absolute;left:0;color:var(--accent);font-weight:800;">›</span>'+esc(d)+'</li>';
+        }).join('');
+        var tools = j.tools.map(function(tool){
+          return '<span style="font-size:11.5px;font-weight:600;color:var(--dim);background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:4px 9px;">'+esc(tool)+'</span>';
+        }).join('');
+        var stores = '';
+        if(j.appKey){
+          var ap = null;
+          for(var z=0;z<m.apps.length;z++){ if(m.apps[z].key===j.appKey){ ap=m.apps[z]; break; } }
+          if(ap && ap.stores.length){
+            stores = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">'
+              + ap.stores.map(function(st){ return '<a href="'+st.url+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-size:12px;font-weight:700;color:var(--bg);background:var(--text);border-radius:10px;padding:7px 13px;">'+esc(st.label)+' ↗</a>'; }).join('')
+              + '</div>';
+          }
+        }
+        detail = '<div style="animation:pb-fade .42s cubic-bezier(.22,1,.36,1);padding-top:6px;">'
+          + '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;">'+lis+'</ul>'
+          + '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;">'+tools+'</div>'
+          + stores
+          + '</div>';
+      }
+      return '<div style="display:grid;grid-template-columns:64px 1fr;gap:16px;">'
+        + '<div style="text-align:right;font-family:\'Bricolage Grotesque\',sans-serif;font-size:16px;font-weight:800;color:var(--accent);padding-top:14px;">'+esc(j.year)+'</div>'
+        + '<div style="border-left:2px solid var(--border);padding:0 0 14px 22px;position:relative;">'
+        +   '<span style="position:absolute;left:-7px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);"></span>'
+        +   '<button onclick="PB.toggleJourney('+i+')" style="width:100%;text-align:left;cursor:pointer;border:none;background:none;padding:12px 0;display:block;">'
+        +     '<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:2px;"><h3 style="font-size:18px;font-weight:800;color:var(--text);margin:0;">'+esc(j.org)+'</h3>'+currentBadge+'<span style="margin-left:auto;font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:5px;">'+toggleLabel+'</span></div>'
+        +     '<div style="font-size:13px;color:var(--text);font-weight:600;">'+esc(j.role)+'</div>'
+        +     '<div style="font-size:12px;color:var(--dim);">'+esc(j.period)+' · '+esc(j.domain)+'</div>'
+        +   '</button>'
+        +   detail
+        + '</div></div>';
+    }).join('');
+
+    return '<section id="roadmap" style="max-width:840px;margin:0 auto;padding:70px 24px 0;">'
+      + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 4px;">'+esc(m.t.secJourney)+'</h2>'
+      + '<p style="color:var(--dim);font-size:15px;margin:0 0 14px;">'+esc(m.t.secJourneySub)+'</p>'
+      + '<a href="assets/Paulo_Barroso_CV.pdf" download="Paulo_Barroso_CV.pdf" target="_blank" rel="noopener noreferrer" class="pb-cta pb-cta-primary" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-weight:700;font-size:14px;background:var(--accent);color:#fff;padding:11px 18px;border-radius:12px;box-shadow:0 8px 20px var(--accent-soft);margin:0 0 30px;">↓ '+esc(m.t.downloadCV)+'</a>'
+      + '<div>'+items+'</div></section>';
+  }
+
+  function skillsView(m){
+    var cards = m.skills.map(function(sk){
+      var items = sk.items.map(function(it){
+        return '<span style="font-size:13px;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:6px 11px;">'+esc(it)+'</span>';
+      }).join('');
+      return '<div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 20px;">'
+        + '<div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;">'+esc(sk.g)+'</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+items+'</div></div>';
+    }).join('');
+    return '<section style="max-width:980px;margin:0 auto;padding:64px 24px 0;">'
+      + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 24px;">'+esc(m.t.secSkills)+'</h2>'
+      + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;" class="pb-skills-grid">'+cards+'</div></section>';
+  }
+
+  function petsView(m){
+    var cards = m.pets.map(function(pet){
+      return '<div class="pb-pet" style="background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:14px;text-align:center;box-shadow:0 10px 26px var(--shadow);overflow:hidden;">'
+        + '<div style="position:relative;width:100%;aspect-ratio:1;margin-bottom:12px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 38%,var(--accent-soft),var(--panel2) 72%);">'
+        +   '<img src="assets/'+pet.key+'.webp" alt="'+esc(pet.name)+'" class="pb-pet-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;" onerror="this.remove()">'
+        + '</div>'
+        + '<div style="font-size:17px;font-weight:800;color:var(--text);">'+esc(pet.name)+'</div>'
+        + '<div style="font-size:12.5px;color:var(--dim);">'+esc(pet.kind)+'</div></div>';
+    }).join('');
+    return '<section style="max-width:980px;margin:0 auto;padding:64px 24px 0;">'
+      + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 4px;">'+esc(m.t.secOffduty)+' 🐾</h2>'
+      + '<p style="color:var(--dim);font-size:15px;margin:0 0 26px;">'+esc(m.t.offdutyLine)+'</p>'
+      + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:560px;margin:0 auto;" class="pb-pets-grid">'+cards+'</div></section>';
+  }
+
+  function contactView(m){
+    return '<section id="contact" style="max-width:840px;margin:0 auto;padding:64px 24px 0;">'
+      + '<div style="background:linear-gradient(135deg,#ff6a1a 0%,#e0533a 46%,#9b4bd6 100%);border-radius:30px;padding:50px 40px;text-align:center;box-shadow:0 24px 56px rgba(155,75,214,.30);">'
+      +   '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(30px,4.5vw,44px);font-weight:800;letter-spacing:-1px;margin:0 0 10px;color:#fff;">'+esc(m.t.secContact)+'</h2>'
+      +   '<p style="font-size:16px;color:rgba(255,255,255,.92);font-weight:500;max-width:440px;margin:0 auto 26px;">'+esc(m.t.contactLine)+'</p>'
+      +   '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">'
+      +     '<a href="mailto:paulo.dev.85@gmail.com" style="text-decoration:none;font-weight:800;font-size:15px;background:#fff;color:var(--accent);padding:14px 24px;border-radius:14px;">paulo.dev.85@gmail.com</a>'
+      +     '<a href="https://www.linkedin.com/in/paulo-cesar-barroso/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-weight:800;font-size:15px;background:rgba(255,255,255,.16);color:#fff;padding:14px 24px;border-radius:14px;border:1px solid rgba(255,255,255,.4);">LinkedIn ↗</a>'
+      +     '<a href="assets/Paulo_Barroso_CV.pdf" download="Paulo_Barroso_CV.pdf" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-weight:800;font-size:15px;background:rgba(255,255,255,.16);color:#fff;padding:14px 24px;border-radius:14px;border:1px solid rgba(255,255,255,.4);">↓ '+esc(m.t.downloadCV)+'</a>'
+      +   '</div>'
+      +   '<div style="font-size:13px;color:rgba(255,255,255,.85);font-weight:600;margin-top:22px;">+55 85 99920-9820</div>'
+      + '</div>'
+      + '<div style="text-align:center;color:var(--dim);font-size:13px;margin-top:28px;">'+esc(m.t.footerLine)+'</div></section>';
+  }
+
+  // ── Root render ──────────────────────────────────────────────────────────
+  function render(){
+    var m = model();
+    document.documentElement.setAttribute('lang', state.lang);
+    var html = '<div style="position:relative;background:var(--bg);color:var(--text);font-family:\'Manrope\',system-ui,sans-serif;">'
+      + navView(m) + heroView(m) + aboutView(m) + journeyView(m) + skillsView(m) + petsView(m) + contactView(m)
+      + '</div>';
+    document.getElementById('app').innerHTML = html;
+    tickClock();
+    if(!state.openApp){ wirePager(); wireAppGrid(); }
+  }
+
+  // ── Live status-bar clock ────────────────────────────────────────────────
+  function tickClock(){
+    var el = document.getElementById('pb-clock');
+    if(!el) return;
+    var d = new Date(), h = d.getHours(), mn = d.getMinutes();
+    el.textContent = h + ':' + (mn<10?'0':'') + mn;
+  }
+
+  // ── Home-screen pager (swipe + dots) ─────────────────────────────────────
+  function setPage(i){
+    i = i < 0 ? 0 : (i > 1 ? 1 : i);
+    state.page = i;
+    var track = document.getElementById('pb-track');
+    if(track){ track.style.transition = 'transform .42s cubic-bezier(.22,1,.36,1)'; track.style.transform = 'translateX(-' + (i*50) + '%)'; }
+    var dots = document.querySelectorAll('[data-pbdot]');
+    for(var d=0; d<dots.length; d++){
+      var on = (+dots[d].getAttribute('data-pbdot') === i);
+      dots[d].style.width = on ? '18px' : '6px';
+      dots[d].style.opacity = on ? '1' : '.45';
+    }
+  }
+
+  function wirePager(){
+    var pager = document.getElementById('pb-pager');
+    var track = document.getElementById('pb-track');
+    if(!pager || !track) return;
+    var startX=0, startY=0, dx=0, vpW=0, dragging=false, decided=false, horizontal=false, moved=false;
+    function onMove(e){
+      if(!dragging) return;
+      dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if(!decided){
+        if(Math.abs(dx) > 7 || Math.abs(dy) > 7){ decided=true; horizontal = Math.abs(dx) > Math.abs(dy); }
+        else return;
+      }
+      if(!horizontal) return;            // vertical intent: let the page scroll
+      if(e.cancelable) e.preventDefault();
+      if(Math.abs(dx) > 9) moved = true;
+      var pos = -state.page*vpW + dx;
+      var min = -vpW, max = 0;
+      if(pos > max) pos = max + (pos-max)*0.32;
+      if(pos < min) pos = min + (pos-min)*0.32;
+      track.style.transform = 'translateX(' + pos + 'px)';
+    }
+    function onUp(){
+      if(!dragging) return;
+      dragging = false;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      if(horizontal){
+        var th = vpW * 0.2, np = state.page;
+        if(dx < -th && state.page < 1) np = 1;
+        else if(dx > th && state.page > 0) np = 0;
+        setPage(np);
+      } else {
+        track.style.transition = 'transform .3s ease';
+        track.style.transform = 'translateX(-' + (state.page*50) + '%)';
+      }
+      if(moved){ pager._swiped = true; setTimeout(function(){ pager._swiped = false; }, 60); }
+    }
+    track.addEventListener('pointerdown', function(e){
+      if(state.editMode) return;
+      if(e.button !== undefined && e.button !== 0) return;
+      startX=e.clientX; startY=e.clientY; dx=0; dragging=true; decided=false; horizontal=false; moved=false;
+      vpW = pager.clientWidth || 1;
+      track.style.transition = 'none';
+      // listen on window so the swipe keeps working when the finger leaves the phone
+      window.addEventListener('pointermove', onMove, {passive:false});
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
+    // swallow the click that follows a real swipe so it doesn't open an app
+    track.addEventListener('click', function(e){ if(pager._swiped){ e.stopPropagation(); e.preventDefault(); } }, true);
+  }
+
+  // ── iOS edit mode: long-press to jiggle, drag to rearrange ───────────────
+  function wireAppGrid(){
+    var grid = document.getElementById('pb-appgrid');
+    if(!grid) return;
+    function cells(){ return Array.prototype.slice.call(grid.querySelectorAll('.pb-appicon')); }
+
+    var pressTimer=null, sx=0, sy=0;
+    var dragging=false, origin=null, fromIndex=0, curTo=0, slots=[], grabDX=0, grabDY=0;
+
+    function clearPress(){ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } }
+
+    function onDown(e){
+      var cell = e.target.closest && e.target.closest('.pb-appicon');
+      if(!cell) return;
+      if(e.target.closest('.pb-del')) return;
+      sx=e.clientX; sy=e.clientY;
+      if(state.editMode){
+        beginDrag(cell, e);
+      } else {
+        clearPress();
+        pressTimer = setTimeout(function(){
+          pressTimer=null;
+          if(navigator.vibrate){ try{ navigator.vibrate(8); }catch(_){} }
+          PB.enterEdit();
+        }, 450);
+      }
+    }
+    function onMove(e){
+      if(pressTimer && (Math.abs(e.clientX-sx)>8 || Math.abs(e.clientY-sy)>8)) clearPress();
+      if(dragging) duringDrag(e);
+    }
+    function onUp(){ clearPress(); if(dragging) endDrag(); }
+
+    function beginDrag(cell, e){
+      dragging=true; origin=cell;
+      var list=cells(); fromIndex=list.indexOf(cell); curTo=fromIndex;
+      slots = list.map(function(el){ var r=el.getBoundingClientRect(); return {cx:r.left+r.width/2, cy:r.top+r.height/2}; });
+      grabDX = e.clientX - slots[fromIndex].cx;
+      grabDY = e.clientY - slots[fromIndex].cy;
+      origin.style.transition='none'; origin.style.zIndex='60';
+      var jig = origin.querySelector('.pb-jig'); if(jig) jig.style.animation='none';
+      window.addEventListener('pointermove', onMove, {passive:false});
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    }
+    function duringDrag(e){
+      if(e.cancelable) e.preventDefault();
+      var dx=(e.clientX-grabDX)-slots[fromIndex].cx, dy=(e.clientY-grabDY)-slots[fromIndex].cy;
+      origin.style.transform='translate('+dx+'px,'+dy+'px) scale(1.12)';
+      var to=fromIndex, best=1e9;
+      for(var i=0;i<slots.length;i++){ var d=Math.hypot(slots[i].cx-e.clientX, slots[i].cy-e.clientY); if(d<best){ best=d; to=i; } }
+      if(to!==curTo){ curTo=to; layoutShift(); }
+    }
+    function layoutShift(){
+      var list=cells();
+      for(var i=0;i<list.length;i++){
+        if(i===fromIndex) continue;
+        var disp=i;
+        if(fromIndex<curTo){ if(i>fromIndex && i<=curTo) disp=i-1; }
+        else if(fromIndex>curTo){ if(i>=curTo && i<fromIndex) disp=i+1; }
+        list[i].style.transform = (disp===i) ? '' : 'translate('+(slots[disp].cx-slots[i].cx)+'px,'+(slots[disp].cy-slots[i].cy)+'px)';
+      }
+    }
+    function endDrag(){
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      dragging=false;
+      var keys = cells().map(function(el){ return el.getAttribute('data-key'); });
+      var moved = keys.splice(fromIndex,1)[0];
+      keys.splice(curTo,0,moved);
+      state.appOrder = keys;
+      save('pb_apporder', JSON.stringify(keys));
+      origin=null;
+      render();
+    }
+
+    grid.addEventListener('pointerdown', onDown);
+    grid.addEventListener('pointermove', onMove);
+    grid.addEventListener('pointerup', onUp);       // cancels the long-press timer on a quick tap
+    grid.addEventListener('pointercancel', onUp);
+  }
+
+  // ── Easter egg: Konami code → confetti ───────────────────────────────────
+  function confetti(){
+    var colors = ['#ff6a1a','#ff8a3d','#9b4bd6','#5b8cff','#2dd4bf','#ffd34d'];
+    for(var i=0;i<110;i++){
+      var d = document.createElement('div');
+      var sz = 6 + Math.random()*8;
+      d.style.cssText = 'position:fixed;top:-24px;left:'+(Math.random()*100)+'vw;width:'+sz+'px;height:'+(sz*0.5)+'px;background:'+colors[i%colors.length]+';z-index:99999;border-radius:2px;pointer-events:none;';
+      document.body.appendChild(d);
+      var dur = 2200 + Math.random()*1900;
+      (function(node,dur){
+        node.animate(
+          [{transform:'translateY(0) rotate(0deg)',opacity:1},
+           {transform:'translateY('+(window.innerHeight+80)+'px) rotate('+(360+Math.random()*720)+'deg)',opacity:.9}],
+          {duration:dur, easing:'cubic-bezier(.2,.6,.4,1)'});
+        setTimeout(function(){ node.remove(); }, dur);
+      })(d,dur);
+    }
+  }
+  function toast(msg){
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:99999;background:var(--text);color:var(--bg);font-weight:800;font-size:13px;padding:10px 18px;border-radius:999px;box-shadow:0 12px 34px rgba(0,0,0,.35);font-family:Manrope,system-ui,sans-serif;opacity:0;transition:opacity .25s ease, top .25s ease;';
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.style.opacity='1'; t.style.top='72px'; });
+    setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 320); }, 2700);
+  }
+  // iOS-style push notification, rendered INSIDE the phone screen
+  function phoneNotify(msg){
+    var screen = document.getElementById('pb-screen');
+    if(!screen){ toast(msg); return; }
+    var prev = screen.querySelector('.pb-push'); if(prev) prev.remove();
+    var pt = state.lang==='pt';
+    var el = document.createElement('div');
+    el.className = 'pb-push';
+    el.style.cssText = 'position:absolute;top:54px;left:10px;right:10px;z-index:30;display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:20px;background:rgba(250,250,250,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 12px 32px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.55);transform:translateY(-170%);opacity:0;transition:transform .5s cubic-bezier(.2,.9,.3,1.25),opacity .3s ease;font-family:Manrope,system-ui,sans-serif;';
+    el.innerHTML = '<div style="width:38px;height:38px;border-radius:10px;flex:none;overflow:hidden;position:relative;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:13px;">PB</span><img src="assets/portrait.webp" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
+      + '<div style="min-width:0;flex:1;">'
+      +   '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:12px;font-weight:800;color:#111;">Paulo Barroso</span><span style="font-size:11px;color:#666;font-weight:600;flex:none;">'+(pt?'agora':'now')+'</span></div>'
+      +   '<div style="font-size:12.5px;line-height:1.35;color:#1c1c1c;margin-top:1px;">'+esc(msg)+'</div>'
+      + '</div>';
+    screen.appendChild(el);
+    requestAnimationFrame(function(){ el.style.transform='translateY(0)'; el.style.opacity='1'; });
+    setTimeout(function(){ el.style.transform='translateY(-170%)'; el.style.opacity='0'; setTimeout(function(){ el.remove(); }, 520); }, 2900);
+  }
+
+  var KONAMI = ['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','b','a'];
+  var kPos = 0;
+  window.addEventListener('keydown', function(e){
+    var k = (e.key || '').toLowerCase();
+    if(k === KONAMI[kPos]){
+      kPos++;
+      if(kPos === KONAMI.length){ kPos = 0; confetti(); toast(state.lang==='pt' ? '🎉 Você achou o segredo!' : '🎉 You found the secret!'); }
+    } else {
+      kPos = (k === KONAMI[0]) ? 1 : 0;
+    }
+  });
+
+  // exit edit mode: Escape, or tapping empty space inside the phone
+  window.addEventListener('keydown', function(e){ if(e.key==='Escape' && state.editMode){ PB.exitEdit(); } });
+  document.addEventListener('click', function(e){
+    if(!state.editMode) return;
+    var t = e.target;
+    if(t.closest && (t.closest('.pb-appicon') || t.closest('.pb-del'))) return;
+    if(t.closest && t.closest('#pb-pager')) PB.exitEdit();
+  });
+
+  // ── Controller (global, survives re-render via inline handlers) ──────────
+  window.PB = {
+    setEN: function(){ if(state.lang!=='en'){ state.lang='en'; save('pb_lang','en'); render(); } },
+    setPT: function(){ if(state.lang!=='pt'){ state.lang='pt'; save('pb_lang','pt'); render(); } },
+    toggleTheme: function(){
+      state.theme = state.theme==='dark' ? 'light' : 'dark';
+      save('pb_theme', state.theme);
+      document.documentElement.setAttribute('data-theme', state.theme);
+      var btn = document.getElementById('pb-theme-btn');
+      if(btn) btn.textContent = state.theme==='dark' ? '☀' : '☾';
+    },
+    openApp: function(k){ if(state.editMode) return; state.openApp = k; render(); },
+    closeApp: function(){ if(state.openApp){ state.openApp = null; render(); } },
+    toggleJourney: function(i){ state.journeyOpen = (state.journeyOpen===i ? null : i); render(); },
+    goPage: function(i){ setPage(i); },
+    goAbout: function(){ if(state.editMode) return; var el=document.getElementById('about'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },
+    enterEdit: function(){ if(!state.editMode){ state.editMode = true; render(); } },
+    exitEdit: function(ev){ if(ev && ev.stopPropagation) ev.stopPropagation(); if(state.editMode){ state.editMode = false; render(); } },
+    tryDelete: function(key, ev){
+      if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+      var pt = state.lang==='pt';
+      var msgs = pt
+        ? ['🙅 Você não apaga a minha história!', '🚀 Esse foi publicado na App Store. Fica.', '😄 Boa tentativa! Esse aqui eu não deleto.', '❤️ Apagar anos de trabalho? Jamais.']
+        : ["🙅 You can't delete my story!", '🚀 That one shipped to the App Store. It stays.', '😄 Nice try! This app is here to stay.', '❤️ Erase years of work? Never.'];
+      phoneNotify(msgs[Math.floor(Math.random()*msgs.length)]);
+      var cell = document.querySelector('.pb-appicon[data-key="'+key+'"]');
+      if(cell){ cell.classList.remove('pb-deny'); void cell.offsetWidth; cell.classList.add('pb-deny'); }
+    },
+    poke: function(ev){
+      if(ev && ev.stopPropagation) ev.stopPropagation();
+      var notch = ev && ev.currentTarget, frame = notch && notch.parentElement;
+      if(!frame || frame.querySelector('.pb-island')) return;
+      var el = document.createElement('div');
+      el.className = 'pb-island';
+      el.textContent = state.lang==='pt' ? '🎧 codando • jazz' : '🎧 coding • jazz';
+      el.style.cssText = 'position:absolute;top:18px;left:50%;transform:translateX(-50%) scale(.85);background:#0b0b0d;color:#fff;font-size:12px;font-weight:700;padding:9px 16px;border-radius:999px;z-index:8;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.55);font-family:Manrope,system-ui,sans-serif;opacity:0;transition:opacity .25s ease, transform .4s cubic-bezier(.22,1,.36,1);';
+      frame.appendChild(el);
+      requestAnimationFrame(function(){ el.style.opacity='1'; el.style.transform='translateX(-50%) scale(1)'; });
+      setTimeout(function(){ el.style.opacity='0'; el.style.transform='translateX(-50%) scale(.85)'; setTimeout(function(){ el.remove(); }, 320); }, 2400);
+    }
+  };
+
+  document.documentElement.setAttribute('data-theme', state.theme);
+  render();
+  setInterval(tickClock, 15000);
+})();
+</script>
+</body>
+</html>
