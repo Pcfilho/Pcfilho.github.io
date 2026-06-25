@@ -14,6 +14,9 @@
   var host, canvas, ctx, caption, dpr = 1;
   var W = 0, H = 0, env = null;
   var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
+  var played = readLS('pb_dog_played', '') === '1';
+  var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hintT = 0;
   var running = false, visible = true, lastTs = 0;
   var dog = null, ball = null, thrown = false;
   var aiming = false, aimPtr = null, aimStart = null, aimCur = null;
@@ -81,6 +84,7 @@
     if (!dog) resetIdle();
     if (dog.state === 'idle') {
       ball.x = env.homeX; ball.y = env.groundY - env.radius; ball.resting = true;
+      if (!reduceMotion) hintT += dt;
       return;
     }
     if (dog.state === 'chasing') ball = Core.stepBall(ball, dt, env);
@@ -117,6 +121,7 @@
     drawDogMock();
     drawBallMock();
     drawAim();
+    drawHint();
   }
 
   function drawBallMock() {
@@ -199,7 +204,28 @@
     aimStart = aimCur = null;
     if (v.power > 0) { var r = Core.startThrow(dog, ball, v); dog = r.dog; ball = r.ball; thrown = true; markPlayed(); }
   }
-  function markPlayed() {} // overridden in Task 6
+  function markPlayed() {
+    if (played) return;
+    played = true;
+    try { localStorage.setItem('pb_dog_played', '1'); } catch (e) {}
+  }
+
+  function hintText() {
+    return lang === 'pt' ? 'puxe e solte a bolinha' : 'drag & release the ball';
+  }
+  function drawHint() {
+    if (played || !ball || dog.state !== 'idle') return;
+    var pulse = reduceMotion ? 1 : (0.6 + 0.4 * Math.abs(Math.sin(hintT * 2)));
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(ball.x, ball.y, env.radius + 8 + (reduceMotion ? 0 : pulse * 4), 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(255,255,255,.92)';
+    ctx.font = '600 13px Manrope, system-ui, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(hintText(), ball.x, ball.y - env.radius - 16);
+    ctx.restore();
+  }
 
   function mount() {
     host = document.getElementById('pb-beach');

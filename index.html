@@ -589,6 +589,7 @@
     document.getElementById('app').innerHTML = html;
     tickClock();
     if(!state.openApp){ wirePager(); wireAppGrid(); }
+    if (window.DogGame) { window.DogGame.setLang(state.lang); window.DogGame.setTheme(state.theme); }
   }
 
   // ── Live status-bar clock ────────────────────────────────────────────────
@@ -824,6 +825,7 @@
       state.theme = state.theme==='dark' ? 'light' : 'dark';
       save('pb_theme', state.theme);
       document.documentElement.setAttribute('data-theme', state.theme);
+      if (window.DogGame) window.DogGame.setTheme(state.theme);
       var btn = document.getElementById('pb-theme-btn');
       if(btn) btn.textContent = state.theme==='dark' ? '☀' : '☾';
     },
