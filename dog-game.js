@@ -15,6 +15,7 @@
   var W = 0, H = 0, env = null;
   var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
   var running = false, visible = true, lastTs = 0;
+  var dog = null, ball = null, thrown = false;
 
   function readLS(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
 
@@ -50,7 +51,17 @@
     onResize(); // hook for later tasks
   }
 
-  function onResize() {} // overridden in later tasks
+  function resetIdle() {
+    dog = Core.createDog(env);
+    ball = { x: env.homeX, y: env.groundY - env.radius, vx: 0, vy: 0, angle: 0, resting: true };
+    thrown = false;
+  }
+
+  function onResize() {
+    if (!dog) { resetIdle(); return; }
+    // keep dog/ball in bounds after a resize
+    if (dog.state === 'idle') resetIdle();
+  }
 
   function drawBackground() {
     var t = THEME[theme] || THEME.light;
@@ -65,7 +76,17 @@
     ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
   }
 
-  function update(dt) {} // overridden in later tasks
+  function update(dt) {
+    if (!dog) resetIdle();
+    if (dog.state === 'idle') {
+      ball.x = env.homeX; ball.y = env.groundY - env.radius; ball.resting = true;
+      return;
+    }
+    if (dog.state === 'chasing') ball = Core.stepBall(ball, dt, env);
+    var r = Core.stepDog(dog, ball, env, dt);
+    dog = r.dog; ball = r.ball;
+    if (r.events.indexOf('dropped') >= 0) thrown = false;
+  }
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
@@ -73,7 +94,50 @@
     drawScene(); // hook for later tasks
   }
 
-  function drawScene() {} // overridden in later tasks
+  function drawScene() {
+    if (!ball || !dog) return;
+    drawDogMock();
+    drawBallMock();
+  }
+
+  function drawBallMock() {
+    var r = env.radius;
+    ctx.save();
+    ctx.translate(ball.x, ball.y);
+    ctx.rotate(ball.angle || 0);
+    ctx.fillStyle = '#b6e034';
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = Math.max(1, r * 0.18);
+    ctx.beginPath(); ctx.arc(-r * 0.2, 0, r * 1.1, -0.9, 0.9); ctx.stroke();
+    ctx.beginPath(); ctx.arc(r * 1.2, 0, r * 1.1, Math.PI - 0.9, Math.PI + 0.9); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawDogMock() {
+    var s = env.mouthHeight;            // body scale ~ mouth height
+    var bx = dog.x, by = env.groundY;   // feet on the ground
+    var run = (dog.state === 'chasing' || dog.state === 'returning');
+    var phase = run ? Math.sin(Date.now() / 70) : 0; // mock leg/body bob
+    ctx.save();
+    ctx.translate(bx, by);
+    ctx.scale(dog.dir, 1);              // face direction
+    // legs
+    ctx.strokeStyle = '#8a5a2b'; ctx.lineWidth = s * 0.12; ctx.lineCap = 'round';
+    [-0.5, -0.2, 0.2, 0.5].forEach(function (o, i) {
+      var swing = run ? Math.sin(Date.now() / 70 + i) * s * 0.18 : 0;
+      ctx.beginPath(); ctx.moveTo(o * s, -s * 0.55); ctx.lineTo(o * s + swing, 0); ctx.stroke();
+    });
+    // body
+    ctx.fillStyle = '#a9712f';
+    ctx.beginPath(); ctx.ellipse(0, -s * 0.7 + phase * 2, s * 0.7, s * 0.42, 0, 0, Math.PI * 2); ctx.fill();
+    // head
+    ctx.beginPath(); ctx.ellipse(s * 0.62, -s * 0.95, s * 0.32, s * 0.30, 0, 0, Math.PI * 2); ctx.fill();
+    // ear + tail
+    ctx.fillStyle = '#8a5a2b';
+    ctx.beginPath(); ctx.ellipse(s * 0.5, -s * 1.1, s * 0.12, s * 0.22, 0.3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-s * 0.72, -s * 0.95, s * 0.1, s * 0.22, -0.6, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
 
   function loop(ts) {
     if (!running) return;
@@ -121,6 +185,12 @@
   window.DogGame = {
     setLang: function (l) { lang = l; updateCaption(); },
     setTheme: function (th) { theme = th; updateCaption(); }
+  };
+
+  window.DogGame._debugThrow = function (vx, vy) {
+    if (!dog || dog.state !== 'idle') return;
+    var r = Core.startThrow(dog, ball, { vx: vx, vy: vy });
+    dog = r.dog; ball = r.ball; thrown = true;
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
