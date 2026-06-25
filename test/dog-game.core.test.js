@@ -110,6 +110,21 @@ test('stepDog: dropping ends idle with the ball resting at home', () => {
   assert.ok(r.events.includes('dropped'));
 });
 
+test('stepDog: on the returning->dropping transition frame, ball.carried is not true', () => {
+  // Dog is one step away from homeX=200; dt large enough to arrive this frame.
+  const dt = 0.1;
+  const speed = C.DEFAULTS.runSpeed; // 540 px/s
+  // Place dog just close enough that one step overshoots home (200 - 540*0.1 = 146, so start at 210 to approach from right)
+  // Actually: dog at homeX + 1 px, dir=-1 won't work since it's already within reachDist.
+  // Use a dog approaching from the right, just outside reachDist.
+  const startX = ENV.homeX + C.DEFAULTS.reachDist + 1; // 225, just beyond reach
+  const dog = { state: 'returning', x: startX, dir: -1, timer: 0 };
+  const ball = { x: startX, y: ENV.groundY - ENV.mouthHeight, vx: 0, vy: 0, angle: 0, resting: false, carried: true };
+  const r = C.stepDog(dog, ball, ENV, dt);
+  assert.strictEqual(r.dog.state, 'dropping', 'dog should be dropping');
+  assert.notStrictEqual(r.ball.carried, true, 'ball.carried must not be true when dog is dropping');
+});
+
 test('integration: a throw resolves back to idle within a few seconds', () => {
   let { dog, ball } = C.startThrow(C.createDog(ENV), { x: 200, y: 290, angle: 0 }, { vx: 700, vy: -500 });
   const dt = 1 / 60;

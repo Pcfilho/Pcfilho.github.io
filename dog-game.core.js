@@ -81,7 +81,7 @@
       d.x += d.dir * cfg.runSpeed * dt;
       if ((d.dir === 1 && d.x >= env.homeX) || (d.dir === -1 && d.x <= env.homeX)) d.x = env.homeX;
       b = { x: d.x, y: env.groundY - env.mouthHeight, vx: 0, vy: 0, angle: ball.angle || 0, resting: false, carried: true };
-      if (Math.abs(d.x - env.homeX) <= cfg.reachDist) { d.x = env.homeX; d.state = 'dropping'; d.timer = 0; events.push('home'); }
+      if (Math.abs(d.x - env.homeX) <= cfg.reachDist) { d.x = env.homeX; d.state = 'dropping'; d.timer = 0; events.push('home'); b.carried = false; }
     } else if (d.state === 'dropping') {
       d.timer += dt;
       b = { x: env.homeX, y: env.groundY - env.radius, vx: 0, vy: 0, angle: ball.angle || 0, resting: true, carried: false };
