@@ -1052,8 +1052,8 @@ On a real iPhone (Safari), open the deployed/preview URL, scroll the page throug
 
 - [ ] **Step 4: Run the unit suite once more**
 
-Run: `node --test test/`
-Expected: PASS, 16 tests.
+Run: `node --test` (auto-discovery; `node --test test/` mis-handles the directory arg on Node 22, use the no-arg form or `node --test 'test/*.test.js'`)
+Expected: PASS, 18 tests.
 
 - [ ] **Step 5: Commit any fixes**
 
