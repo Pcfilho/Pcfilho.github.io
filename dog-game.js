@@ -12,14 +12,13 @@
             pickup: { row: 2, frames: 3, fps: 12 }, returning: { row: 3, frames: 6, fps: 12 } },
     mouth: { x: 196, y: 150 } // mouth anchor within a 256x256 cell (where the ball sits)
   };
-  var img = { dog: null, ball: null, ready: false };
+  var img = { dog: null, ball: null };
 
   function loadSprites() {
     if (!USE_SPRITE) return;
-    var d = new Image(), b = new Image(), n = 0;
-    function done() { if (++n === 2) img.ready = true; }
-    d.onload = function () { img.dog = d; done(); };
-    b.onload = function () { img.ball = b; done(); };
+    var d = new Image(), b = new Image();
+    d.onload = function () { img.dog = d; };
+    b.onload = function () { img.ball = b; };
     d.onerror = function () { img.dog = null; }; // fall back to mock
     b.onerror = function () { img.ball = null; };
     d.src = 'assets/beach/dog.png'; b.src = 'assets/beach/ball.png';
@@ -38,7 +37,7 @@
   var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hintT = 0;
   var running = false, visible = true, lastTs = 0;
-  var dog = null, ball = null, thrown = false;
+  var dog = null, ball = null;
   var aiming = false, aimPtr = null, aimStart = null, aimCur = null;
 
   function readLS(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
@@ -78,7 +77,6 @@
   function resetIdle() {
     dog = Core.createDog(env);
     ball = { x: env.homeX, y: env.groundY - env.radius, vx: 0, vy: 0, angle: 0, resting: true };
-    thrown = false;
   }
 
   function onResize() {
@@ -110,7 +108,6 @@
     if (dog.state === 'chasing') ball = Core.stepBall(ball, dt, env);
     var r = Core.stepDog(dog, ball, env, dt);
     dog = r.dog; ball = r.ball;
-    if (r.events.indexOf('dropped') >= 0) thrown = false;
   }
 
   function draw() {
@@ -196,14 +193,15 @@
     var s = env.mouthHeight;            // body scale ~ mouth height
     var bx = dog.x, by = env.groundY;   // feet on the ground
     var run = (dog.state === 'chasing' || dog.state === 'returning');
-    var phase = run ? Math.sin(Date.now() / 70) : 0; // mock leg/body bob
+    var now = Date.now();
+    var phase = run ? Math.sin(now / 70) : 0; // mock leg/body bob
     ctx.save();
     ctx.translate(bx, by);
     ctx.scale(dog.dir, 1);              // face direction
     // legs
     ctx.strokeStyle = '#8a5a2b'; ctx.lineWidth = s * 0.12; ctx.lineCap = 'round';
     [-0.5, -0.2, 0.2, 0.5].forEach(function (o, i) {
-      var swing = run ? Math.sin(Date.now() / 70 + i) * s * 0.18 : 0;
+      var swing = run ? Math.sin(now / 70 + i) * s * 0.18 : 0;
       ctx.beginPath(); ctx.moveTo(o * s, -s * 0.55); ctx.lineTo(o * s + swing, 0); ctx.stroke();
     });
     // body
@@ -257,7 +255,7 @@
     var pullX = aimCur.x - aimStart.x, pullY = aimCur.y - aimStart.y;
     var v = Core.launchVelocity(pullX, pullY);
     aimStart = aimCur = null;
-    if (v.power > 0) { var r = Core.startThrow(dog, ball, v); dog = r.dog; ball = r.ball; thrown = true; markPlayed(); }
+    if (v.power > 0) { var r = Core.startThrow(dog, ball, v); dog = r.dog; ball = r.ball; markPlayed(); }
   }
   function markPlayed() {
     if (played) return;
@@ -328,7 +326,7 @@
   window.DogGame._debugThrow = function (vx, vy) {
     if (!dog || dog.state !== 'idle') return;
     var r = Core.startThrow(dog, ball, { vx: vx, vy: vy });
-    dog = r.dog; ball = r.ball; thrown = true;
+    dog = r.dog; ball = r.ball;
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);

@@ -27,3 +27,7 @@ sprite sheet on a 256x256 grid: row 1 idle breathing (4 frames), row 2 running
 cycle (6 frames), row 3 lowering head to grab a ball (3 frames), row 4 running
 while carrying a green tennis ball in the mouth (6 frames). Even spacing, each
 pose centered in its cell, feet on the cell baseline."
+
+Note: the prompt uses 1-indexed rows (row 1 = topmost row of the sheet).
+The code uses 0-indexed rows: idle row 0, run row 1, pickup row 2, carry row 3.
+They map 1-to-1: prompt row 1 = code row 0, prompt row 4 = code row 3.
