@@ -60,3 +60,66 @@ test('stepBall: a resting ball stays put', () => {
   assert.strictEqual(b.x, 200);
   assert.strictEqual(b.angle, 1.2);
 });
+
+test('createDog: idle at home', () => {
+  const d = C.createDog(ENV);
+  assert.strictEqual(d.state, 'idle');
+  assert.strictEqual(d.x, ENV.homeX);
+});
+
+test('startThrow: dog chases, ball gets velocity', () => {
+  const r = C.startThrow(C.createDog(ENV), { x: 200, y: 290, angle: 0 }, { vx: 300, vy: -200 });
+  assert.strictEqual(r.dog.state, 'chasing');
+  assert.strictEqual(r.ball.vx, 300);
+  assert.strictEqual(r.ball.resting, false);
+});
+
+test('stepDog: chasing runs toward the ball', () => {
+  const dog = { state: 'chasing', x: 200, dir: 1, timer: 0 };
+  const r = C.stepDog(dog, { x: 380, y: 290, resting: true }, ENV, 0.1);
+  assert.ok(r.dog.x > 200, 'moved right');
+  assert.strictEqual(r.dog.dir, 1);
+});
+
+test('stepDog: reaching a resting ball triggers pickup', () => {
+  const dog = { state: 'chasing', x: 378, dir: 1, timer: 0 };
+  const r = C.stepDog(dog, { x: 380, y: 290, resting: true }, ENV, 0.016);
+  assert.strictEqual(r.dog.state, 'pickup');
+  assert.ok(r.events.includes('reached'));
+});
+
+test('stepDog: pickup completes into returning', () => {
+  const r = C.stepDog({ state: 'pickup', x: 380, dir: 1, timer: 0 }, { x: 380, y: 290 }, ENV, 0.4);
+  assert.strictEqual(r.dog.state, 'returning');
+  assert.ok(r.events.includes('grabbed'));
+});
+
+test('stepDog: returning carries the ball at the mouth toward home', () => {
+  const r = C.stepDog({ state: 'returning', x: 380, dir: -1, timer: 0 }, { x: 380, y: 290 }, ENV, 0.05);
+  assert.ok(r.dog.x < 380, 'moved toward home');
+  assert.strictEqual(r.ball.carried, true);
+  assert.strictEqual(r.ball.x, r.dog.x);
+  assert.strictEqual(r.ball.y, ENV.groundY - ENV.mouthHeight);
+});
+
+test('stepDog: dropping ends idle with the ball resting at home', () => {
+  const r = C.stepDog({ state: 'dropping', x: 200, dir: -1, timer: 0 }, { x: 200, y: 240 }, ENV, 0.3);
+  assert.strictEqual(r.dog.state, 'idle');
+  assert.strictEqual(r.ball.resting, true);
+  assert.strictEqual(r.ball.x, ENV.homeX);
+  assert.ok(r.events.includes('dropped'));
+});
+
+test('integration: a throw resolves back to idle within a few seconds', () => {
+  let { dog, ball } = C.startThrow(C.createDog(ENV), { x: 200, y: 290, angle: 0 }, { vx: 700, vy: -500 });
+  const dt = 1 / 60;
+  let idle = false;
+  for (let i = 0; i < 60 * 8; i++) {
+    if (dog.state === 'chasing') ball = C.stepBall(ball, dt, ENV);
+    const r = C.stepDog(dog, ball, ENV, dt);
+    dog = r.dog; ball = r.ball;
+    if (dog.state === 'idle' && r.events.includes('dropped')) { idle = true; break; }
+  }
+  assert.strictEqual(idle, true, 'returned to idle');
+  assert.strictEqual(Math.round(ball.x), ENV.homeX);
+});

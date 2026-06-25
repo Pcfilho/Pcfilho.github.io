@@ -51,8 +51,48 @@
     return b;
   }
 
+  function createDog(env) { return { state: 'idle', x: env.homeX, dir: 1, timer: 0 }; }
+
+  function startThrow(dog, ball, vel) {
+    return {
+      dog: { state: 'chasing', x: dog.x, dir: vel.vx >= 0 ? 1 : -1, timer: 0 },
+      ball: { x: ball.x, y: ball.y, vx: vel.vx, vy: vel.vy, angle: ball.angle || 0, resting: false }
+    };
+  }
+
+  function stepDog(dog, ball, env, dt, cfg) {
+    cfg = cfg || DEFAULTS;
+    var d = { state: dog.state, x: dog.x, dir: dog.dir, timer: dog.timer || 0 };
+    var b = ball, events = [];
+    if (d.state === 'chasing') {
+      var t = ball.x;
+      d.dir = t >= d.x ? 1 : -1;
+      d.x += d.dir * cfg.runSpeed * dt;
+      if ((d.dir === 1 && d.x >= t) || (d.dir === -1 && d.x <= t)) d.x = t;
+      if (Math.abs(d.x - t) <= cfg.reachDist) {
+        d.x = t;
+        if (ball.resting) { d.state = 'pickup'; d.timer = 0; events.push('reached'); }
+      }
+    } else if (d.state === 'pickup') {
+      d.timer += dt;
+      if (d.timer >= cfg.pickupTime) { d.state = 'returning'; d.timer = 0; events.push('grabbed'); }
+    } else if (d.state === 'returning') {
+      d.dir = env.homeX >= d.x ? 1 : -1;
+      d.x += d.dir * cfg.runSpeed * dt;
+      if ((d.dir === 1 && d.x >= env.homeX) || (d.dir === -1 && d.x <= env.homeX)) d.x = env.homeX;
+      b = { x: d.x, y: env.groundY - env.mouthHeight, vx: 0, vy: 0, angle: ball.angle || 0, resting: false, carried: true };
+      if (Math.abs(d.x - env.homeX) <= cfg.reachDist) { d.x = env.homeX; d.state = 'dropping'; d.timer = 0; events.push('home'); }
+    } else if (d.state === 'dropping') {
+      d.timer += dt;
+      b = { x: env.homeX, y: env.groundY - env.radius, vx: 0, vy: 0, angle: ball.angle || 0, resting: true, carried: false };
+      if (d.timer >= cfg.dropTime) { d.state = 'idle'; d.timer = 0; events.push('dropped'); }
+    }
+    return { dog: d, ball: b, events: events };
+  }
+
   return {
     DEFAULTS: DEFAULTS, clamp: clamp, len: len,
-    launchVelocity: launchVelocity, stepBall: stepBall
+    launchVelocity: launchVelocity, stepBall: stepBall,
+    createDog: createDog, startThrow: startThrow, stepDog: stepDog
   };
 });
