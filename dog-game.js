@@ -8,14 +8,15 @@
   var USE_SPRITE = true; // individual transparent PNG frames in assets/beach/ (else procedural mock)
   var SPRITES = {
     feet: 0.86,    // feet line within each 1024x1024 frame (fraction from top)
-    hRatio: 0.78,  // dog draw size (square) as a fraction of the band height
+    hRatio: 0.58,  // dog draw size (square) as a fraction of the band height
+    mouthDX: 0.27, // snout offset from the dog's center, fraction of draw size (so it grabs with the mouth)
     ballScale: 1.5, // ball.png size relative to physics diameter
     states: {
       idle:      { files: ['dog-idle-1', 'dog-idle-2'], fps: 2.5 },
       waiting:   { files: ['dog-alert-1'], fps: 1 },
-      chasing:   { files: ['dog-run-1', 'dog-run-2', 'dog-run-3', 'dog-run-4'], fps: 11 },
-      pickup:    { files: ['dog-pickup-1', 'dog-pickup-2'], fps: 7 },
-      returning: { files: ['dog-carry-1', 'dog-carry-2', 'dog-carry-3', 'dog-carry-4'], fps: 11 },
+      chasing:   { files: ['dog-run-1', 'dog-run-2', 'dog-run-3', 'dog-run-4'], fps: 8 },
+      pickup:    { files: ['dog-pickup-1', 'dog-pickup-2'], fps: 6 },
+      returning: { files: ['dog-carry-1', 'dog-carry-2', 'dog-carry-3', 'dog-carry-4'], fps: 8 },
       dropping:  { files: ['dog-pickup-2', 'dog-idle-1'], fps: 6 }
     }
   };
@@ -69,7 +70,8 @@
       leftBound: W * LAYOUT.sideInset,
       rightBound: W * (1 - LAYOUT.sideInset),
       radius: Math.max(9, H * LAYOUT.radiusRatio),
-      mouthHeight: H * LAYOUT.mouthRatio
+      mouthHeight: H * LAYOUT.mouthRatio,
+      mouthDX: H * SPRITES.hRatio * SPRITES.mouthDX // horizontal snout reach, so the dog stops with its mouth on the ball
     };
   }
 

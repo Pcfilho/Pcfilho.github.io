@@ -5,15 +5,15 @@
   'use strict';
 
   var DEFAULTS = {
-    gravity: 2600,        // px/s^2
-    restitution: 0.70,    // vertical energy kept per bounce (bouncier: higher, more bounces)
-    groundFriction: 0.88, // horizontal kept on each ground/wall contact (keeps speed -> goes farther)
-    rollDecay: 1.7,       // 1/s horizontal velocity decay while rolling (rolls farther)
+    gravity: 2200,        // px/s^2 (a touch floatier so the ball hangs and flies)
+    restitution: 0.80,    // vertical energy kept per bounce (very bouncy: high, many bounces)
+    groundFriction: 0.90, // horizontal kept on each ground/wall contact (keeps speed -> goes farther)
+    rollDecay: 1.4,       // 1/s horizontal velocity decay while rolling (rolls farther)
     restSpeed: 14,        // px/s; below this on the ground => rest (keeps bouncing a bit longer)
-    powerScale: 7.6,      // pull(px) -> launch speed (launches farther/higher)
-    maxPower: 1950,       // px/s cap (allows bigger throws)
+    powerScale: 8.5,      // pull(px) -> launch speed (launches farther/higher)
+    maxPower: 2500,       // px/s cap (allows big, flying throws)
     minPower: 130,        // px/s; below this, no throw
-    runSpeed: 540,        // dog px/s
+    runSpeed: 450,        // dog px/s (smoother, less frantic)
     reachDist: 24,        // px to count as "reached"
     chaseDelay: 0.28,     // s the dog waits after launch before chasing
     pickupTime: 0.30,     // s
@@ -74,8 +74,8 @@
       d.timer += dt; // dog holds at home, watching the ball fly, before giving chase
       if (d.timer >= cfg.chaseDelay) { d.state = 'chasing'; d.timer = 0; events.push('chase'); }
     } else if (d.state === 'chasing') {
-      var t = ball.x;
-      d.dir = t >= d.x ? 1 : -1;
+      d.dir = ball.x >= d.x ? 1 : -1;
+      var t = ball.x - d.dir * (env.mouthDX || 0); // stop so the snout meets the ball, not the body center
       d.x += d.dir * cfg.runSpeed * dt;
       if ((d.dir === 1 && d.x >= t) || (d.dir === -1 && d.x <= t)) d.x = t;
       if (Math.abs(d.x - t) <= cfg.reachDist) {

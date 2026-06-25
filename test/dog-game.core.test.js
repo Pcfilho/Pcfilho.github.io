@@ -120,6 +120,15 @@ test('stepDog: returning carries the ball at the mouth toward home', () => {
   assert.strictEqual(r.ball.y, ENV.groundY - ENV.mouthHeight);
 });
 
+test('stepDog: stops a snout-width short so it grabs with the mouth (mouthDX)', () => {
+  const env = Object.assign({}, ENV, { mouthDX: 30 });
+  let dog = { state: 'chasing', x: 100, dir: 1, timer: 0 };
+  const ball = { x: 300, y: 290, resting: true };
+  for (let i = 0; i < 600 && dog.state === 'chasing'; i++) dog = C.stepDog(dog, ball, env, 1 / 60).dog;
+  assert.strictEqual(dog.state, 'pickup');
+  assert.ok(Math.abs(dog.x - (300 - 30)) < 1, 'dog center stops mouthDX left of the resting ball');
+});
+
 test('stepDog: dropping ends idle with the ball resting at home', () => {
   const r = C.stepDog({ state: 'dropping', x: 200, dir: -1, timer: 0 }, { x: 200, y: 240 }, ENV, 0.3);
   assert.strictEqual(r.dog.state, 'idle');
