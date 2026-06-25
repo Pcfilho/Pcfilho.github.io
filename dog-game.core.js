@@ -74,13 +74,14 @@
       d.timer += dt; // dog holds at home, watching the ball fly, before giving chase
       if (d.timer >= cfg.chaseDelay) { d.state = 'chasing'; d.timer = 0; events.push('chase'); }
     } else if (d.state === 'chasing') {
-      d.dir = ball.x >= d.x ? 1 : -1;
-      var t = ball.x - d.dir * (env.mouthDX || 0); // stop so the snout meets the ball, not the body center
+      d.dir = ball.x >= d.x ? 1 : -1; // always face/move toward the ball (no moonwalk on a wall-bounce)
+      // While the ball is moving, just track it. Only when it rests, aim a snout-width
+      // short so the dog grabs with its mouth instead of standing on the ball.
+      var t = ball.resting ? ball.x - d.dir * (env.mouthDX || 0) : ball.x;
       d.x += d.dir * cfg.runSpeed * dt;
       if ((d.dir === 1 && d.x >= t) || (d.dir === -1 && d.x <= t)) d.x = t;
-      if (Math.abs(d.x - t) <= cfg.reachDist) {
-        d.x = t;
-        if (ball.resting) { d.state = 'pickup'; d.timer = 0; events.push('reached'); }
+      if (ball.resting && Math.abs(d.x - t) <= cfg.reachDist) {
+        d.x = t; d.state = 'pickup'; d.timer = 0; events.push('reached');
       }
     } else if (d.state === 'pickup') {
       d.timer += dt;

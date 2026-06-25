@@ -120,6 +120,15 @@ test('stepDog: returning carries the ball at the mouth toward home', () => {
   assert.strictEqual(r.ball.y, ENV.groundY - ENV.mouthHeight);
 });
 
+test('stepDog: a moving ball near the dog never makes it run backward (no mouthDX while moving)', () => {
+  const env = Object.assign({}, ENV, { mouthDX: 30 });
+  // Ball just to the right of the dog and still moving (not resting): dog must move toward it.
+  const r = C.stepDog({ state: 'chasing', x: 200, dir: 1, timer: 0 }, { x: 205, y: 290, resting: false }, env, 1 / 60);
+  assert.strictEqual(r.dog.dir, 1, 'faces the ball');
+  assert.ok(r.dog.x > 200, 'moves toward the ball, not backward away from it');
+  assert.strictEqual(r.dog.state, 'chasing', 'does not pick up a moving ball');
+});
+
 test('stepDog: stops a snout-width short so it grabs with the mouth (mouthDX)', () => {
   const env = Object.assign({}, ENV, { mouthDX: 30 });
   let dog = { state: 'chasing', x: 100, dir: 1, timer: 0 };
