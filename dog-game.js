@@ -5,23 +5,36 @@
   if (!Core) { console.warn('[dog-game] core missing'); return; }
   var CFG = Core.DEFAULTS;
 
-  var USE_SPRITE = false; // flip to true once assets/beach/dog.png + ball.png exist
+  var USE_SPRITE = true; // individual transparent PNG frames in assets/beach/ (else procedural mock)
   var SPRITES = {
-    cell: 256,
-    rows: { idle: { row: 0, frames: 4, fps: 6 }, chasing: { row: 1, frames: 6, fps: 12 },
-            pickup: { row: 2, frames: 3, fps: 12 }, returning: { row: 3, frames: 6, fps: 12 } },
-    mouth: { x: 196, y: 150 } // mouth anchor within a 256x256 cell (where the ball sits)
+    feet: 0.86,    // feet line within each 1024x1024 frame (fraction from top)
+    hRatio: 0.78,  // dog draw size (square) as a fraction of the band height
+    ballScale: 1.5, // ball.png size relative to physics diameter
+    states: {
+      idle:      { files: ['dog-idle-1', 'dog-idle-2'], fps: 2.5 },
+      waiting:   { files: ['dog-alert-1'], fps: 1 },
+      chasing:   { files: ['dog-run-1', 'dog-run-2', 'dog-run-3', 'dog-run-4'], fps: 11 },
+      pickup:    { files: ['dog-pickup-1', 'dog-pickup-2'], fps: 7 },
+      returning: { files: ['dog-carry-1', 'dog-carry-2', 'dog-carry-3', 'dog-carry-4'], fps: 11 },
+      dropping:  { files: ['dog-pickup-2', 'dog-idle-1'], fps: 6 }
+    }
   };
-  var img = { dog: null, ball: null };
+  var cache = {}, ballImg = null; // fileName -> Image; ballImg for ball.png
 
   function loadSprites() {
     if (!USE_SPRITE) return;
-    var d = new Image(), b = new Image();
-    d.onload = function () { img.dog = d; };
-    b.onload = function () { img.ball = b; };
-    d.onerror = function () { img.dog = null; }; // fall back to mock
-    b.onerror = function () { img.ball = null; };
-    d.src = 'assets/beach/dog.png'; b.src = 'assets/beach/ball.png';
+    var names = {};
+    for (var k in SPRITES.states) SPRITES.states[k].files.forEach(function (f) { names[f] = 1; });
+    Object.keys(names).forEach(function (f) {
+      var im = new Image();
+      im.onload = function () { cache[f] = im; };
+      im.onerror = function () { cache[f] = null; }; // missing frame -> mock fallback for that state
+      im.src = 'assets/beach/' + f + '.png';
+    });
+    var b = new Image();
+    b.onload = function () { ballImg = b; };
+    b.onerror = function () { ballImg = null; };
+    b.src = 'assets/beach/ball.png';
   }
 
   var LAYOUT = { heightVH: 0.38, minH: 280, maxH: 420, groundRatio: 0.74, radiusRatio: 0.045, sideInset: 0.05, mouthRatio: 0.16 };
@@ -133,23 +146,21 @@
     ctx.restore();
   }
 
-  function frameOf(stateKey) {
-    var r = SPRITES.rows[stateKey] || SPRITES.rows.idle;
-    var i = Math.floor((Date.now() / 1000) * r.fps) % r.frames;
-    return { sx: i * SPRITES.cell, sy: r.row * SPRITES.cell, n: SPRITES.cell };
+  function spriteFor(stateKey) {
+    var s = SPRITES.states[stateKey] || SPRITES.states.idle;
+    var i = Math.floor((Date.now() / 1000) * s.fps) % s.files.length;
+    return cache[s.files[i]] || null; // null while loading or on error -> mock fallback
   }
 
   function drawDog() {
-    if (USE_SPRITE && img.dog) {
-      var stateKey = (dog.state === 'pickup') ? 'pickup'
-        : (dog.state === 'returning') ? 'returning'
-        : (dog.state === 'chasing') ? 'chasing' : 'idle';
-      var f = frameOf(stateKey);
-      var size = env.mouthHeight * 2.6;
+    var key = SPRITES.states[dog.state] ? dog.state : 'idle';
+    var im = USE_SPRITE ? spriteFor(key) : null;
+    if (im) {
+      var S = H * SPRITES.hRatio;
       ctx.save();
-      ctx.translate(dog.x, env.groundY - size * 0.5);
+      ctx.translate(dog.x, env.groundY - SPRITES.feet * S); // image top; feet land on groundY
       ctx.scale(dog.dir, 1);
-      ctx.drawImage(img.dog, f.sx, f.sy, f.n, f.n, -size / 2, -size / 2, size, size);
+      ctx.drawImage(im, -S / 2, 0, S, S);
       ctx.restore();
     } else {
       drawDogMock();
@@ -157,11 +168,12 @@
   }
 
   function drawBall() {
-    if (USE_SPRITE && img.ball) {
-      var d = env.radius * 2;
+    if (USE_SPRITE && ballImg) {
+      if (ball.carried) return; // the carry frames already hold the ball in the mouth
+      var d = env.radius * 2 * SPRITES.ballScale;
       ctx.save();
       ctx.translate(ball.x, ball.y); ctx.rotate(ball.angle || 0);
-      ctx.drawImage(img.ball, -env.radius, -env.radius, d, d);
+      ctx.drawImage(ballImg, -d / 2, -d / 2, d, d);
       ctx.restore();
     } else {
       drawBallMock();
