@@ -6,15 +6,16 @@
 
   var DEFAULTS = {
     gravity: 2600,        // px/s^2
-    restitution: 0.52,    // vertical energy kept per bounce
-    groundFriction: 0.80, // horizontal kept on each ground contact
-    rollDecay: 2.6,       // 1/s horizontal velocity decay while rolling
-    restSpeed: 22,        // px/s; below this on the ground => rest
-    powerScale: 6.5,      // pull(px) -> launch speed
-    maxPower: 1500,       // px/s cap
+    restitution: 0.70,    // vertical energy kept per bounce (bouncier: higher, more bounces)
+    groundFriction: 0.88, // horizontal kept on each ground/wall contact (keeps speed -> goes farther)
+    rollDecay: 1.7,       // 1/s horizontal velocity decay while rolling (rolls farther)
+    restSpeed: 14,        // px/s; below this on the ground => rest (keeps bouncing a bit longer)
+    powerScale: 7.6,      // pull(px) -> launch speed (launches farther/higher)
+    maxPower: 1950,       // px/s cap (allows bigger throws)
     minPower: 130,        // px/s; below this, no throw
     runSpeed: 540,        // dog px/s
     reachDist: 24,        // px to count as "reached"
+    chaseDelay: 0.28,     // s the dog waits after launch before chasing
     pickupTime: 0.30,     // s
     dropTime: 0.26        // s
   };
@@ -40,10 +41,15 @@
     b.y += b.vy * dt;
     if (b.x < env.leftBound + env.radius) { b.x = env.leftBound + env.radius; b.vx = -b.vx * cfg.groundFriction; }
     if (b.x > env.rightBound - env.radius) { b.x = env.rightBound - env.radius; b.vx = -b.vx * cfg.groundFriction; }
+    var ceil = (env.topBound != null ? env.topBound : 0) + env.radius;
+    if (b.y < ceil) { b.y = ceil; if (b.vy < 0) b.vy = -b.vy * cfg.restitution; } // a high arc bounces off the top instead of leaving the band
     var floor = env.groundY - env.radius;
     if (b.y >= floor) {
       b.y = floor;
-      if (b.vy > 0) { b.vy = -b.vy * cfg.restitution; b.vx *= cfg.groundFriction; }
+      if (b.vy > 0) {
+        b.vy = -b.vy * cfg.restitution; b.vx *= cfg.groundFriction;
+        if (-b.vy < cfg.gravity * dt) b.vy = 0; // rebound too weak to clear one frame of gravity -> settle (avoids infinite micro-bounce)
+      }
       b.vx -= b.vx * clamp(cfg.rollDecay * dt, 0, 1);
       if (Math.abs(b.vy) < cfg.restSpeed && Math.abs(b.vx) < cfg.restSpeed) { b.vx = 0; b.vy = 0; b.resting = true; }
     }
@@ -55,7 +61,7 @@
 
   function startThrow(dog, ball, vel) {
     return {
-      dog: { state: 'chasing', x: dog.x, dir: vel.vx >= 0 ? 1 : -1, timer: 0 },
+      dog: { state: 'waiting', x: dog.x, dir: vel.vx >= 0 ? 1 : -1, timer: 0 },
       ball: { x: ball.x, y: ball.y, vx: vel.vx, vy: vel.vy, angle: ball.angle || 0, resting: false }
     };
   }
@@ -64,7 +70,10 @@
     cfg = cfg || DEFAULTS;
     var d = { state: dog.state, x: dog.x, dir: dog.dir, timer: dog.timer || 0 };
     var b = ball, events = [];
-    if (d.state === 'chasing') {
+    if (d.state === 'waiting') {
+      d.timer += dt; // dog holds at home, watching the ball fly, before giving chase
+      if (d.timer >= cfg.chaseDelay) { d.state = 'chasing'; d.timer = 0; events.push('chase'); }
+    } else if (d.state === 'chasing') {
       var t = ball.x;
       d.dir = t >= d.x ? 1 : -1;
       d.x += d.dir * cfg.runSpeed * dt;

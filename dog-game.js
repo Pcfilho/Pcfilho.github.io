@@ -105,7 +105,7 @@
       if (!reduceMotion) hintT += dt;
       return;
     }
-    if (dog.state === 'chasing') ball = Core.stepBall(ball, dt, env);
+    if (dog.state === 'waiting' || dog.state === 'chasing') ball = Core.stepBall(ball, dt, env);
     var r = Core.stepDog(dog, ball, env, dt);
     dog = r.dog; ball = r.ball;
   }

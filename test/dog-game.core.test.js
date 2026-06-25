@@ -46,6 +46,13 @@ test('stepBall: reflects off the side wall', () => {
   assert.strictEqual(b.x, ENV.leftBound + ENV.radius);
 });
 
+test('stepBall: reflects off the top so a high arc stays in the band', () => {
+  // Ball near the top moving fast upward; the ceiling (canvas top, default 0) keeps it in view.
+  const b = C.stepBall({ x: 200, y: 12, vx: 0, vy: -500, angle: 0, resting: false }, 0.01, ENV);
+  assert.ok(b.vy > 0, 'vy reflected downward off the ceiling');
+  assert.strictEqual(b.y, ENV.radius, 'clamped at the top edge (radius from y=0)');
+});
+
 test('stepBall: a slow ball on the ground comes to rest', () => {
   const b = C.stepBall({ x: 200, y: 290, vx: 8, vy: 4, angle: 0, resting: false }, 0.001, ENV);
   assert.strictEqual(b.resting, true);
@@ -67,11 +74,22 @@ test('createDog: idle at home', () => {
   assert.strictEqual(d.x, ENV.homeX);
 });
 
-test('startThrow: dog chases, ball gets velocity', () => {
+test('startThrow: dog waits (launch delay) before chasing, ball gets velocity', () => {
   const r = C.startThrow(C.createDog(ENV), { x: 200, y: 290, angle: 0 }, { vx: 300, vy: -200 });
-  assert.strictEqual(r.dog.state, 'chasing');
+  assert.strictEqual(r.dog.state, 'waiting');
   assert.strictEqual(r.ball.vx, 300);
   assert.strictEqual(r.ball.resting, false);
+});
+
+test('stepDog: waiting holds the dog in place, then flips to chasing after chaseDelay', () => {
+  const start = { state: 'waiting', x: ENV.homeX, dir: 1, timer: 0 };
+  // A short step (less than chaseDelay): dog does not move and stays waiting.
+  const mid = C.stepDog(start, { x: 380, y: 290, resting: true }, ENV, C.DEFAULTS.chaseDelay * 0.5);
+  assert.strictEqual(mid.dog.state, 'waiting');
+  assert.strictEqual(mid.dog.x, ENV.homeX, 'dog stays put while waiting');
+  // A step that exceeds chaseDelay: transitions to chasing.
+  const go = C.stepDog(start, { x: 380, y: 290, resting: true }, ENV, C.DEFAULTS.chaseDelay + 0.01);
+  assert.strictEqual(go.dog.state, 'chasing');
 });
 
 test('stepDog: chasing runs toward the ball', () => {
@@ -130,7 +148,7 @@ test('integration: a throw resolves back to idle within a few seconds', () => {
   const dt = 1 / 60;
   let idle = false;
   for (let i = 0; i < 60 * 8; i++) {
-    if (dog.state === 'chasing') ball = C.stepBall(ball, dt, ENV);
+    if (dog.state === 'waiting' || dog.state === 'chasing') ball = C.stepBall(ball, dt, ENV);
     const r = C.stepDog(dog, ball, ENV, dt);
     dog = r.dog; ball = r.ball;
     if (dog.state === 'idle' && r.events.includes('dropped')) { idle = true; break; }
