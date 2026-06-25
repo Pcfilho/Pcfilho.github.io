@@ -16,6 +16,7 @@
   var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
   var running = false, visible = true, lastTs = 0;
   var dog = null, ball = null, thrown = false;
+  var aiming = false, aimPtr = null, aimStart = null, aimCur = null;
 
   function readLS(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
 
@@ -94,10 +95,28 @@
     drawScene(); // hook for later tasks
   }
 
+  function drawAim() {
+    if (!aiming || !aimStart || !aimCur) return;
+    var pullX = aimCur.x - aimStart.x, pullY = aimCur.y - aimStart.y;
+    var v = Core.launchVelocity(pullX, pullY);
+    var power = Math.min(1, v.power / CFG.maxPower);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,' + (0.35 + 0.5 * power) + ')';
+    ctx.lineWidth = 2; ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.moveTo(ball.x, ball.y);
+    ctx.lineTo(ball.x - pullX, ball.y - pullY); // launch direction (opposite the pull)
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.beginPath(); ctx.arc(ball.x - pullX, ball.y - pullY, 4 + 3 * power, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   function drawScene() {
     if (!ball || !dog) return;
     drawDogMock();
     drawBallMock();
+    drawAim();
   }
 
   function drawBallMock() {
@@ -149,6 +168,39 @@
 
   function start() { if (running) return; running = true; lastTs = 0; requestAnimationFrame(loop); }
 
+  function localPoint(e) {
+    var rc = canvas.getBoundingClientRect();
+    return { x: e.clientX - rc.left, y: e.clientY - rc.top };
+  }
+  function onBall(p) {
+    if (!ball) return false;
+    var pad = (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? env.radius * 1.6 : env.radius * 0.6;
+    return Core.len(p.x - ball.x, p.y - ball.y) <= env.radius + pad;
+  }
+  function onPointerDown(e) {
+    if (!dog || dog.state !== 'idle') return;
+    var p = localPoint(e);
+    if (!onBall(p)) return;            // not on the ball -> let the page scroll
+    aiming = true; aimPtr = e.pointerId; aimStart = { x: ball.x, y: ball.y }; aimCur = p;
+    canvas.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }
+  function onPointerMove(e) {
+    if (!aiming || e.pointerId !== aimPtr) return;
+    aimCur = localPoint(e);
+    e.preventDefault();
+  }
+  function onPointerUp(e) {
+    if (!aiming || e.pointerId !== aimPtr) return;
+    aiming = false;
+    try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    var pullX = aimCur.x - aimStart.x, pullY = aimCur.y - aimStart.y;
+    var v = Core.launchVelocity(pullX, pullY);
+    aimStart = aimCur = null;
+    if (v.power > 0) { var r = Core.startThrow(dog, ball, v); dog = r.dog; ball = r.ball; thrown = true; markPlayed(); }
+  }
+  function markPlayed() {} // overridden in Task 6
+
   function mount() {
     host = document.getElementById('pb-beach');
     if (!host) return;
@@ -160,6 +212,10 @@
     canvas.style.display = 'block';
     canvas.style.touchAction = 'pan-y'; // let vertical scroll pass unless we capture on the ball
     host.appendChild(canvas);
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
     ctx = canvas.getContext('2d');
 
     caption = document.createElement('div');
