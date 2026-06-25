@@ -5,6 +5,26 @@
   if (!Core) { console.warn('[dog-game] core missing'); return; }
   var CFG = Core.DEFAULTS;
 
+  var USE_SPRITE = false; // flip to true once assets/beach/dog.png + ball.png exist
+  var SPRITES = {
+    cell: 256,
+    rows: { idle: { row: 0, frames: 4, fps: 6 }, chasing: { row: 1, frames: 6, fps: 12 },
+            pickup: { row: 2, frames: 3, fps: 12 }, returning: { row: 3, frames: 6, fps: 12 } },
+    mouth: { x: 196, y: 150 } // mouth anchor within a 256x256 cell (where the ball sits)
+  };
+  var img = { dog: null, ball: null, ready: false };
+
+  function loadSprites() {
+    if (!USE_SPRITE) return;
+    var d = new Image(), b = new Image(), n = 0;
+    function done() { if (++n === 2) img.ready = true; }
+    d.onload = function () { img.dog = d; done(); };
+    b.onload = function () { img.ball = b; done(); };
+    d.onerror = function () { img.dog = null; }; // fall back to mock
+    b.onerror = function () { img.ball = null; };
+    d.src = 'assets/beach/dog.png'; b.src = 'assets/beach/ball.png';
+  }
+
   var LAYOUT = { heightVH: 0.38, minH: 280, maxH: 420, groundRatio: 0.74, radiusRatio: 0.045, sideInset: 0.05, mouthRatio: 0.16 };
   var THEME = {
     light: { sky0: '#ffd6a5', sky1: '#ff9e7d', sea: '#3aa6b9', sand0: '#f7e3b8', sand1: '#e9cf95', text: 'rgba(60,40,20,.8)' },
@@ -116,10 +136,45 @@
     ctx.restore();
   }
 
+  function frameOf(stateKey) {
+    var r = SPRITES.rows[stateKey] || SPRITES.rows.idle;
+    var i = Math.floor((Date.now() / 1000) * r.fps) % r.frames;
+    return { sx: i * SPRITES.cell, sy: r.row * SPRITES.cell, n: SPRITES.cell };
+  }
+
+  function drawDog() {
+    if (USE_SPRITE && img.dog) {
+      var stateKey = (dog.state === 'pickup') ? 'pickup'
+        : (dog.state === 'returning') ? 'returning'
+        : (dog.state === 'chasing') ? 'chasing' : 'idle';
+      var f = frameOf(stateKey);
+      var size = env.mouthHeight * 2.6;
+      ctx.save();
+      ctx.translate(dog.x, env.groundY - size * 0.5);
+      ctx.scale(dog.dir, 1);
+      ctx.drawImage(img.dog, f.sx, f.sy, f.n, f.n, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    } else {
+      drawDogMock();
+    }
+  }
+
+  function drawBall() {
+    if (USE_SPRITE && img.ball) {
+      var d = env.radius * 2;
+      ctx.save();
+      ctx.translate(ball.x, ball.y); ctx.rotate(ball.angle || 0);
+      ctx.drawImage(img.ball, -env.radius, -env.radius, d, d);
+      ctx.restore();
+    } else {
+      drawBallMock();
+    }
+  }
+
   function drawScene() {
     if (!ball || !dog) return;
-    drawDogMock();
-    drawBallMock();
+    drawDog();
+    drawBall();
     drawAim();
     drawHint();
   }
@@ -255,6 +310,7 @@
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: 0.01 }).observe(host);
     }
+    loadSprites();
     start();
   }
 
