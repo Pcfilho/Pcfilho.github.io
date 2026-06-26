@@ -57,7 +57,7 @@
     b.onload = function () { ballImg = b; };
     b.onerror = function () { ballImg = null; };
     b.src = 'assets/beach/ball.png';
-    [['sky', 'bg-sky'], ['sand', 'bg-sand'], ['p1', 'palm-1'], ['p2', 'palm-2']].forEach(function (p) {
+    [['sand', 'bg-sand'], ['p1', 'palm-1'], ['p2', 'palm-2']].forEach(function (p) {
       var im = new Image();
       im.onload = function () { LAYER[p[0]] = im; };
       im.onerror = function () { LAYER[p[0]] = null; }; // missing -> gradient fallback
@@ -67,8 +67,8 @@
 
   var LAYOUT = { heightVH: 0.38, minH: 280, maxH: 420, groundRatio: 0.74, radiusRatio: 0.045, sideInset: 0.05, mouthRatio: 0.16 };
   var THEME = {
-    light: { sky0: '#ffd6a5', sky1: '#ff9e7d', sea: '#3aa6b9', sand0: '#f7e3b8', sand1: '#e9cf95', text: 'rgba(60,40,20,.8)' },
-    dark:  { sky0: '#3a2b4d', sky1: '#7a4b6b', sea: '#2a6b78', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
+    light: { sky0: '#ffe3bd', sky1: '#ffb38f', seaTop: '#ff9e86', sea1: '#5fa6ad', sand0: '#f7e3b8', sand1: '#e9cf95', text: 'rgba(60,40,20,.8)' },
+    dark:  { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
   };
 
   var host, canvas, ctx, caption, dpr = 1;
@@ -146,16 +146,20 @@
 
   function drawBackground() {
     var t = THEME[theme] || THEME.light;
-    // gradient base: fallback, and fills any gap if an image layer is missing
-    var sky = ctx.createLinearGradient(0, 0, 0, env.groundY);
+    var horizonY = env.groundY - H * 0.17;
+    // sky gradient (warm, ties the site's cream/coral above)
+    var sky = ctx.createLinearGradient(0, 0, 0, horizonY);
     sky.addColorStop(0, t.sky0); sky.addColorStop(1, t.sky1);
-    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, env.groundY + 4);
-    ctx.fillStyle = t.sea; ctx.fillRect(0, env.groundY - H * 0.10, W, H * 0.10);
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, horizonY + 1);
+    // sea gradient (a soft sunset reflection: warm at the horizon into a muted teal)
+    var sea = ctx.createLinearGradient(0, horizonY, 0, env.groundY);
+    sea.addColorStop(0, t.seaTop); sea.addColorStop(1, t.sea1);
+    ctx.fillStyle = sea; ctx.fillRect(0, horizonY, W, env.groundY - horizonY + 2);
+    // sand
     var sand = ctx.createLinearGradient(0, env.groundY - H * 0.04, 0, H);
     sand.addColorStop(0, t.sand0); sand.addColorStop(1, t.sand1);
     ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
     // image layers, far -> near (near parallaxes more)
-    if (LAYER.sky) drawLayer(LAYER.sky, 1.0, 0.010);
     if (LAYER.p1) drawPalm(LAYER.p1, -1, 0.035, 0.85); // left corner
     if (LAYER.p2) drawPalm(LAYER.p2, 1, 0.045, 0.95);  // right corner
     if (LAYER.sand) drawLayer(LAYER.sand, 0.30, 0.055); // drawn last so the sand front hides the sunk trunk bases
