@@ -7,9 +7,8 @@
 
   var USE_SPRITE = true; // individual transparent PNG frames in assets/beach/ (else procedural mock)
   var SPRITES = {
-    feet: 0.86,    // feet line within each 1024x1024 frame (fraction from top)
-    hRatio: 0.58,  // dog draw size (square) as a fraction of the band height
-    mouthDX: 0.27, // snout offset from the dog's center, fraction of draw size (so it grabs with the mouth)
+    hRatio: 0.52,  // dog BODY height (its opaque bbox) as a fraction of the band height
+    mouthDX: 0.30, // snout offset from the dog's center, fraction of dog body height (grabs with the mouth)
     ballScale: 1.5, // ball.png size relative to physics diameter
     states: {
       idle:      { files: ['dog-idle-1', 'dog-idle-2'], fps: 2.5 },
@@ -20,7 +19,28 @@
       dropping:  { files: ['dog-pickup-2', 'dog-idle-1'], fps: 6 }
     }
   };
-  var cache = {}, ballImg = null; // fileName -> Image; ballImg for ball.png
+  var cache = {}, ballImg = null;          // fileName -> {img, cx, top, bottom} (bbox fractions)
+  var LAYER = { sky: null, palms: null, sand: null };
+  var parX = 0, parTargetX = 0; // parallax: -1..1, eased toward the pointer position
+
+  // Opaque bounding box of a frame, so any pose (even an airborne carry frame with
+  // no planted feet) is anchored by its real feet and center, not the padded frame.
+  function measureBox(img) {
+    try {
+      var n = 220, c = document.createElement('canvas'); c.width = n; c.height = n;
+      var g = c.getContext('2d'); g.drawImage(img, 0, 0, n, n);
+      var d = g.getImageData(0, 0, n, n).data;
+      var minX = n, maxX = -1, minY = n, maxY = -1;
+      for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+        if (d[(y * n + x) * 4 + 3] > 24) {
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+          if (y < minY) minY = y; if (y > maxY) maxY = y;
+        }
+      }
+      if (maxX < 0) return { cx: 0.5, top: 0.12, bottom: 0.88 };
+      return { cx: ((minX + maxX) / 2) / n, top: minY / n, bottom: (maxY + 1) / n };
+    } catch (e) { return { cx: 0.5, top: 0.12, bottom: 0.88 }; }
+  }
 
   function loadSprites() {
     if (!USE_SPRITE) return;
@@ -28,7 +48,7 @@
     for (var k in SPRITES.states) SPRITES.states[k].files.forEach(function (f) { names[f] = 1; });
     Object.keys(names).forEach(function (f) {
       var im = new Image();
-      im.onload = function () { cache[f] = im; };
+      im.onload = function () { var b = measureBox(im); cache[f] = { img: im, cx: b.cx, top: b.top, bottom: b.bottom }; };
       im.onerror = function () { cache[f] = null; }; // missing frame -> mock fallback for that state
       im.src = 'assets/beach/' + f + '.png';
     });
@@ -36,6 +56,12 @@
     b.onload = function () { ballImg = b; };
     b.onerror = function () { ballImg = null; };
     b.src = 'assets/beach/ball.png';
+    ['sky', 'palms', 'sand'].forEach(function (key) {
+      var im = new Image();
+      im.onload = function () { LAYER[key] = im; };
+      im.onerror = function () { LAYER[key] = null; }; // missing -> gradient fallback
+      im.src = 'assets/beach/bg-' + key + '.png';
+    });
   }
 
   var LAYOUT = { heightVH: 0.38, minH: 280, maxH: 420, groundRatio: 0.74, radiusRatio: 0.045, sideInset: 0.05, mouthRatio: 0.16 };
@@ -100,21 +126,34 @@
     if (dog.state === 'idle') resetIdle();
   }
 
+  function drawLayer(img, anchorFrac, par) {
+    var scale = (W / img.width) * 1.14;          // cover width + slack for the parallax shift
+    var dw = img.width * scale, dh = img.height * scale;
+    var ox = (W - dw) / 2 - parX * W * par;
+    if (ox > 0) ox = 0; if (ox + dw < W) ox = W - dw; // never expose an edge gap
+    ctx.drawImage(img, ox, env.groundY - anchorFrac * dh, dw, dh); // image row at anchorFrac lands on groundY
+  }
+
   function drawBackground() {
     var t = THEME[theme] || THEME.light;
+    // gradient base: fallback, and fills any gap if an image layer is missing
     var sky = ctx.createLinearGradient(0, 0, 0, env.groundY);
     sky.addColorStop(0, t.sky0); sky.addColorStop(1, t.sky1);
     ctx.fillStyle = sky; ctx.fillRect(0, 0, W, env.groundY + 4);
-    // sea strip
     ctx.fillStyle = t.sea; ctx.fillRect(0, env.groundY - H * 0.10, W, H * 0.10);
-    // sand
     var sand = ctx.createLinearGradient(0, env.groundY - H * 0.04, 0, H);
     sand.addColorStop(0, t.sand0); sand.addColorStop(1, t.sand1);
     ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
+    // image layers, far -> near (near parallaxes more)
+    if (LAYER.sky) drawLayer(LAYER.sky, 1.0, 0.010);
+    if (LAYER.palms) drawLayer(LAYER.palms, 0.97, 0.030);
+    if (LAYER.sand) drawLayer(LAYER.sand, 0.30, 0.055);
   }
 
   function update(dt) {
     if (!dog) resetIdle();
+    if (reduceMotion) parTargetX = 0;
+    parX += (parTargetX - parX) * 0.08; // ease the parallax every frame
     if (dog.state === 'idle') {
       ball.x = env.homeX; ball.y = env.groundY - env.radius; ball.resting = true;
       if (!reduceMotion) hintT += dt;
@@ -156,13 +195,14 @@
 
   function drawDog() {
     var key = SPRITES.states[dog.state] ? dog.state : 'idle';
-    var im = USE_SPRITE ? spriteFor(key) : null;
-    if (im) {
-      var S = H * SPRITES.hRatio;
+    var rec = USE_SPRITE ? spriteFor(key) : null;
+    if (rec && rec.img) {
+      var bh = rec.bottom - rec.top;
+      var S = (H * SPRITES.hRatio) / bh; // scale so the dog BODY height = hRatio*H in every pose (no float/jump)
       ctx.save();
-      ctx.translate(dog.x, env.groundY - SPRITES.feet * S); // image top; feet land on groundY
+      ctx.translate(dog.x, env.groundY);
       ctx.scale(dog.dir, 1);
-      ctx.drawImage(im, -S / 2, 0, S, S);
+      ctx.drawImage(rec.img, -rec.cx * S, -rec.bottom * S, S, S); // bbox center -> dog.x, bbox feet -> groundY
       ctx.restore();
     } else {
       drawDogMock();
@@ -271,6 +311,11 @@
     aimStart = aimCur = null;
     if (v.power > 0) { var r = Core.startThrow(dog, ball, v); dog = r.dog; ball = r.ball; markPlayed(); }
   }
+  function onParallax(e) {
+    var r = canvas.getBoundingClientRect();
+    parTargetX = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+  }
+
   function markPlayed() {
     if (played) return;
     played = true;
@@ -309,6 +354,8 @@
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerUp);
+    canvas.addEventListener('pointermove', onParallax);
+    canvas.addEventListener('pointerleave', function () { parTargetX = 0; });
     ctx = canvas.getContext('2d');
 
     caption = document.createElement('div');
