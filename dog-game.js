@@ -71,7 +71,7 @@
     dark:  { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
   };
 
-  var host, phoneEl, screenEl, canvas, ctx, caption, headEl, subEl, ctaEl, dpr = 1;
+  var host, phoneEl, screenEl, canvas, ctx, caption, headEl, subEl, dpr = 1;
   var PHONE = { maxW: 880, bezel: 14, aspect: 19.5 / 9 }; // landscape iPhone: screen w:h ratio
   var W = 0, H = 0, env = null;
   var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
@@ -388,12 +388,6 @@
     homebar.style.cssText = 'position:absolute;right:7px;top:50%;transform:translateY(-50%);width:4px;height:82px;background:rgba(255,255,255,.55);border-radius:3px;z-index:6;pointer-events:none;';
     screenEl.appendChild(homebar);
 
-    // CTA back into the site flow
-    ctaEl = document.createElement('a');
-    ctaEl.href = '#contact';
-    ctaEl.style.cssText = 'margin-top:20px;text-decoration:none;font-weight:700;font-size:14px;background:var(--text);color:var(--bg);padding:12px 22px;border-radius:12px;';
-    host.appendChild(ctaEl);
-
     // credit, on the cream below the phone
     caption = document.createElement('div');
     caption.style.cssText = 'margin-top:16px;text-align:center;font:600 12.5px Manrope,system-ui,sans-serif;';
@@ -417,7 +411,6 @@
     if (subEl) subEl.textContent = pt
       ? 'Experimente brincar com o Bull na praia!'
       : 'Come play fetch with Bull on the beach!';
-    if (ctaEl) ctaEl.textContent = pt ? 'Vamos trabalhar juntos' : "Let's work together";
     caption.textContent = captionText();
     caption.style.color = t.text;
   }
