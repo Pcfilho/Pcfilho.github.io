@@ -7,7 +7,7 @@
 
   var USE_SPRITE = true; // individual transparent PNG frames in assets/beach/ (else procedural mock)
   var SPRITES = {
-    hRatio: 0.52,  // dog BODY height (its opaque bbox) as a fraction of the band height
+    hRatio: 0.40,  // dog BODY height (its opaque bbox) as a fraction of the band height
     mouthDX: 0.30, // snout offset from the dog's center, fraction of dog body height (grabs with the mouth)
     ballScale: 1.5, // ball.png size relative to physics diameter
     states: {
@@ -126,12 +126,18 @@
     if (dog.state === 'idle') resetIdle();
   }
 
-  function drawLayer(img, anchorFrac, par) {
+  function drawLayer(img, anchorFrac, par) { // cover full width (sky, sand)
     var scale = (W / img.width) * 1.14;          // cover width + slack for the parallax shift
     var dw = img.width * scale, dh = img.height * scale;
     var ox = (W - dw) / 2 - parX * W * par;
     if (ox > 0) ox = 0; if (ox + dw < W) ox = W - dw; // never expose an edge gap
     ctx.drawImage(img, ox, env.groundY - anchorFrac * dh, dw, dh); // image row at anchorFrac lands on groundY
+  }
+
+  function drawLayerH(img, anchorFrac, par, hFrac) { // scale by height so the art isn't blown up to cover width
+    var dh = H * hFrac, scale = dh / img.height, dw = img.width * scale;
+    var ox = (W - dw) / 2 - parX * W * par;
+    ctx.drawImage(img, ox, env.groundY - anchorFrac * dh, dw, dh);
   }
 
   function drawBackground() {
@@ -146,7 +152,7 @@
     ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
     // image layers, far -> near (near parallaxes more)
     if (LAYER.sky) drawLayer(LAYER.sky, 1.0, 0.010);
-    if (LAYER.palms) drawLayer(LAYER.palms, 0.97, 0.030);
+    if (LAYER.palms) drawLayerH(LAYER.palms, 0.97, 0.030, 0.62); // full palms, modest height
     if (LAYER.sand) drawLayer(LAYER.sand, 0.30, 0.055);
   }
 
