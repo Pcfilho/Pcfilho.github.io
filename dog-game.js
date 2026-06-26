@@ -20,8 +20,9 @@
     }
   };
   var cache = {}, ballImg = null;          // fileName -> {img, cx, top, bottom} (bbox fractions)
-  var LAYER = { sky: null, palms: null, sand: null };
+  var LAYER = { sky: null, sand: null, p1: null, p2: null }; // p1/p2 = corner palms
   var parX = 0, parTargetX = 0; // parallax: -1..1, eased toward the pointer position
+  var DOG_SINK = 0.055, BALL_SINK = 0.035, PALM_SINK = 0.05; // sink into the sand (fraction of band height)
 
   // Opaque bounding box of a frame, so any pose (even an airborne carry frame with
   // no planted feet) is anchored by its real feet and center, not the padded frame.
@@ -56,11 +57,11 @@
     b.onload = function () { ballImg = b; };
     b.onerror = function () { ballImg = null; };
     b.src = 'assets/beach/ball.png';
-    ['sky', 'palms', 'sand'].forEach(function (key) {
+    [['sky', 'bg-sky'], ['sand', 'bg-sand'], ['p1', 'palm-1'], ['p2', 'palm-2']].forEach(function (p) {
       var im = new Image();
-      im.onload = function () { LAYER[key] = im; };
-      im.onerror = function () { LAYER[key] = null; }; // missing -> gradient fallback
-      im.src = 'assets/beach/bg-' + key + '.png';
+      im.onload = function () { LAYER[p[0]] = im; };
+      im.onerror = function () { LAYER[p[0]] = null; }; // missing -> gradient fallback
+      im.src = 'assets/beach/' + p[1] + '.png';
     });
   }
 
@@ -134,10 +135,13 @@
     ctx.drawImage(img, ox, env.groundY - anchorFrac * dh, dw, dh); // image row at anchorFrac lands on groundY
   }
 
-  function drawLayerH(img, anchorFrac, par, hFrac) { // scale by height so the art isn't blown up to cover width
+  function drawPalm(img, side, par, hFrac) { // corner palm; side -1 = left, +1 = right
     var dh = H * hFrac, scale = dh / img.height, dw = img.width * scale;
-    var ox = (W - dw) / 2 - parX * W * par;
-    ctx.drawImage(img, ox, env.groundY - anchorFrac * dh, dw, dh);
+    var base = side < 0 ? -dw * 0.16 : W - dw * 0.84;       // hug the edge, trunk slightly off-screen
+    var ox = base - parX * W * par;
+    var oy = (env.groundY + H * PALM_SINK) - 0.97 * dh;     // trunk base sunk into the sand
+    if (side > 0) { ctx.save(); ctx.translate(ox + dw, oy); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, dw, dh); ctx.restore(); }
+    else ctx.drawImage(img, ox, oy, dw, dh);
   }
 
   function drawBackground() {
@@ -152,8 +156,9 @@
     ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
     // image layers, far -> near (near parallaxes more)
     if (LAYER.sky) drawLayer(LAYER.sky, 1.0, 0.010);
-    if (LAYER.palms) drawLayerH(LAYER.palms, 0.97, 0.030, 0.62); // full palms, modest height
-    if (LAYER.sand) drawLayer(LAYER.sand, 0.30, 0.055);
+    if (LAYER.p1) drawPalm(LAYER.p1, -1, 0.035, 0.85); // left corner
+    if (LAYER.p2) drawPalm(LAYER.p2, 1, 0.045, 0.95);  // right corner
+    if (LAYER.sand) drawLayer(LAYER.sand, 0.30, 0.055); // drawn last so the sand front hides the sunk trunk bases
   }
 
   function update(dt) {
@@ -205,10 +210,15 @@
     if (rec && rec.img) {
       var bh = rec.bottom - rec.top;
       var S = (H * SPRITES.hRatio) / bh; // scale so the dog BODY height = hRatio*H in every pose (no float/jump)
+      var fy = env.groundY + H * DOG_SINK; // feet sit a touch into the sand
+      ctx.save(); // soft contact shadow for grounding
+      ctx.fillStyle = 'rgba(60,40,20,.18)';
+      ctx.beginPath(); ctx.ellipse(dog.x, fy, S * 0.22, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
       ctx.save();
-      ctx.translate(dog.x, env.groundY);
+      ctx.translate(dog.x, fy);
       ctx.scale(dog.dir, 1);
-      ctx.drawImage(rec.img, -rec.cx * S, -rec.bottom * S, S, S); // bbox center -> dog.x, bbox feet -> groundY
+      ctx.drawImage(rec.img, -rec.cx * S, -rec.bottom * S, S, S); // bbox center -> dog.x, bbox feet -> sand
       ctx.restore();
     } else {
       drawDogMock();
@@ -219,8 +229,9 @@
     if (USE_SPRITE && ballImg) {
       if (ball.carried) return; // the carry frames already hold the ball in the mouth
       var d = env.radius * 2 * SPRITES.ballScale;
+      var by = ball.y + (ball.resting ? H * BALL_SINK : 0); // nestle into the sand at rest
       ctx.save();
-      ctx.translate(ball.x, ball.y); ctx.rotate(ball.angle || 0);
+      ctx.translate(ball.x, by); ctx.rotate(ball.angle || 0);
       ctx.drawImage(ballImg, -d / 2, -d / 2, d, d);
       ctx.restore();
     } else {
