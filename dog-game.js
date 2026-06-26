@@ -20,6 +20,7 @@
     }
   };
   var cache = {}, ballImg = null;          // fileName -> {img, cx, top, bottom} (bbox fractions)
+  var refBH = 0;                            // reference body height (idle bbox) so the dog keeps ONE size across poses
   var LAYER = { p1: null, p2: null }; // corner palms
   var DOG_SINK = 0.055, BALL_SINK = 0.035, PALM_SINK = 0.05; // sink into the sand (fraction of band height)
 
@@ -48,7 +49,7 @@
     for (var k in SPRITES.states) SPRITES.states[k].files.forEach(function (f) { names[f] = 1; });
     Object.keys(names).forEach(function (f) {
       var im = new Image();
-      im.onload = function () { var b = measureBox(im); cache[f] = { img: im, cx: b.cx, top: b.top, bottom: b.bottom }; };
+      im.onload = (function (key) { return function () { var b = measureBox(this); cache[key] = { img: this, cx: b.cx, top: b.top, bottom: b.bottom }; if (key === 'dog-idle-1') refBH = b.bottom - b.top; }; })(f);
       im.onerror = function () { cache[f] = null; }; // missing frame -> mock fallback for that state
       im.src = 'assets/beach/' + f + '.png';
     });
@@ -202,8 +203,7 @@
     var key = SPRITES.states[dog.state] ? dog.state : 'idle';
     var rec = USE_SPRITE ? spriteFor(key) : null;
     if (rec && rec.img) {
-      var bh = rec.bottom - rec.top;
-      var S = (H * SPRITES.hRatio) / bh; // scale so the dog BODY height = hRatio*H in every pose (no float/jump)
+      var S = (H * SPRITES.hRatio) / (refBH || 0.66); // ONE scale for all poses (idle bbox = reference), so the dog never grows/shrinks between frames
       var fy = env.groundY + H * DOG_SINK; // feet sit a touch into the sand
       ctx.save(); // soft contact shadow for grounding
       ctx.fillStyle = 'rgba(60,40,20,.18)';
@@ -353,7 +353,7 @@
 
     // section header (same language as the other section titles, ties it to the page)
     headEl = document.createElement('h2');
-    headEl.style.cssText = "font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-1px;margin:0 0 6px;text-align:center;";
+    headEl.style.cssText = "font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-1px;margin:0 0 6px;text-align:center;color:var(--text);";
     host.appendChild(headEl);
     subEl = document.createElement('p');
     subEl.style.cssText = 'color:var(--dim);font-size:15px;margin:0 0 22px;text-align:center;max-width:520px;';
@@ -415,8 +415,8 @@
     var pt = lang === 'pt';
     if (headEl) headEl.textContent = pt ? 'Hora do recreio 🎾' : 'Playtime 🎾';
     if (subEl) subEl.textContent = pt
-      ? 'Arraste a bolinha e veja meu cachorro buscar. Sim, eu programei isso do zero, sem framework.'
-      : 'Drag the ball and watch my dog fetch. Yes, I coded this from scratch, no framework.';
+      ? 'Experimente brincar com o Bull na praia!'
+      : 'Come play fetch with Bull on the beach!';
     if (ctaEl) ctaEl.textContent = pt ? 'Vamos trabalhar juntos' : "Let's work together";
     caption.textContent = captionText();
     caption.style.color = t.text;
