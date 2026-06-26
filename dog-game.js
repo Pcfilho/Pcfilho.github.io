@@ -71,7 +71,8 @@
     dark:  { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
   };
 
-  var host, canvas, ctx, caption, dpr = 1;
+  var host, phoneEl, screenEl, canvas, ctx, caption, dpr = 1;
+  var PHONE = { maxW: 880, bezel: 14, aspect: 19.5 / 9 }; // landscape iPhone: screen w:h ratio
   var W = 0, H = 0, env = null;
   var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
   var played = readLS('pb_dog_played', '') === '1';
@@ -104,16 +105,18 @@
 
   function resize() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
-    W = host.clientWidth;
-    H = Math.max(LAYOUT.minH, Math.min(LAYOUT.maxH, window.innerHeight * LAYOUT.heightVH));
-    host.style.height = H + 'px';
+    var outer = Math.min(PHONE.maxW, host.clientWidth - 32); // phone outer width, with page margin
+    W = Math.round(outer - 2 * PHONE.bezel);                 // screen (= canvas) width
+    H = Math.round(W / PHONE.aspect);                        // landscape screen height
+    screenEl.style.width = W + 'px';
+    screenEl.style.height = H + 'px';
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     env = computeEnv();
-    onResize(); // hook for later tasks
+    onResize();
   }
 
   function resetIdle() {
@@ -363,14 +366,24 @@
   function mount() {
     host = document.getElementById('pb-beach');
     if (!host) return;
-    host.style.position = 'relative';
-    host.style.width = '100%';
-    host.style.overflow = 'hidden';
+    // section: cream page bg, centers the phone, credit below it
+    host.style.cssText = 'position:relative;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:36px 16px 52px;';
+
+    // landscape iPhone body (bezel)
+    phoneEl = document.createElement('div');
+    phoneEl.style.cssText = 'position:relative;display:inline-block;background:linear-gradient(150deg,#3a3a3f,#0d0d10);' +
+      'padding:' + PHONE.bezel + 'px;border-radius:46px;box-sizing:border-box;' +
+      'box-shadow:0 26px 50px -18px rgba(40,20,10,.45), 0 0 0 2px rgba(255,255,255,.05) inset, 0 1px 2px rgba(255,255,255,.15);';
+    host.appendChild(phoneEl);
+
+    // screen (clips the game)
+    screenEl = document.createElement('div');
+    screenEl.style.cssText = 'position:relative;border-radius:32px;overflow:hidden;background:#000;display:block;';
+    phoneEl.appendChild(screenEl);
 
     canvas = document.createElement('canvas');
-    canvas.style.display = 'block';
-    canvas.style.touchAction = 'pan-y'; // let vertical scroll pass unless we capture on the ball
-    host.appendChild(canvas);
+    canvas.style.cssText = 'display:block;touch-action:pan-y;'; // pan-y keeps page scroll unless we grab the ball
+    screenEl.appendChild(canvas);
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
@@ -379,8 +392,17 @@
     canvas.addEventListener('pointerleave', function () { parTargetX = 0; });
     ctx = canvas.getContext('2d');
 
+    // landscape Dynamic Island (left short edge) + home indicator (right)
+    var island = document.createElement('div');
+    island.style.cssText = 'position:absolute;left:9px;top:50%;transform:translateY(-50%);width:10px;height:62px;background:#000;border-radius:6px;z-index:6;pointer-events:none;';
+    screenEl.appendChild(island);
+    var homebar = document.createElement('div');
+    homebar.style.cssText = 'position:absolute;right:7px;top:50%;transform:translateY(-50%);width:4px;height:82px;background:rgba(255,255,255,.55);border-radius:3px;z-index:6;pointer-events:none;';
+    screenEl.appendChild(homebar);
+
+    // credit, on the cream below the phone
     caption = document.createElement('div');
-    caption.style.cssText = 'position:absolute;left:0;right:0;bottom:10px;text-align:center;font:600 12.5px Manrope,system-ui,sans-serif;pointer-events:none;';
+    caption.style.cssText = 'margin-top:18px;text-align:center;font:600 12.5px Manrope,system-ui,sans-serif;';
     host.appendChild(caption);
 
     resize();
