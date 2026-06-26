@@ -7,7 +7,7 @@
 
   var USE_SPRITE = true; // individual transparent PNG frames in assets/beach/ (else procedural mock)
   var SPRITES = {
-    hRatio: 0.40,  // dog BODY height (its opaque bbox) as a fraction of the band height
+    hRatio: 0.46,  // dog BODY height (its opaque bbox) as a fraction of the screen height
     mouthDX: 0.30, // snout offset from the dog's center, fraction of dog body height (grabs with the mouth)
     ballScale: 1.5, // ball.png size relative to physics diameter
     states: {
@@ -20,8 +20,7 @@
     }
   };
   var cache = {}, ballImg = null;          // fileName -> {img, cx, top, bottom} (bbox fractions)
-  var LAYER = { sky: null, sand: null, p1: null, p2: null }; // p1/p2 = corner palms
-  var parX = 0, parTargetX = 0; // parallax: -1..1, eased toward the pointer position
+  var LAYER = { p1: null, p2: null }; // corner palms
   var DOG_SINK = 0.055, BALL_SINK = 0.035, PALM_SINK = 0.05; // sink into the sand (fraction of band height)
 
   // Opaque bounding box of a frame, so any pose (even an airborne carry frame with
@@ -57,7 +56,7 @@
     b.onload = function () { ballImg = b; };
     b.onerror = function () { ballImg = null; };
     b.src = 'assets/beach/ball.png';
-    [['sand', 'bg-sand'], ['p1', 'palm-1'], ['p2', 'palm-2']].forEach(function (p) {
+    [['p1', 'palm-1'], ['p2', 'palm-2']].forEach(function (p) {
       var im = new Image();
       im.onload = function () { LAYER[p[0]] = im; };
       im.onerror = function () { LAYER[p[0]] = null; }; // missing -> gradient fallback
@@ -71,7 +70,7 @@
     dark:  { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
   };
 
-  var host, phoneEl, screenEl, canvas, ctx, caption, dpr = 1;
+  var host, phoneEl, screenEl, canvas, ctx, caption, headEl, subEl, ctaEl, dpr = 1;
   var PHONE = { maxW: 880, bezel: 14, aspect: 19.5 / 9 }; // landscape iPhone: screen w:h ratio
   var W = 0, H = 0, env = null;
   var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
@@ -130,19 +129,10 @@
     if (dog.state === 'idle') resetIdle();
   }
 
-  function drawLayer(img, anchorFrac, par) { // cover full width (sky, sand)
-    var scale = (W / img.width) * 1.14;          // cover width + slack for the parallax shift
-    var dw = img.width * scale, dh = img.height * scale;
-    var ox = (W - dw) / 2 - parX * W * par;
-    if (ox > 0) ox = 0; if (ox + dw < W) ox = W - dw; // never expose an edge gap
-    ctx.drawImage(img, ox, env.groundY - anchorFrac * dh, dw, dh); // image row at anchorFrac lands on groundY
-  }
-
-  function drawPalm(img, side, par, hFrac) { // corner palm; side -1 = left, +1 = right
+  function drawPalm(img, side, hFrac) { // corner palm; side -1 = left, +1 = right
     var dh = H * hFrac, scale = dh / img.height, dw = img.width * scale;
-    var base = side < 0 ? -dw * 0.16 : W - dw * 0.84;       // hug the edge, trunk slightly off-screen
-    var ox = base - parX * W * par;
-    var oy = (env.groundY + H * PALM_SINK) - 0.97 * dh;     // trunk base sunk into the sand
+    var ox = side < 0 ? -dw * 0.16 : W - dw * 0.84;        // hug the edge, trunk slightly off-screen
+    var oy = (env.groundY + H * PALM_SINK) - 0.97 * dh;    // trunk base sunk into the sand
     if (side > 0) { ctx.save(); ctx.translate(ox + dw, oy); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, dw, dh); ctx.restore(); }
     else ctx.drawImage(img, ox, oy, dw, dh);
   }
@@ -158,20 +148,17 @@
     var sea = ctx.createLinearGradient(0, horizonY, 0, env.groundY);
     sea.addColorStop(0, t.seaTop); sea.addColorStop(1, t.sea1);
     ctx.fillStyle = sea; ctx.fillRect(0, horizonY, W, env.groundY - horizonY + 2);
-    // sand
+    // corner palms (behind the sand so their sunk trunk bases get hidden)
+    if (LAYER.p1) drawPalm(LAYER.p1, -1, 0.85); // left corner
+    if (LAYER.p2) drawPalm(LAYER.p2, 1, 0.95);  // right corner
+    // sand gradient, last, so it occludes the buried palm bases
     var sand = ctx.createLinearGradient(0, env.groundY - H * 0.04, 0, H);
     sand.addColorStop(0, t.sand0); sand.addColorStop(1, t.sand1);
     ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
-    // image layers, far -> near (near parallaxes more)
-    if (LAYER.p1) drawPalm(LAYER.p1, -1, 0.035, 0.85); // left corner
-    if (LAYER.p2) drawPalm(LAYER.p2, 1, 0.045, 0.95);  // right corner
-    if (LAYER.sand) drawLayer(LAYER.sand, 0.30, 0.055); // drawn last so the sand front hides the sunk trunk bases
   }
 
   function update(dt) {
     if (!dog) resetIdle();
-    if (reduceMotion) parTargetX = 0;
-    parX += (parTargetX - parX) * 0.08; // ease the parallax every frame
     if (dog.state === 'idle') {
       ball.x = env.homeX; ball.y = env.groundY - env.radius; ball.resting = true;
       if (!reduceMotion) hintT += dt;
@@ -335,11 +322,6 @@
     aimStart = aimCur = null;
     if (v.power > 0) { var r = Core.startThrow(dog, ball, v); dog = r.dog; ball = r.ball; markPlayed(); }
   }
-  function onParallax(e) {
-    var r = canvas.getBoundingClientRect();
-    parTargetX = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
-  }
-
   function markPlayed() {
     if (played) return;
     played = true;
@@ -369,6 +351,14 @@
     // section: cream page bg, centers the phone, credit below it
     host.style.cssText = 'position:relative;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:36px 16px 52px;';
 
+    // section header (same language as the other section titles, ties it to the page)
+    headEl = document.createElement('h2');
+    headEl.style.cssText = "font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-1px;margin:0 0 6px;text-align:center;";
+    host.appendChild(headEl);
+    subEl = document.createElement('p');
+    subEl.style.cssText = 'color:var(--dim);font-size:15px;margin:0 0 22px;text-align:center;max-width:520px;';
+    host.appendChild(subEl);
+
     // landscape iPhone body (bezel)
     phoneEl = document.createElement('div');
     phoneEl.style.cssText = 'position:relative;display:inline-block;background:linear-gradient(150deg,#3a3a3f,#0d0d10);' +
@@ -388,8 +378,6 @@
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerUp);
-    canvas.addEventListener('pointermove', onParallax);
-    canvas.addEventListener('pointerleave', function () { parTargetX = 0; });
     ctx = canvas.getContext('2d');
 
     // landscape Dynamic Island (left short edge) + home indicator (right)
@@ -400,9 +388,15 @@
     homebar.style.cssText = 'position:absolute;right:7px;top:50%;transform:translateY(-50%);width:4px;height:82px;background:rgba(255,255,255,.55);border-radius:3px;z-index:6;pointer-events:none;';
     screenEl.appendChild(homebar);
 
+    // CTA back into the site flow
+    ctaEl = document.createElement('a');
+    ctaEl.href = '#contact';
+    ctaEl.style.cssText = 'margin-top:20px;text-decoration:none;font-weight:700;font-size:14px;background:var(--text);color:var(--bg);padding:12px 22px;border-radius:12px;';
+    host.appendChild(ctaEl);
+
     // credit, on the cream below the phone
     caption = document.createElement('div');
-    caption.style.cssText = 'margin-top:18px;text-align:center;font:600 12.5px Manrope,system-ui,sans-serif;';
+    caption.style.cssText = 'margin-top:16px;text-align:center;font:600 12.5px Manrope,system-ui,sans-serif;';
     host.appendChild(caption);
 
     resize();
@@ -418,6 +412,12 @@
 
   function updateCaption() {
     var t = THEME[theme] || THEME.light;
+    var pt = lang === 'pt';
+    if (headEl) headEl.textContent = pt ? 'Hora do recreio 🎾' : 'Playtime 🎾';
+    if (subEl) subEl.textContent = pt
+      ? 'Arraste a bolinha e veja meu cachorro buscar. Sim, eu programei isso do zero, sem framework.'
+      : 'Drag the ball and watch my dog fetch. Yes, I coded this from scratch, no framework.';
+    if (ctaEl) ctaEl.textContent = pt ? 'Vamos trabalhar juntos' : "Let's work together";
     caption.textContent = captionText();
     caption.style.color = t.text;
   }
