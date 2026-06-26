@@ -120,6 +120,8 @@
   @keyframes pb-eq{0%,100%{transform:scaleY(.28)}50%{transform:scaleY(1)}}
   .pb-dot{transition:width .3s ease, opacity .3s ease;}
   .pb-app, .pb-dock{ touch-action:manipulation; }
+  /* long-press (jiggle mode) must not trigger iOS text/image selection or the callout menu */
+  .pb-appicon, .pb-dock{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
   @media (prefers-reduced-motion:reduce){
     [style*="pb-spin"],[style*="pb-eq"]{animation:none !important;}
   }

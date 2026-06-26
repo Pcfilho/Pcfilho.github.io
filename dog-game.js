@@ -349,7 +349,8 @@
     host = document.getElementById('pb-beach');
     if (!host) return;
     // section: cream page bg, centers the phone, credit below it
-    host.style.cssText = 'position:relative;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:36px 16px 52px;';
+    // -webkit-touch-callout/user-select:none so dragging the ball doesn't trigger iOS text/image selection
+    host.style.cssText = 'position:relative;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:36px 16px 52px;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;';
 
     // section header (same language as the other section titles, ties it to the page)
     headEl = document.createElement('h2');
