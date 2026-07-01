@@ -213,7 +213,8 @@
       recoName: 'Tammy Soo',
       recoRole: 'Engineering Manager · Collective Health',
       recoRel: L('Managed Paulo directly','Foi gestora direta do Paulo'),
-      recoVerify: L('See on LinkedIn','Ver no LinkedIn')
+      recoVerify: L('See on LinkedIn','Ver no LinkedIn'),
+      secBackground: L('Education & languages','Formação & idiomas')
     };
 
     var mk = function(ios,android){ var a=[]; if(ios) a.push({label:'App Store',url:ios}); if(android) a.push({label:'Google Play',url:android}); return a; };
@@ -221,8 +222,8 @@
     var apps = [
       {key:'collective', name:'Collective Health', short:'Collective', mono:'C', icon:'assets/collective.webp', domain:L('Health','Saúde'), year:'2026', live:true, iconBg:'linear-gradient(135deg,#2dd4bf,#0ea5a3)',
         cs:{ problem:L('On a health-benefits app serving 500k+ members across 70+ enterprise employers, members could not reliably reach support, and the app had no automated test safety net.','Em um app de benefícios de saúde que atende 500 mil+ membros em 70+ empresas, os membros não conseguiam suporte confiável e o app não tinha rede de testes automatizados.'),
-             build:L('I built the mobile E2E testing from scratch with Maestro and a custom Node mock server, led the React Native 0.83 upgrade for Fabric, TurboModules and the React Compiler, and owned chat and notifications with UJET (Google CCAI), Customer.io and Firebase.','Criei os testes E2E mobile do zero com Maestro e um servidor mock em Node, liderei o upgrade do React Native 0.83 para Fabric, TurboModules e React Compiler, e assumi chat e notificações com UJET (Google CCAI), Customer.io e Firebase.'),
-             impact:L('Brought back the main activation path on iOS and cut the user impact reported in the Play Console.','Trouxe de volta o caminho principal de ativação no iOS e reduzi o impacto reportado no Play Console.') },
+             build:L("The team's first end-to-end test framework, from zero: Maestro with 32 flows across 11 feature areas, a Node mock server, and nightly iOS and Android CI. I led the React Native 0.83 upgrade for Fabric, TurboModules and the React Compiler, and owned chat and notifications with UJET (Google CCAI), Customer.io and Firebase.",'O primeiro framework de testes ponta a ponta do time, do zero: Maestro com 32 fluxos em 11 áreas, um servidor mock em Node e CI noturno no iOS e Android. Liderei o upgrade do React Native 0.83 para Fabric, TurboModules e React Compiler, e assumi chat e notificações com UJET (Google CCAI), Customer.io e Firebase.'),
+             impact:L('The React Compiler cut benchmarked re-renders by 91% (55 to 5), warm Android CI dropped from 75 to 16 minutes, and I cleared 449 TypeScript and 149 hook violations while bringing the iOS activation path back.','O React Compiler cortou os re-renders medidos em 91% (55 para 5), o CI do Android caiu de 75 para 16 minutos, e limpei 449 erros de TypeScript e 149 de hooks enquanto trazia de volta o caminho de ativação no iOS.') },
         stores:mk('https://apps.apple.com/app/id1032100065','https://play.google.com/store/apps/details?id=com.collectivehealth.member')},
       {key:'pluma', name:'Pluma Finance', short:'Pluma', mono:'P', icon:'assets/pluma.webp', domain:'Fintech', year:'2026', live:true, iconBg:'linear-gradient(135deg,#8b6cff,#5b8cff)',
         cs:{ problem:L('People manage money across several banks with no single, trustworthy view.','As pessoas cuidam do dinheiro em vários bancos sem uma visão única e confiável.'),
@@ -272,22 +273,23 @@
           L('Streamlined CI/CD with Bitrise, CodePush and GitHub Actions, cutting deploy time by 70%.','Otimizei o CI/CD com Bitrise, CodePush e GitHub Actions, cortando o tempo de deploy em 70%.')
         ],
         tools:['React Native','TypeScript','Redux','RealmDB','Jest','Maestro','Bitrise','CodePush','Zustand']},
-      {year:'2026', org:'Collective Health', role:L('React Native Engineer','Engenheiro React Native'), period:L('01/2026 – Present','01/2026 – Atual'), domain:L('Health · Fintech','Saúde · Fintech'), current:true, appKey:'collective',
-        details:[
-          L('Built the mobile E2E testing program from scratch with Maestro and a custom Node mock server, with reusable flows covering critical member journeys on iOS and Android.','Construí o programa de testes E2E mobile do zero com Maestro e um servidor mock em Node, com fluxos reutilizáveis cobrindo jornadas críticas dos membros no iOS e Android.'),
-          L('Led the React Native 0.83 upgrade, clearing hundreds of type and hook-rule issues to get the app ready for Fabric, TurboModules and the React Compiler.','Liderei o upgrade do React Native 0.83, resolvendo centenas de problemas de tipos e regras de hooks para deixar o app pronto para Fabric, TurboModules e React Compiler.'),
-          L('Owned chat and notifications with UJET (Google Cloud CCAI), Customer.io and Firebase, bringing back the main activation path on iOS.','Assumi chat e notificações com UJET (Google Cloud CCAI), Customer.io e Firebase, trazendo de volta o caminho principal de ativação no iOS.'),
-          L('Fixed production crashes and Android 15 edge-to-edge issues across React Native, Kotlin and Gradle.','Corrigi crashes de produção e problemas de edge-to-edge no Android 15 em React Native, Kotlin e Gradle.'),
-          L('Expanded AI claim search across Medical, Dental and Vision, with i18n, accessibility and design-system work.','Expandi a busca de sinistros com IA em Medical, Dental e Vision, com i18n, acessibilidade e design system.')
-        ],
-        tools:['React Native','TypeScript','Zustand','Maestro','TurboModules','Swift','Kotlin','Sentry','Firebase','UJET','Fabric','React Compiler']},
       {year:'2026', org:L('Fintech Freelance','Fintech Freelance'), role:L('Mobile Developer','Desenvolvedor Mobile'), period:L('03/2026 – Present','03/2026 – Atual'), domain:'Fintech', appKey:'pluma',
         details:[
           L('Shipped Pluma Finance, a personal-finance iOS app, from zero to production with React Native and Expo.','Publiquei o Pluma Finance, um app de finanças pessoais para iOS, do zero à produção com React Native e Expo.'),
           L('Built Supabase auth (PKCE, TOTP 2FA) and Open Finance with Pluggy, on a network-aware tRPC and TanStack Query data layer.','Construí auth Supabase (PKCE, 2FA TOTP) e Open Finance com Pluggy, sobre uma camada de dados tRPC e TanStack Query atenta à rede.'),
           L('Delivered a native iOS Liquid Glass UI with Reanimated, RevenueCat subscriptions, Sentry, and a full EAS Build and OTA pipeline on GitHub Actions, tested with Jest and Maestro.','Entreguei uma UI nativa iOS Liquid Glass com Reanimated, assinaturas RevenueCat, Sentry, e um pipeline completo EAS Build e OTA no GitHub Actions, testado com Jest e Maestro.')
         ],
-        tools:['React Native','Expo','EAS','Supabase','RevenueCat','Sentry','Jest','Maestro','GitHub Actions','Claude']}
+        tools:['React Native','Expo','EAS','Supabase','RevenueCat','Sentry','Jest','Maestro','GitHub Actions','Claude']},
+      {year:'2026', org:'Collective Health', role:L('Senior React Native Engineer','Engenheiro React Native Sênior'), period:L('01/2026 – Present','01/2026 – Atual'), domain:L('Health · Fintech','Saúde · Fintech'), current:true, appKey:'collective',
+        details:[
+          L("Built the team's first end-to-end test framework from zero: Maestro with 32 flows across 11 feature areas and a Node mock server (26+ routes) that made full auth testing runnable on the Android emulator.",'Construí o primeiro framework de testes ponta a ponta do time do zero: Maestro com 32 fluxos em 11 áreas e um servidor mock em Node (26+ rotas) que tornou o teste completo de autenticação possível no emulador Android.'),
+          L('Wired the suite into nightly iOS and Android CI, cutting warm Android runs from 75 to 16 minutes, plus an automated pass-rate and flake report for non-technical stakeholders.','Liguei a suíte a um CI noturno no iOS e Android, cortando as execuções do Android de 75 para 16 minutos, com um relatório automático de aprovação e flakes para quem não é técnico.'),
+          L('Shipped three regression-blocking PR quality gates (TypeScript, ESLint, commit and branch conventions) with a baseline-ratchet design that stops new errors without blocking the backlog.','Entreguei três quality gates de PR que bloqueiam regressões (TypeScript, ESLint, convenções de commit e branch) com um design baseline-ratchet que barra erros novos sem travar o backlog.'),
+          L('Led the React Native 0.83 New Architecture stabilization, migrating three deprecated libraries onto Fabric and TurboModules and clearing 449 TypeScript and 149 hook violations.','Liderei a estabilização da Nova Arquitetura no React Native 0.83, migrando três bibliotecas descontinuadas para Fabric e TurboModules e limpando 449 erros de TypeScript e 149 de hooks.'),
+          L('Enabled the React Compiler app-wide, cutting benchmarked re-renders by 91% (55 to 5) across 585 components, and root-caused an Android crash affecting 153 production users.','Habilitei o React Compiler em todo o app, cortando os re-renders medidos em 91% (55 para 5) em 585 componentes, e encontrei a causa raiz de um crash no Android que afetava 153 usuários em produção.'),
+          L('Owned chat and notifications with UJET (Google Cloud CCAI), Customer.io and Firebase, fixed iOS cold-boot deep links, and extended AI claim search to Dental and Vision for 500k+ members.','Assumi chat e notificações com UJET (Google Cloud CCAI), Customer.io e Firebase, corrigi deep links no cold boot do iOS, e estendi a busca de sinistros com IA para Dental e Vision para 500 mil+ membros.')
+        ],
+        tools:['React Native','TypeScript','Zustand','Maestro','Node','TurboModules','Fabric','React Compiler','Swift','Kotlin','GitHub Actions','Sentry','Firebase','UJET']}
     ];
 
     var heroStats = [
@@ -297,10 +299,13 @@
     ];
 
     var skills = [
-      {g:L('Languages','Linguagens'), items:['React Native','TypeScript','Swift','Kotlin','JavaScript']},
-      {g:L('State & Data','Estado & Dados'), items:['Zustand','Redux','React Query','RealmDB','Drizzle','OData']},
-      {g:L('Platform','Plataforma'), items:['Expo / EAS','Reanimated','TurboModules','Fabric','React Compiler']},
-      {g:L('Quality & CI','Qualidade & CI'), items:['Jest','Maestro','Bitrise','GitHub Actions','CodePush','Sentry']}
+      {g:L('Languages','Linguagens'), items:['TypeScript','JavaScript','Swift','Kotlin','SQL']},
+      {g:L('Native UI','UI Nativa'), items:['SwiftUI','UIKit','Jetpack Compose']},
+      {g:'React Native', items:['New Architecture','Fabric','TurboModules','React Compiler','Reanimated','Gesture Handler']},
+      {g:L('UI & Navigation','UI & Navegação'), items:['Expo / EAS','React Navigation','NativeWind','Gluestack-UI','Live Activities / WidgetKit']},
+      {g:L('State & Data','Estado & Dados'), items:['Zustand','Redux','TanStack Query','React Hook Form','Zod','RealmDB','expo-SQLite','Drizzle','OData']},
+      {g:L('Quality & CI','Qualidade & CI'), items:['Jest','Maestro','GitHub Actions','Bitrise','CodePush / EAS Update','baseline-ratchet gates']},
+      {g:L('Cloud & Services','Cloud & Serviços'), items:['AWS','Firebase','Supabase','Sentry','Amplitude','RevenueCat','LaunchDarkly','UJET','Customer.io','Pluggy','Figma']}
     ];
 
     var pets = [
@@ -614,6 +619,28 @@
       + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;" class="pb-skills-grid">'+cards+'</div></section>';
   }
 
+  function eduLangView(m){
+    var L = m.L;
+    var edu = '<div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 20px;">'
+      + '<div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;">'+esc(L('Education','Formação'))+'</div>'
+      + '<div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.3;">'+esc(L('BSc Computer Science','Bacharelado em Ciência da Computação'))+'</div>'
+      + '<div style="font-size:13px;color:var(--dim);font-weight:600;margin-top:3px;">'+esc(L('University of Fortaleza (Unifor)','Universidade de Fortaleza (Unifor)'))+' · 2025</div>'
+      + '</div>';
+    var langItems = [
+      L('Portuguese · Native','Português · Nativo'),
+      L('English · C1 Advanced','Inglês · C1 Avançado'),
+      L('Spanish · Intermediate','Espanhol · Intermediário')
+    ].map(function(it){ return '<span style="font-size:13px;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:6px 11px;">'+esc(it)+'</span>'; }).join('');
+    var lang = '<div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 20px;">'
+      + '<div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;">'+esc(L('Languages','Idiomas'))+'</div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+langItems+'</div>'
+      + '<div style="font-size:12px;color:var(--dim);font-weight:600;margin-top:12px;">'+esc(L('English C1 certificate · Fisk · 2018','Certificado de Inglês C1 · Fisk · 2018'))+'</div>'
+      + '</div>';
+    return '<section style="max-width:980px;margin:0 auto;padding:64px 24px 0;">'
+      + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 24px;">'+esc(m.t.secBackground)+'</h2>'
+      + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;" class="pb-skills-grid">'+edu+lang+'</div></section>';
+  }
+
   function petsView(m){
     var cards = m.pets.map(function(pet){
       return '<div class="pb-pet" style="background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:14px;text-align:center;box-shadow:0 10px 26px var(--shadow);overflow:hidden;">'
@@ -666,7 +693,7 @@
     var m = model();
     document.documentElement.setAttribute('lang', state.lang);
     var html = '<div style="position:relative;background:var(--bg);color:var(--text);font-family:\'Manrope\',system-ui,sans-serif;">'
-      + navView(m) + heroView(m) + aboutView(m) + journeyView(m) + skillsView(m) + petsView(m) + recoView(m) + contactView(m)
+      + navView(m) + heroView(m) + aboutView(m) + journeyView(m) + skillsView(m) + eduLangView(m) + petsView(m) + recoView(m) + contactView(m)
       + '</div>';
     document.getElementById('app').innerHTML = html;
     tickClock();
