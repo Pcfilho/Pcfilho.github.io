@@ -22,7 +22,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23ff6a1a'/%3E%3Ctext x='50' y='68' font-family='Arial,sans-serif' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3EPB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#f4f0ea; --panel:#ffffff; --panel2:#faf6f0; --text:#1c1814; --dim:#736a5e;
@@ -107,6 +107,7 @@
     .pb-about{grid-template-columns:1fr !important;text-align:center;gap:22px !important;}
     .pb-about > div:first-child{justify-self:center;}
     .pb-skills-grid{grid-template-columns:1fr !important;}
+    .pb-datarow{grid-template-columns:1fr !important;gap:6px !important;}
   }
   @media (max-width:500px){
     .pb-hero{padding-left:14px !important;padding-right:14px !important;}
@@ -188,7 +189,6 @@
       seeWork: L('See the work','Ver os trabalhos'),
       ctaContact: L('Get in touch','Falar comigo'),
       downloadCV: L('Download CV','Baixar CV'),
-      tapHint: L('The phone is interactive. Tap any app to open its story, or swipe for more.','O celular é interativo. Toque em qualquer app pra ver a história, ou arraste pro lado pra ver mais.'),
       annot: L('go on, tap an app','vai, toca num app'),
       shippedApps: L('Shipped apps','Apps publicados'),
       back: L('Back','Voltar'),
@@ -208,11 +208,7 @@
       offdutyLine: L('When I am not shipping code, I am at the cinema or with these two.','Quando não tô publicando código, tô no cinema ou com esses dois.'),
       secContact: L("Let's build something",'Vamos construir algo'),
       contactLine: L('Open to senior mobile roles. Remote, freelance, or here in Fortaleza, Brazil.','Aberto a vagas mobile sênior. Remoto, freelance, ou aqui em Fortaleza, Brasil.'),
-      secReco: L('What a manager says','O que uma gestora diz'),
-      recoQuote: L('He tackled long-standing issues in our mobile chat that others had written off as unsolvable … and he got results where others had not. Any team that gets to work with Paulo is very lucky to have him.','Ele resolveu problemas antigos no nosso chat mobile que outros já tinham dado como insolúveis … e conseguiu resultados onde os outros não conseguiram. Qualquer time que trabalhe com o Paulo tem muita sorte de tê-lo.'),
-      recoName: 'Tammy Soo',
-      recoRole: 'Engineering Manager · Collective Health',
-      recoRel: L('Managed Paulo directly','Foi gestora direta do Paulo'),
+      secReco: L('What colleagues say','O que dizem sobre mim'),
       recoVerify: L('See on LinkedIn','Ver no LinkedIn'),
       secBackground: L('Education & languages','Formação & idiomas')
     };
@@ -248,14 +244,14 @@
     ];
 
     var journey = [
-      {year:'2020', org:'Freelance', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'06/2020 – 01/2021', domain:L('Startups & MVPs','Startups & MVPs'),
+      {year:'2020', org:'Freelance', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'06/2020 - 01/2021', domain:L('Startups & MVPs','Startups & MVPs'),
         details:[
           L('Built mobile apps for small companies and early-stage startups with React Native and TypeScript, turning product ideas into apps ready for the market.','Construí apps mobile para pequenas empresas e startups iniciantes com React Native e TypeScript, transformando ideias de produto em apps prontos para o mercado.'),
           L('Worked directly with founders and designers to shape scalable app structures and deliver MVPs and production releases.','Trabalhei diretamente com fundadores e designers para desenhar estruturas escaláveis e entregar MVPs e versões de produção.'),
           L('Set up continuous delivery with CodePush (OTA updates) and store publishing for the App Store and Play Store.','Montei entrega contínua com CodePush (atualizações OTA) e publicação na App Store e Play Store.')
         ],
         tools:['React Native','TypeScript','Expo','Redux','CodePush']},
-      {year:'2021', org:'Agrolite', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'01/2021 – 05/2023', domain:L('Agritech · IoT','Agritech · IoT'), appKey:'agrolite',
+      {year:'2021', org:'Agrolite', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'01/2021 - 05/2023', domain:L('Agritech · IoT','Agritech · IoT'), appKey:'agrolite',
         details:[
           L('Built an offline-first architecture for the Farm Operations app in Kotlin, with full offline use and reliable sync.','Construí uma arquitetura offline-first para o app de Operações da Fazenda em Kotlin, com uso totalmente offline e sincronização confiável.'),
           L('Connected proprietary farm hardware in real time with custom Bluetooth and WebSocket native modules.','Conectei hardware agrícola proprietário em tempo real com módulos nativos de Bluetooth e WebSocket sob medida.'),
@@ -264,7 +260,7 @@
           L('Added Firebase Crashlytics and Analytics for better error and performance visibility.','Adicionei Firebase Crashlytics e Analytics para mais visibilidade de erros e performance.')
         ],
         tools:['React Native','Kotlin','TypeScript','Reanimated','React Navigation','Firebase','AWS']},
-      {year:'2023', org:'Ploomes', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'05/2023 – 01/2026', domain:L('CRM · Sales','CRM · Vendas'), appKey:'ploomes',
+      {year:'2023', org:'Ploomes', role:L('Mobile Developer','Desenvolvedor Mobile'), period:'05/2023 - 01/2026', domain:L('CRM · Sales','CRM · Vendas'), appKey:'ploomes',
         details:[
           L('Built a solid offline architecture with RealmDB and OData, cutting support tickets by 90% and keeping reliable sync in low-connectivity places.','Construí uma arquitetura offline sólida com RealmDB e OData, cortando os tickets de suporte em 90% e mantendo sincronização confiável em locais de baixa conectividade.'),
           L('Improved core flows with React Native, Reanimated and Gesture Handler for CRUD, charts and maps.','Melhorei os fluxos principais com React Native, Reanimated e Gesture Handler para CRUD, gráficos e mapas.'),
@@ -273,14 +269,14 @@
           L('Streamlined CI/CD with Bitrise, CodePush and GitHub Actions, cutting deploy time by 70%.','Otimizei o CI/CD com Bitrise, CodePush e GitHub Actions, cortando o tempo de deploy em 70%.')
         ],
         tools:['React Native','TypeScript','Redux','RealmDB','Jest','Maestro','Bitrise','CodePush','Zustand']},
-      {year:'2026', org:L('Fintech Freelance','Fintech Freelance'), role:L('Mobile Developer','Desenvolvedor Mobile'), period:L('03/2026 – Present','03/2026 – Atual'), domain:'Fintech', appKey:'pluma',
+      {year:'2026', org:L('Fintech Freelance','Fintech Freelance'), role:L('Mobile Developer','Desenvolvedor Mobile'), period:L('03/2026 - Present','03/2026 - Atual'), domain:'Fintech', appKey:'pluma',
         details:[
           L('Shipped Pluma Finance, a personal-finance iOS app, from zero to production with React Native and Expo.','Publiquei o Pluma Finance, um app de finanças pessoais para iOS, do zero à produção com React Native e Expo.'),
           L('Built Supabase auth (PKCE, TOTP 2FA) and Open Finance with Pluggy, on a network-aware tRPC and TanStack Query data layer.','Construí auth Supabase (PKCE, 2FA TOTP) e Open Finance com Pluggy, sobre uma camada de dados tRPC e TanStack Query atenta à rede.'),
           L('Delivered a native iOS Liquid Glass UI with Reanimated, RevenueCat subscriptions, Sentry, and a full EAS Build and OTA pipeline on GitHub Actions, tested with Jest and Maestro.','Entreguei uma UI nativa iOS Liquid Glass com Reanimated, assinaturas RevenueCat, Sentry, e um pipeline completo EAS Build e OTA no GitHub Actions, testado com Jest e Maestro.')
         ],
         tools:['React Native','Expo','EAS','Supabase','RevenueCat','Sentry','Jest','Maestro','GitHub Actions','Claude']},
-      {year:'2026', org:'Collective Health', role:L('Senior React Native Engineer','Engenheiro React Native Sênior'), period:L('01/2026 – Present','01/2026 – Atual'), domain:L('Health · Fintech','Saúde · Fintech'), current:true, appKey:'collective',
+      {year:'2026', org:'Collective Health', role:L('Senior React Native Engineer','Engenheiro React Native Sênior'), period:L('01/2026 - Present','01/2026 - Atual'), domain:L('Health · Fintech','Saúde · Fintech'), current:true, appKey:'collective',
         details:[
           L("Built the team's first end-to-end test framework from zero: Maestro with 32 flows across 11 feature areas and a Node mock server (26+ routes) that made full auth testing runnable on the Android emulator.",'Construí o primeiro framework de testes ponta a ponta do time do zero: Maestro com 32 fluxos em 11 áreas e um servidor mock em Node (26+ rotas) que tornou o teste completo de autenticação possível no emulador Android.'),
           L('Wired the suite into nightly iOS and Android CI, cutting warm Android runs from 75 to 16 minutes, plus an automated pass-rate and flake report for non-technical stakeholders.','Liguei a suíte a um CI noturno no iOS e Android, cortando as execuções do Android de 75 para 16 minutos, com um relatório automático de aprovação e flakes para quem não é técnico.'),
@@ -315,7 +311,16 @@
 
     var motto = { text:'It is not enough for code to work.', author:'Robert C. Martin' };
 
-    return { t:t, isPT:isPT, L:L, exp:exp, apps:apps, journey:journey, heroStats:heroStats, skills:skills, pets:pets, motto:motto };
+    var recos = [
+      { initials:'TS', name:'Tammy Soo', role:'Engineering Manager · Collective Health',
+        rel: L('Managed Paulo directly','Foi gestora direta do Paulo'),
+        quote: L('He tackled long-standing issues in our mobile chat that others had written off as unsolvable … and he got results where others had not. Any team that gets to work with Paulo is very lucky to have him.','Ele resolveu problemas antigos no nosso chat mobile que outros já tinham dado como insolúveis … e conseguiu resultados onde os outros não conseguiram. Qualquer time que trabalhe com o Paulo tem muita sorte de tê-lo.') },
+      { initials:'CV', name:'Chaitanya Vaddelli', role:'Lead Mobile Developer',
+        rel: L('Senior to Paulo, not a direct manager','Sênior em relação ao Paulo, sem supervisão direta'),
+        quote: L('Paulo is a phenomenal React Native engineer and an absolute joy to work with. He guided our team through a major project upgrade and elevated our testing standards by implementing automation with the Maestro framework … he would be an asset to any engineering organization.','Paulo é um engenheiro React Native fenomenal e uma alegria de se trabalhar. Ele conduziu nosso time por um grande upgrade de projeto e elevou nossos padrões de teste com automação usando o framework Maestro … ele seria um ativo pra qualquer organização de engenharia.') }
+    ];
+
+    return { t:t, isPT:isPT, L:L, exp:exp, apps:apps, journey:journey, heroStats:heroStats, skills:skills, pets:pets, motto:motto, recos:recos };
   }
 
   // ── Render helpers ───────────────────────────────────────────────────────
@@ -391,7 +396,7 @@
     return '<div style="height:100%;overflow-x:hidden;overflow-y:'+PB_HOME_OVERFLOW+';padding:58px 18px 124px;">'
       + '<div onclick="PB.goAbout()" title="'+esc(m.L('About me','Sobre mim'))+'" style="cursor:pointer;background:var(--ios-glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--ios-glass-brd);border-radius:24px;padding:16px;margin-bottom:22px;box-shadow:0 8px 24px rgba(0,0,0,.2);">'
       +   '<div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;">'
-      +     '<div style="width:50px;height:50px;border-radius:50%;border:2px solid rgba(255,255,255,.6);overflow:hidden;flex:none;position:relative;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:17px;">PB</span><img src="assets/portrait.webp" alt="Paulo Barroso" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
+      +     '<div style="width:50px;height:50px;border-radius:50%;border:2px solid rgba(255,255,255,.6);overflow:hidden;flex:none;position:relative;background:linear-gradient(135deg,#ff8a3d,#ff6a1a);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:17px;">PB</span><img src="assets/portrait.webp" alt="Paulo Barroso" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
       +     '<div style="min-width:0;"><div style="font-size:17px;font-weight:800;color:#fff;line-height:1.1;">Paulo Barroso</div><div style="font-size:12px;color:rgba(255,255,255,.88);font-weight:600;">'+esc(m.t.roleShort)+'</div><div style="font-size:10.5px;color:rgba(255,255,255,.72);font-weight:600;margin-top:1px;">'+m.exp+'+ '+esc(m.L('years shipping','anos publicando'))+'</div></div>'
       +   '</div>'
       +   '<div style="display:flex;gap:7px;">'+stats+'</div>'
@@ -424,7 +429,7 @@
     for(var i=0;i<5;i++){ bars += '<span style="width:4px;height:20px;border-radius:2px;background:#fff;display:block;transform-origin:bottom;animation:pb-eq '+(0.7+i*0.13).toFixed(2)+'s ease-in-out '+(i*0.09).toFixed(2)+'s infinite;"></span>'; }
     var coding = '<div style="border-radius:20px;background:var(--panel2);border:1px solid var(--border);padding:14px 16px;box-shadow:0 6px 18px var(--shadow);">'
       + '<div style="display:flex;align-items:center;gap:12px;">'
-      +   '<div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:flex-end;justify-content:center;gap:3px;padding:8px 0;flex:none;">'+bars+'</div>'
+      +   '<div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#ff8a3d,#ff6a1a);display:flex;align-items:flex-end;justify-content:center;gap:3px;padding:8px 0;flex:none;">'+bars+'</div>'
       +   '<div style="min-width:0;flex:1;">'
       +     '<div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--accent);">'+esc(L('Now coding to','Programando ao som de'))+'</div>'
       +     '<div style="font-size:14px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(L('Smooth jazz','Jazz suave'))+' 🎷</div>'
@@ -526,13 +531,12 @@
     return '<section style="max-width:1140px;margin:0 auto;padding:118px 24px 40px;display:grid;grid-template-columns:1.05fr 350px;gap:48px;align-items:center;" class="pb-hero">'
       + '<div>'
       +   '<div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;margin-bottom:22px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:pb-pulse 2.2s infinite;"></span>'+esc(m.t.openRemote)+'</div>'
-      +   '<h1 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(34px,5.2vw,60px);line-height:1.03;font-weight:800;letter-spacing:-1.5px;margin:0 0 22px;">'+esc(m.t.heroLine)+'</h1>'
-      +   '<div style="border-left:3px solid var(--accent);padding-left:16px;margin-bottom:28px;"><div style="font-family:\'Instrument Serif\',serif;font-style:italic;font-size:22px;line-height:1.3;color:var(--text);">“'+esc(m.motto.text)+'”</div><div style="font-size:13px;color:var(--dim);font-weight:600;margin-top:4px;">'+esc(m.motto.author)+'</div></div>'
+      +   '<h1 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(30px,3.7vw,43px);line-height:1.08;font-weight:800;letter-spacing:-1.5px;margin:0 0 22px;">'+esc(m.t.heroLine)+'</h1>'
+      +   '<div style="border-left:3px solid var(--accent);padding-left:16px;margin-bottom:28px;"><div style="font-weight:600;font-size:19px;line-height:1.4;color:var(--text);">“'+esc(m.motto.text)+'”</div><div style="font-size:13px;color:var(--dim);font-weight:600;margin-top:4px;">'+esc(m.motto.author)+'</div></div>'
       +   '<div style="display:flex;gap:12px;flex-wrap:wrap;">'
       +     '<a href="#roadmap" class="pb-cta pb-cta-primary" style="text-decoration:none;font-weight:700;font-size:15px;background:var(--accent);color:#fff;padding:14px 24px;border-radius:14px;box-shadow:0 10px 26px var(--accent-soft);">'+esc(m.t.seeWork)+'</a>'
-      +     '<a href="#recommendation" class="pb-cta pb-cta-ghost" style="text-decoration:none;font-weight:700;font-size:15px;background:var(--panel);color:var(--text);padding:14px 24px;border-radius:14px;border:1px solid var(--border);">'+esc(m.t.ctaContact)+'</a>'
+      +     '<a href="#contact" class="pb-cta pb-cta-ghost" style="text-decoration:none;font-weight:700;font-size:15px;background:var(--panel);color:var(--text);padding:14px 24px;border-radius:14px;border:1px solid var(--border);">'+esc(m.t.ctaContact)+'</a>'
       +   '</div>'
-      +   '<div style="font-size:13.5px;color:var(--dim);margin-top:22px;">'+esc(m.t.tapHint)+'</div>'
       + '</div>'
       + '<div class="pb-phonewrap" style="justify-self:center;position:relative;display:flex;flex-direction:column;align-items:center;">'
       +   (state.hinted ? '' : '<button onclick="PB.openApp(\'collective\')" class="pb-annot" aria-label="'+esc(m.t.annot)+'">'
@@ -540,7 +544,7 @@
       +     '<svg class="pb-annot-arrow pb-arr-l" width="54" height="58" viewBox="0 0 54 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32 5 C 6 10, 6 49, 43 48"/><path d="M35 41 L45 48 L35 55"/></svg>'
       +     '<svg class="pb-annot-arrow pb-arr-down" width="40" height="46" viewBox="0 0 40 46" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3 C 10 12, 30 22, 20 40"/><path d="M12 32 L 20 42 L 29 33"/></svg>'
       +   '</button>')
-      +   '<div style="width:330px;height:680px;background:#0b0b0d;border-radius:52px;padding:11px;box-shadow:0 44px 90px rgba(124,92,255,.30),0 22px 60px rgba(255,106,26,.24),0 0 0 2px rgba(0,0,0,.2);position:relative;">'
+      +   '<div style="width:330px;height:680px;background:#0b0b0d;border-radius:52px;padding:11px;box-shadow:0 44px 90px var(--shadow),0 22px 60px rgba(255,106,26,.24),0 0 0 2px rgba(0,0,0,.2);position:relative;">'
       +     '<button onclick="PB.poke(event)" aria-label="Dynamic Island" style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#0b0b0d;border:none;border-radius:999px;z-index:7;cursor:pointer;padding:0;"></button>'
       +     '<div id="pb-screen" style="width:100%;height:100%;border-radius:42px;overflow:hidden;position:relative;background:var(--wall) center/cover;">'+phoneScreen+'</div>'
       +   '</div>'
@@ -551,7 +555,7 @@
   function aboutView(m){
     return '<section id="about" style="max-width:980px;margin:0 auto;padding:50px 24px 0;">'
       + '<div style="background:var(--panel);border:1px solid var(--border);border-radius:28px;padding:36px;display:grid;grid-template-columns:160px 1fr;gap:32px;align-items:center;box-shadow:0 16px 40px var(--shadow);" class="pb-about">'
-      +   '<div style="position:relative;width:160px;height:190px;border-radius:24px;overflow:hidden;border:1px solid var(--border);background:linear-gradient(160deg,#ff8a3d 0%,#e0533a 50%,#9b4bd6 100%);flex:none;display:flex;align-items:center;justify-content:center;">'+PERSON_SVG+'<img src="assets/portrait.webp" alt="Paulo Barroso" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
+      +   '<div style="position:relative;width:160px;height:190px;border-radius:24px;overflow:hidden;border:1px solid var(--border);background:linear-gradient(160deg,#ffa869 0%,#ff8a3d 50%,#e0533a 100%);flex:none;display:flex;align-items:center;justify-content:center;">'+PERSON_SVG+'<img src="assets/portrait.webp" alt="Paulo Barroso" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
       +   '<div><div style="font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">'+esc(m.t.secAbout)+'</div><p style="font-size:17px;line-height:1.6;color:var(--text);margin:0;">'+esc(m.t.about)+'</p></div>'
       + '</div></section>';
   }
@@ -606,39 +610,34 @@
   }
 
   function skillsView(m){
-    var cards = m.skills.map(function(sk){
-      var items = sk.items.map(function(it){
-        return '<span style="font-size:13px;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:6px 11px;">'+esc(it)+'</span>';
-      }).join('');
-      return '<div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 20px;">'
-        + '<div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;">'+esc(sk.g)+'</div>'
-        + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+items+'</div></div>';
+    var rows = m.skills.map(function(sk){
+      return '<div class="pb-datarow" style="display:grid;grid-template-columns:170px 1fr;gap:24px;padding:16px 0;border-top:1px solid var(--border);">'
+        + '<div style="font-size:14px;font-weight:800;color:var(--accent);">'+esc(sk.g)+'</div>'
+        + '<div style="font-size:14.5px;color:var(--text);line-height:1.7;">'+esc(sk.items.join(', '))+'</div></div>';
     }).join('');
-    return '<section style="max-width:980px;margin:0 auto;padding:64px 24px 0;">'
+    return '<section style="max-width:900px;margin:0 auto;padding:64px 24px 0;">'
       + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 24px;">'+esc(m.t.secSkills)+'</h2>'
-      + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;" class="pb-skills-grid">'+cards+'</div></section>';
+      + '<div style="border-bottom:1px solid var(--border);">'+rows+'</div></section>';
   }
 
   function eduLangView(m){
     var L = m.L;
-    var edu = '<div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 20px;">'
-      + '<div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;">'+esc(L('Education','Formação'))+'</div>'
-      + '<div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.3;">'+esc(L('BSc Computer Science','Bacharelado em Ciência da Computação'))+'</div>'
-      + '<div style="font-size:13px;color:var(--dim);font-weight:600;margin-top:3px;">'+esc(L('University of Fortaleza (Unifor)','Universidade de Fortaleza (Unifor)'))+' · 2025</div>'
-      + '</div>';
-    var langItems = [
+    var edu = '<div class="pb-datarow" style="display:grid;grid-template-columns:170px 1fr;gap:24px;padding:16px 0;border-top:1px solid var(--border);">'
+      + '<div style="font-size:14px;font-weight:800;color:var(--accent);">'+esc(L('Education','Formação'))+'</div>'
+      + '<div><div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.3;">'+esc(L('BSc Computer Science','Bacharelado em Ciência da Computação'))+'</div>'
+      + '<div style="font-size:13px;color:var(--dim);font-weight:600;margin-top:3px;">'+esc(L('University of Fortaleza (Unifor)','Universidade de Fortaleza (Unifor)'))+' · 2025</div></div></div>';
+    var langLine = [
       L('Portuguese · Native','Português · Nativo'),
       L('English · C1 Advanced','Inglês · C1 Avançado'),
       L('Spanish · Intermediate','Espanhol · Intermediário')
-    ].map(function(it){ return '<span style="font-size:13px;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:6px 11px;">'+esc(it)+'</span>'; }).join('');
-    var lang = '<div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px 20px;">'
-      + '<div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;">'+esc(L('Languages','Idiomas'))+'</div>'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+langItems+'</div>'
-      + '<div style="font-size:12px;color:var(--dim);font-weight:600;margin-top:12px;">'+esc(L('English C1 certificate · Fisk · 2018','Certificado de Inglês C1 · Fisk · 2018'))+'</div>'
-      + '</div>';
-    return '<section style="max-width:980px;margin:0 auto;padding:64px 24px 0;">'
+    ].join(', ');
+    var lang = '<div class="pb-datarow" style="display:grid;grid-template-columns:170px 1fr;gap:24px;padding:16px 0;border-top:1px solid var(--border);">'
+      + '<div style="font-size:14px;font-weight:800;color:var(--accent);">'+esc(L('Languages','Idiomas'))+'</div>'
+      + '<div><div style="font-size:14.5px;color:var(--text);line-height:1.5;">'+esc(langLine)+'</div>'
+      + '<div style="font-size:12px;color:var(--dim);font-weight:600;margin-top:6px;">'+esc(L('English C1 certificate · Fisk · 2018','Certificado de Inglês C1 · Fisk · 2018'))+'</div></div></div>';
+    return '<section style="max-width:900px;margin:0 auto;padding:64px 24px 0;">'
       + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 24px;">'+esc(m.t.secBackground)+'</h2>'
-      + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;" class="pb-skills-grid">'+edu+lang+'</div></section>';
+      + '<div style="border-bottom:1px solid var(--border);">'+edu+lang+'</div></section>';
   }
 
   function petsView(m){
@@ -657,24 +656,28 @@
   }
 
   function recoView(m){
+    var cards = m.recos.map(function(r){
+      return '<figure style="margin:0;background:var(--panel);border:1px solid var(--border);border-radius:28px;padding:34px 36px;box-shadow:0 16px 40px var(--shadow);position:relative;overflow:hidden;">'
+        +   '<div aria-hidden="true" style="position:absolute;top:-22px;left:22px;font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;font-size:120px;line-height:1;color:var(--accent-soft);pointer-events:none;">“</div>'
+        +   '<blockquote style="margin:0 0 24px;position:relative;font-weight:500;font-size:clamp(17px,2.2vw,21px);line-height:1.55;color:var(--text);">'+esc(r.quote)+'</blockquote>'
+        +   '<figcaption style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
+        +     '<div style="width:48px;height:48px;border-radius:50%;flex:none;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;font-size:16px;">'+esc(r.initials)+'</div>'
+        +     '<div style="min-width:0;"><div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(r.name)+'</div>'
+        +       '<div style="font-size:13px;color:var(--dim);font-weight:600;">'+esc(r.role)+'</div>'
+        +       '<div style="font-size:12px;color:var(--dim);">'+esc(r.rel)+'</div></div>'
+        +     '<a href="https://www.linkedin.com/in/paulo-cesar-barroso/details/recommendations/" target="_blank" rel="noopener noreferrer" style="margin-left:auto;text-decoration:none;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:9px 15px;border-radius:11px;">'+esc(m.t.recoVerify)+' ↗</a>'
+        +   '</figcaption>'
+        + '</figure>';
+    }).join('');
     return '<section id="recommendation" style="max-width:840px;margin:0 auto;padding:64px 24px 0;">'
       + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 24px;">'+esc(m.t.secReco)+'</h2>'
-      + '<figure style="margin:0;background:var(--panel);border:1px solid var(--border);border-radius:28px;padding:34px 36px;box-shadow:0 16px 40px var(--shadow);position:relative;overflow:hidden;">'
-      +   '<div aria-hidden="true" style="position:absolute;top:-22px;left:22px;font-family:\'Instrument Serif\',serif;font-size:130px;line-height:1;color:var(--accent-soft);pointer-events:none;">“</div>'
-      +   '<blockquote style="margin:0 0 24px;position:relative;font-family:\'Instrument Serif\',serif;font-style:italic;font-size:clamp(19px,2.5vw,25px);line-height:1.45;color:var(--text);">'+esc(m.t.recoQuote)+'</blockquote>'
-      +   '<figcaption style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
-      +     '<div style="width:48px;height:48px;border-radius:50%;flex:none;background:linear-gradient(135deg,#2dd4bf,#0ea5a3);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;box-shadow:0 4px 12px var(--shadow);">TS</div>'
-      +     '<div style="min-width:0;"><div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(m.t.recoName)+'</div>'
-      +       '<div style="font-size:13px;color:var(--dim);font-weight:600;">'+esc(m.t.recoRole)+'</div>'
-      +       '<div style="font-size:12px;color:var(--dim);">'+esc(m.t.recoRel)+'</div></div>'
-      +     '<a href="https://www.linkedin.com/in/paulo-cesar-barroso/details/recommendations/" target="_blank" rel="noopener noreferrer" style="margin-left:auto;text-decoration:none;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:9px 15px;border-radius:11px;">'+esc(m.t.recoVerify)+' ↗</a>'
-      +   '</figcaption>'
-      + '</figure></section>';
+      + '<div style="display:flex;flex-direction:column;gap:20px;">'+cards+'</div>'
+      + '</section>';
   }
 
   function contactView(m){
     return '<section id="contact" style="max-width:840px;margin:0 auto;padding:64px 24px 0;">'
-      + '<div style="background:linear-gradient(135deg,#ff6a1a 0%,#e0533a 46%,#9b4bd6 100%);border-radius:30px;padding:50px 40px;text-align:center;box-shadow:0 24px 56px rgba(155,75,214,.30);">'
+      + '<div style="background:linear-gradient(135deg,#ff8a3d 0%,#ff6a1a 52%,#e0533a 100%);border-radius:30px;padding:50px 40px;text-align:center;box-shadow:0 24px 56px rgba(224,83,58,.30);">'
       +   '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(30px,4.5vw,44px);font-weight:800;letter-spacing:-1px;margin:0 0 10px;color:#fff;">'+esc(m.t.secContact)+'</h2>'
       +   '<p style="font-size:16px;color:rgba(255,255,255,.92);font-weight:500;max-width:440px;margin:0 auto 26px;">'+esc(m.t.contactLine)+'</p>'
       +   '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">'
@@ -693,7 +696,7 @@
     var m = model();
     document.documentElement.setAttribute('lang', state.lang);
     var html = '<div style="position:relative;background:var(--bg);color:var(--text);font-family:\'Manrope\',system-ui,sans-serif;">'
-      + navView(m) + heroView(m) + aboutView(m) + journeyView(m) + skillsView(m) + eduLangView(m) + petsView(m) + recoView(m) + contactView(m)
+      + navView(m) + heroView(m) + aboutView(m) + journeyView(m) + skillsView(m) + eduLangView(m) + recoView(m) + contactView(m) + petsView(m)
       + '</div>';
     document.getElementById('app').innerHTML = html;
     tickClock();
@@ -895,7 +898,7 @@
     var el = document.createElement('div');
     el.className = 'pb-push';
     el.style.cssText = 'position:absolute;top:54px;left:10px;right:10px;z-index:30;display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:20px;background:rgba(250,250,250,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 12px 32px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.55);transform:translateY(-170%);opacity:0;transition:transform .5s cubic-bezier(.2,.9,.3,1.25),opacity .3s ease;font-family:Manrope,system-ui,sans-serif;';
-    el.innerHTML = '<div style="width:38px;height:38px;border-radius:10px;flex:none;overflow:hidden;position:relative;background:linear-gradient(135deg,#ff8a3d,#9b4bd6);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:13px;">PB</span><img src="assets/portrait.webp" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
+    el.innerHTML = '<div style="width:38px;height:38px;border-radius:10px;flex:none;overflow:hidden;position:relative;background:linear-gradient(135deg,#ff8a3d,#ff6a1a);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:13px;">PB</span><img src="assets/portrait.webp" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
       + '<div style="min-width:0;flex:1;">'
       +   '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:12px;font-weight:800;color:#111;">Paulo Barroso</span><span style="font-size:11px;color:#666;font-weight:600;flex:none;">'+(pt?'agora':'now')+'</span></div>'
       +   '<div style="font-size:12.5px;line-height:1.35;color:#1c1c1c;margin-top:1px;">'+esc(msg)+'</div>'
