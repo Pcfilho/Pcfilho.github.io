@@ -102,6 +102,16 @@
   .pb-appicon img{pointer-events:none;}
 
   /* responsive: the source was a fixed-size preview; stack columns on small screens */
+  @keyframes pb-marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .pb-marquee-wrap{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);}
+  .pb-marquee{display:flex;width:max-content;animation:pb-marquee 42s linear infinite;padding:8px 0 18px;}
+  .pb-marquee:hover{animation-play-state:paused;}
+  .pb-mq-card{flex:0 0 330px;margin:0 28px 0 0;background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:22px 24px;box-shadow:0 10px 26px var(--shadow);display:flex;flex-direction:column;}
+  @media (max-width:500px){ .pb-mq-card{flex-basis:270px;} }
+  @media (prefers-reduced-motion:reduce){
+    .pb-marquee{animation:none;}
+    .pb-marquee-wrap{overflow-x:auto;-webkit-mask-image:none;mask-image:none;}
+  }
   @media (max-width:820px){
     .pb-hero{grid-template-columns:1fr !important;gap:36px !important;padding-top:96px !important;}
     .pb-about{grid-template-columns:1fr !important;text-align:center;gap:22px !important;}
@@ -312,12 +322,15 @@
     var motto = { text:'It is not enough for code to work.', author:'Robert C. Martin' };
 
     var recos = [
-      { initials:'TS', name:'Tammy Soo', role:'Engineering Manager · Collective Health',
+      { initials:'TS', name:'Tammy Soo', role:'Engineering Manager', co:'Collective Health',
         rel: L('Managed Paulo directly','Foi gestora direta do Paulo'),
         quote: L('He tackled long-standing issues in our mobile chat that others had written off as unsolvable … and he got results where others had not. Any team that gets to work with Paulo is very lucky to have him.','Ele resolveu problemas antigos no nosso chat mobile que outros já tinham dado como insolúveis … e conseguiu resultados onde os outros não conseguiram. Qualquer time que trabalhe com o Paulo tem muita sorte de tê-lo.') },
-      { initials:'CV', name:'Chaitanya Vaddelli', role:'Lead Mobile Developer',
+      { initials:'CV', name:'Chaitanya Vaddelli', role:'Lead Mobile Developer', co:'Collective Health',
         rel: L('Senior to Paulo, not a direct manager','Sênior em relação ao Paulo, sem supervisão direta'),
-        quote: L('Paulo is a phenomenal React Native engineer and an absolute joy to work with. He guided our team through a major project upgrade and elevated our testing standards by implementing automation with the Maestro framework … he would be an asset to any engineering organization.','Paulo é um engenheiro React Native fenomenal e uma alegria de se trabalhar. Ele conduziu nosso time por um grande upgrade de projeto e elevou nossos padrões de teste com automação usando o framework Maestro … ele seria um ativo pra qualquer organização de engenharia.') }
+        quote: L('Paulo is a phenomenal React Native engineer and an absolute joy to work with. He guided our team through a major project upgrade and elevated our testing standards by implementing automation with the Maestro framework … he would be an asset to any engineering organization.','Paulo é um engenheiro React Native fenomenal e uma alegria de se trabalhar. Ele conduziu nosso time por um grande upgrade de projeto e elevou nossos padrões de teste com automação usando o framework Maestro … ele seria um ativo pra qualquer organização de engenharia.') },
+      { initials:'KL', name:'Karine Liuti', role:'Lead Software Engineer', co:'Collective Health',
+        rel: L('Worked with Paulo on the same squad','Trabalhou com o Paulo no mesmo squad'),
+        quote: L('Paulo migrated hundreds of tests using Maestro by understanding the features and coding them in record time … I\'d recommend Paulo without hesitation, and he\'s someone I\'d love to work with again.','Paulo migrou centenas de testes com Maestro entendendo as features e codificando em tempo recorde … Eu recomendaria o Paulo sem hesitar, e é alguém com quem eu adoraria trabalhar de novo.') }
     ];
 
     return { t:t, isPT:isPT, L:L, exp:exp, apps:apps, journey:journey, heroStats:heroStats, skills:skills, pets:pets, motto:motto, recos:recos };
@@ -656,22 +669,37 @@
   }
 
   function recoView(m){
-    var cards = m.recos.map(function(r){
-      return '<figure style="margin:0;background:var(--panel);border:1px solid var(--border);border-radius:28px;padding:34px 36px;box-shadow:0 16px 40px var(--shadow);position:relative;overflow:hidden;">'
-        +   '<div aria-hidden="true" style="position:absolute;top:-22px;left:22px;font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;font-size:120px;line-height:1;color:var(--accent-soft);pointer-events:none;">“</div>'
-        +   '<blockquote style="margin:0 0 24px;position:relative;font-weight:500;font-size:clamp(17px,2.2vw,21px);line-height:1.55;color:var(--text);">'+esc(r.quote)+'</blockquote>'
-        +   '<figcaption style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">'
-        +     '<div style="width:48px;height:48px;border-radius:50%;flex:none;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;font-size:16px;">'+esc(r.initials)+'</div>'
-        +     '<div style="min-width:0;"><div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(r.name)+'</div>'
-        +       '<div style="font-size:13px;color:var(--dim);font-weight:600;">'+esc(r.role)+'</div>'
-        +       '<div style="font-size:12px;color:var(--dim);">'+esc(r.rel)+'</div></div>'
-        +     '<a href="https://www.linkedin.com/in/paulo-cesar-barroso/details/recommendations/" target="_blank" rel="noopener noreferrer" style="margin-left:auto;text-decoration:none;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:9px 15px;border-radius:11px;">'+esc(m.t.recoVerify)+' ↗</a>'
+    var L = m.L;
+    var pulls = [
+      { a:0, q: L('He tackled long-standing issues in our mobile chat that others had written off as unsolvable.','Ele resolveu problemas antigos no nosso chat mobile que outros já tinham dado como insolúveis.') },
+      { a:1, q: L('Paulo is a phenomenal React Native engineer and an absolute joy to work with.','Paulo é um engenheiro React Native fenomenal e uma alegria de se trabalhar.') },
+      { a:2, q: L('Paulo migrated hundreds of tests using Maestro, coding them in record time.','Paulo migrou centenas de testes com Maestro, codificando em tempo recorde.') },
+      { a:0, q: L('Any team that gets to work with Paulo is very lucky to have him.','Qualquer time que trabalhe com o Paulo tem muita sorte de tê-lo.') },
+      { a:1, q: L('He elevated our testing standards … he would be an asset to any engineering organization.','Ele elevou nossos padrões de teste … seria um ativo pra qualquer organização de engenharia.') },
+      { a:2, q: L('Someone I could share a problem with and he’d dive into it until he got it solved. I’d recommend Paulo without hesitation.','Alguém com quem eu podia dividir um problema e ele mergulhava até resolver. Eu recomendaria o Paulo sem hesitar.') }
+    ];
+    function mqCard(pq){
+      var r = m.recos[pq.a];
+      return '<figure class="pb-mq-card">'
+        +   '<blockquote style="margin:0 0 16px;font-weight:500;font-size:14.5px;line-height:1.55;color:var(--text);flex:1;">“'+esc(pq.q)+'”</blockquote>'
+        +   '<figcaption style="display:flex;align-items:center;gap:11px;">'
+        +     '<div style="width:38px;height:38px;border-radius:50%;flex:none;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;font-size:13px;">'+esc(r.initials)+'</div>'
+        +     '<div style="min-width:0;"><div style="font-size:13.5px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(r.name)+'</div>'
+        +       '<div style="font-size:12px;color:var(--dim);font-weight:600;">'+esc(r.role)+'</div>'
+        +       (r.co ? '<div style="font-size:11.5px;color:var(--dim);">'+esc(r.co)+'</div>' : '')
+        +       '</div>'
         +   '</figcaption>'
         + '</figure>';
-    }).join('');
-    return '<section id="recommendation" style="max-width:840px;margin:0 auto;padding:64px 24px 0;">'
-      + '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0 0 24px;">'+esc(m.t.secReco)+'</h2>'
-      + '<div style="display:flex;flex-direction:column;gap:20px;">'+cards+'</div>'
+    }
+    var setHtml = pulls.map(mqCard).join('');
+    return '<section id="recommendation" style="padding:64px 0 0;">'
+      + '<div style="max-width:900px;margin:0 auto;padding:0 24px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px 18px;flex-wrap:wrap;">'
+      +   '<h2 style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;margin:0;">'+esc(m.t.secReco)+'</h2>'
+      +   '<a href="https://www.linkedin.com/in/paulo-cesar-barroso/details/recommendations/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:10px 18px;border-radius:12px;white-space:nowrap;">'+esc(m.t.recoVerify)+' ↗</a>'
+      + '</div>'
+      + '<div class="pb-marquee-wrap" style="width:100vw;margin-left:calc(50% - 50vw);">'
+      +   '<div class="pb-marquee">'+setHtml+'<div aria-hidden="true" style="display:contents;">'+setHtml+'</div></div>'
+      + '</div>'
       + '</section>';
   }
 
