@@ -240,11 +240,11 @@
              build:L('An offline-first architecture, custom Bluetooth and WebSocket native modules, and a redesigned dashboard with charts, goals and camera grids.','Arquitetura offline-first, módulos nativos de Bluetooth e WebSocket sob medida, e dashboard redesenhado com gráficos, metas e grid de câmeras.'),
              impact:L('22% more app usage and reliable real-time control of farm hardware.','22% mais uso e controle confiável em tempo real do hardware agrícola.') },
         stores:mk('https://apps.apple.com/app/id1607414504','https://play.google.com/store/apps/details?id=com.agrolitemanager')},
-      {key:'daily', name:'Daily Logs', short:'Daily Logs', mono:'D', icon:'assets/daily.webp', domain:L('Fitness','Fitness'), year:'2025', review:true, iconBg:'linear-gradient(135deg,#ff9d4d,#ff6a1a)',
-        cs:{ problem:L('Workout trackers break offline and ignore native iOS features.','Apps de treino quebram offline e ignoram recursos nativos do iOS.'),
-             build:L('Offline-first with expo-SQLite and Drizzle (128+ exercises), a Swift module for Live Activities, Dynamic Island and WidgetKit, and a Liquid Glass UI in three languages.','Offline-first com expo-SQLite e Drizzle (128+ exercícios), módulo Swift para Live Activities, Dynamic Island e WidgetKit, e UI Liquid Glass em três idiomas.'),
-             impact:L('Submitted to the App Store and currently in review. I built it with an AI coding workflow (Claude Code).','Enviado à App Store e em análise. Construí com um fluxo de código com IA (Claude Code).') },
-        stores:[]}
+      {key:'daily', name:'Daily Logs', short:'Daily Logs', mono:'D', icon:'assets/daily.webp', domain:L('Fitness','Fitness'), year:'2026', live:true, iconBg:'linear-gradient(135deg,#ff9d4d,#ff6a1a)',
+        cs:{ problem:L('Workout trackers break offline, lock the basics behind a paywall, or tie you to a coach or brand.','Apps de treino quebram offline, trancam o básico atrás de paywall, ou prendem você a um personal ou marca.'),
+             build:L('Built solo end to end, from research to store: offline-first with expo-SQLite and Drizzle (128+ exercises), a Swift module for Live Activities, Dynamic Island and WidgetKit, and a Liquid Glass UI in three languages.','Construído sozinho do zero até a loja, da pesquisa ao lançamento: offline-first com expo-SQLite e Drizzle (128+ exercícios), módulo Swift para Live Activities, Dynamic Island e WidgetKit, e UI Liquid Glass em três idiomas.'),
+             impact:L('Live on the App Store and the web, free and ad-free with no cloud paywall planned. My gift to the world, built solo with an AI coding workflow (Claude Code).','No ar na App Store e na web, grátis e sem anúncios, sem paywall de nuvem planejado. Meu presente pro mundo, construído sozinho com um fluxo de código com IA (Claude Code).') },
+        stores:mk('https://apps.apple.com/us/app/daily-logs-offline-workouts/id6757203084',null).concat([{label:L('Web','Web'),url:'https://daily-logs-app.vercel.app/'}])}
     ];
 
     var journey = [
