@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <title>Paulo Barroso - CV</title>
 <style>
-  @page { size: A4; margin: 11mm 13mm; }
+  @page { size: A4; margin: 10mm 13mm; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: Arial, "Helvetica Neue", sans-serif;
     font-size: 10pt;
-    line-height: 1.35;
+    line-height: 1.3;
     color: #1c1c1c;
   }
   a { color: #1a56a0; text-decoration: none; }
@@ -22,9 +22,9 @@
     font-size: 9.6pt; font-weight: 700; text-transform: uppercase;
     letter-spacing: .6px; color: #2b2b2b;
     border-bottom: 1px solid #d8d8d8;
-    padding-bottom: 2px; margin: 9px 0 5px;
+    padding-bottom: 2px; margin: 8px 0 4px;
   }
-  .job { margin-bottom: 7px; break-inside: auto; }
+  .job { margin-bottom: 6px; break-inside: auto; }
   .job ul, .job li { break-inside: avoid; }
   .job-head { font-size: 10pt; font-weight: 700; }
   .job-meta { font-size: 8.8pt; color: #666; margin-top: 1px; }
@@ -33,7 +33,7 @@
   }
   .app-links a { font-weight: 600; }
   ul { margin: 3px 0 0 14px; }
-  li { margin-bottom: 2.5px; text-align: left; }
+  li { margin-bottom: 2px; text-align: left; }
   .tools { font-size: 9pt; color: #777; margin-top: 3px; }
   .summary { text-align: left; }
   .skills p { margin-bottom: 3px; }
@@ -54,16 +54,7 @@
 </header>
 
 <h2>Summary</h2>
-<p class="summary">Senior Mobile Engineer, 5+ years building production React Native apps across fintech, CRM, and IoT; specialized in TypeScript, the Expo/EAS ecosystem, and React Native's New Architecture. Known for closing quality gaps other teams deferred: built a healthcare app's first end-to-end test framework and nightly two-platform CI from zero, and enabled the React Compiler app-wide for a 91% cut in benchmarked re-renders. At Ploomes: 90% fewer support tickets, 40% fewer regressions, 70% faster deployments. Seeking a senior mobile role to own product quality and platform foundations end to end.</p>
-
-<h2>Skills</h2>
-<div class="skills">
-  <p><strong>Languages:</strong><br>TypeScript, JavaScript, Swift, Kotlin, SQL</p>
-  <p><strong>Mobile / React Native:</strong><br>React Native (New Architecture · Fabric · TurboModules), Expo, EAS, React Compiler, React Navigation, Reanimated, Gesture Handler, NativeWind, Gluestack-UI, native iOS (Live Activities / WidgetKit)</p>
-  <p><strong>State &amp; Data:</strong><br>Redux, Zustand, TanStack Query (React Query), React Hook Form, Zod, RealmDB, expo-SQLite, Drizzle ORM, OData</p>
-  <p><strong>Testing &amp; CI/CD:</strong><br>Jest, Maestro (E2E), GitHub Actions, Bitrise, CodePush / EAS Update (OTA), baseline-ratchet quality gates</p>
-  <p><strong>Cloud, Services &amp; Design:</strong><br>AWS, Firebase, Supabase, Sentry, Amplitude, RevenueCat, LaunchDarkly, UJET (Google Cloud CCAI), Customer.io, Pluggy (Open Finance), Figma</p>
-</div>
+<p class="summary">Senior Mobile Engineer, 5+ years building production React Native apps across fintech, CRM, health, and IoT, shipping web and backend to production along the way and in my own products. Specialized in TypeScript, the Expo/EAS ecosystem, and React Native's New Architecture. Known for closing quality gaps other teams deferred: built a healthcare app's first E2E test framework and nightly two-platform CI from zero, and enabled the React Compiler app-wide for a 91% cut in re-renders.</p>
 
 <h2>Experience</h2>
 
@@ -72,24 +63,22 @@
   <div class="job-meta">Collective Health &nbsp;|&nbsp; 01/2026 – Present</div>
   <div class="app-links">App: Collective Health - <a href="https://apps.apple.com/us/app/collective-health/id1032100065">App Store</a> · <a href="https://play.google.com/store/apps/details?id=com.collectivehealth.member">Google Play</a></div>
   <ul>
-    <li>Built the team's first end-to-end test framework from zero: Maestro with 32 cross-platform flows across 11 feature areas, plus a zero-dependency Node mock server (26+ routes) that made full auth testing runnable on the Android emulator for the first time.</li>
-    <li>Wired the E2E suite into a nightly iOS and Android CI pipeline, cutting warm Android runs from ~75 to ~16 minutes via source-keyed build caching, and added an automated nightly report (pass rate, coverage, flake classification) for non-technical stakeholders.</li>
-    <li>Shipped three regression-blocking PR quality gates (TypeScript, ESLint, commit and branch conventions) using a baseline-ratchet design that stops new errors without blocking the existing backlog, each backed by unit tests.</li>
-    <li>Led the React Native 0.83.1 New Architecture stabilization, migrating three deprecated libraries (splash screen, filesystem, push notifications) onto Fabric and TurboModules with no user-visible regression and clearing 449 TypeScript and 149 React-hook violations.</li>
-    <li>Enabled the React Compiler app-wide, cutting benchmarked re-renders by 91% (55 to 5) across 585 cleanly compiled components, and root-caused an Android fragment-restoration crash affecting 153 production users.</li>
-    <li>Centralized chat and notification SDK init (UJET / Google Cloud CCAI, Customer.io, Firebase Messaging) across 5 files and fixed iOS cold-boot deep-link reliability.</li>
-    <li>Extended AI-powered claim search to Dental and Vision on the member app (500K+ members).</li>
+    <li>Led the React Native 0.83 New Architecture stabilization on a member app serving 500K+ members, migrating three deprecated libraries (splash screen, filesystem, push notifications) onto Fabric and TurboModules with no user-visible regression and clearing 449 TypeScript and 149 React-hook violations.</li>
+    <li>Enabled the React Compiler app-wide, cutting benchmarked re-renders by 91% (55 to 5) across 585 compiled components, and root-caused an Android fragment-restoration crash affecting 153 production users.</li>
+    <li>Built the team's first end-to-end test framework: Maestro with 32 cross-platform flows across 11 feature areas, plus a Node mock server (26+ routes) that made full auth testing runnable on the Android emulator for the first time.</li>
+    <li>Wired the E2E suite into nightly iOS and Android CI, cutting warm Android runs from ~75 to ~16 minutes, and shipped three regression-blocking PR quality gates with a baseline-ratchet design that stops new errors without blocking the backlog.</li>
+    <li>Centralized chat and notification SDK initialization (UJET / Google Cloud CCAI, Customer.io, Firebase Messaging) and fixed iOS cold-boot deep-link reliability.</li>
   </ul>
   <div class="tools">Key Technologies and Tools: React Native (New Architecture), TypeScript, Maestro, React Compiler, Fabric, TurboModules, GitHub Actions, Jest, Node, Swift, Kotlin, LaunchDarkly, UJET (Google Cloud CCAI), Customer.io, Firebase, Sentry, Amplitude, Apple Wallet</div>
 </div>
 
 <div class="job">
-  <div class="job-head">Mobile Developer - Part time</div>
+  <div class="job-head">Fullstack Developer - Part time</div>
   <div class="job-meta">Fintech Freelance &nbsp;|&nbsp; 03/2026 – Present</div>
   <div class="app-links">App: Pluma Finance - <a href="https://apps.apple.com/us/app/pluma-finance/id6759451648">App Store</a></div>
   <ul>
-    <li>Shipped a personal-finance iOS app from zero to production as the sole engineer with React Native + Expo, driven end-to-end through an agentic AI workflow (Claude Code).</li>
-    <li>Implemented Supabase auth (PKCE, TOTP 2FA) and Open Finance integration via Pluggy, backed by a network-aware tRPC + TanStack Query data layer.</li>
+    <li>Shipped Pluma Finance, a personal-finance iOS app, from first commit to the App Store with React Native + Expo, working end to end with a small freelance team in an AI-assisted workflow (Claude Code).</li>
+    <li>Implemented Supabase auth (PKCE, TOTP 2FA) and Open Finance integration via Pluggy, owning the Supabase Postgres backend (RLS) behind a network-aware tRPC + TanStack Query data layer.</li>
     <li>Delivered a modern UI with native iOS Liquid Glass and Reanimated animations, RevenueCat subscriptions, and Sentry monitoring, with a full EAS Build + EAS Update (OTA) pipeline on GitHub Actions, tested with Jest and Maestro.</li>
   </ul>
   <div class="tools">Key Technologies and Tools: React Native, Expo, RevenueCat, Supabase, Claude, Sentry, Maestro, Jest, GitHub Actions, EAS</div>
@@ -100,11 +89,11 @@
   <div class="job-meta">Ploomes &nbsp;|&nbsp; 05/2023 – 01/2026</div>
   <div class="app-links">App: Ploomes CRM - <a href="https://apps.apple.com/us/app/ploomes/id1405137541">App Store</a> · <a href="https://play.google.com/store/apps/details?id=com.ploomes.mobileapp">Google Play</a></div>
   <ul>
-    <li>Engineered a robust offline architecture using RealmDB and OData, reducing support tickets by 90% and ensuring reliable synchronization in low-connectivity environments.</li>
-    <li>Enhanced core UI/UX flows with React Native, Reanimated and Gesture Handler, delivering intuitive CRUD, chart, and map experiences that increased user engagement and data clarity.</li>
-    <li>Developed an offline-cached universal search with TypeScript and Redux, supporting 30+ daily queries per user and improving accessibility for 5,000+ active users.</li>
-    <li>Spearheaded an automated testing pipeline with Jest (unit) and Maestro (E2E), cutting regression incidents by 40% and improving release confidence across teams.</li>
-    <li>Streamlined CI/CD workflows using Bitrise, CodePush (OTA updates), and GitHub Actions, reducing manual deployment time by 70% and ensuring consistent store releases.</li>
+    <li>Engineered an offline architecture with RealmDB and OData that cut support tickets by 90% and kept field reps' data in sync in low-connectivity areas.</li>
+    <li>Built an offline-cached universal search with TypeScript and Redux, serving 30+ queries per user a day across 5,000+ active users.</li>
+    <li>Rebuilt core CRUD, chart, and map flows with React Native, Reanimated and Gesture Handler.</li>
+    <li>Set up the app's automated testing pipeline with Jest (unit) and Maestro (E2E), cutting regression incidents by 40%.</li>
+    <li>Streamlined CI/CD with Bitrise, CodePush (OTA), and GitHub Actions, reducing manual deployment time by 70%.</li>
   </ul>
   <div class="tools">Key Technologies and Tools: React Native, TypeScript, Redux, Jest, Swift, Kotlin, CodePush, Bitrise, Zustand</div>
 </div>
@@ -122,35 +111,52 @@
 </div>
 
 <div class="job">
-  <div class="job-head">Mobile Developer - Part time</div>
+  <div class="job-head">Fullstack Developer - Part time</div>
   <div class="job-meta">Freelance &nbsp;|&nbsp; 06/2020 – 01/2021</div>
   <ul>
     <li>Built and shipped client apps from concept to store release with React Native, TypeScript, and CodePush (OTA) for startups and small businesses.</li>
+    <li>Delivered the full product around each app: Node APIs, Firebase backends (Auth, Firestore, Cloud Messaging) and React admin panels, owning mobile, web and backend end to end.</li>
   </ul>
 </div>
 
 <h2>Projects</h2>
 
 <div class="job">
-  <div class="job-head">Daily Logs - Workout Tracker - Personal project</div>
-  <div class="job-meta">01/2025 – Present &nbsp;|&nbsp; App Store: in review</div>
+  <div class="job-head">Nino - AI Pet Companion - Personal project</div>
+  <div class="job-meta">2026 &nbsp;|&nbsp; In TestFlight beta, launching soon</div>
   <ul>
-    <li>Built and submitted to the App Store (currently in review) an offline-first workout-tracking app from zero with React Native, React 19 with the React Compiler and the New Architecture enabled, driven end-to-end through an agentic AI workflow (Claude Code).</li>
-    <li>Architected a fully offline local data layer with expo-SQLite + Drizzle ORM, designing a three-tier schema (catalog, template, session) with soft deletes, UUID keys, and idempotent versioned seed packs (128+ exercise catalog), exposed through a clean repository pattern.</li>
-    <li>Engineered live workout state on iOS with a custom native Swift module for Live Activities / Dynamic Island and a WidgetKit workout widget (@bacons/apple-targets), persisting rest-timer, current-exercise, and resume-session state across cold boots.</li>
-    <li>Automated the full release lifecycle with GitHub Actions: lint + Jest gates, automatic semantic version bumping, and EAS Build + EAS Update (OTA) across development/preview/production channels, with Maestro E2E flows covering critical journeys.</li>
+    <li>Designing and building a consumer pet-care product end to end in a Turborepo + pnpm monorepo: an Expo (SDK 56, New Architecture) app serving iOS, Android and web from one codebase, a NestJS API in strict TypeScript with the health domain modelled in PostgreSQL + Drizzle across 17 modules, and shared Zod contracts consumed by both sides.</li>
+    <li>Built a multi-provider LLM layer (Anthropic and Google) behind generation, chat and daily-digest modules, with provider balancing and per-account spend controls so inference cost stays bounded as usage grows.</li>
+    <li>Wired the platform end to end: Clerk auth, Google Cloud Storage and Secret Manager, Firebase App Check, RevenueCat subscriptions, Sentry and PostHog, plus GitHub Actions CI and deploy pipelines over 135 test files and Maestro E2E flows.</li>
   </ul>
-  <div class="tools">Key Technologies and Tools: React Native, Expo, EAS, TypeScript, Drizzle ORM, expo-SQLite, Swift (Live Activities/WidgetKit), Zustand, TanStack Query, React Hook Form, Zod, Reanimated, NativeWind, Jest, Maestro, GitHub Actions, Claude, Tailwind</div>
+  <div class="tools">Key Technologies and Tools: Expo, React Native, NestJS, TypeScript, PostgreSQL, Drizzle, Zod, Turborepo, Anthropic SDK, Google GenAI, RevenueCat, Sentry, PostHog, Maestro, GitHub Actions, Docker</div>
 </div>
 
-<h2>Education</h2>
+<div class="job">
+  <div class="job-head">Daily Logs - Workout Tracker - Personal project</div>
+  <div class="job-meta">01/2025 – Present &nbsp;|&nbsp; <a href="https://apps.apple.com/us/app/daily-logs-offline-workouts/id6757203084">App Store</a> · <a href="https://daily-logs-app.vercel.app/">Web</a></div>
+  <ul>
+    <li>Built solo and shipped to the App Store and the web an offline-first workout tracker with React Native (React 19, React Compiler, New Architecture), a fully offline expo-SQLite + Drizzle ORM data layer, and a custom native Swift module for Live Activities, Dynamic Island and a WidgetKit widget.</li>
+    <li>Automated the full release lifecycle with GitHub Actions (lint and Jest gates, semantic version bumping, EAS Build + EAS Update OTA channels, Maestro E2E), driven end to end through an agentic AI workflow (Claude Code).</li>
+  </ul>
+  <div class="tools">Key Technologies and Tools: React Native, Expo, EAS, TypeScript, expo-SQLite, Drizzle, Swift (Live Activities/WidgetKit), Jest, Maestro, GitHub Actions</div>
+</div>
+
+<h2>Skills</h2>
+<div class="skills">
+  <p><strong>Languages:</strong> TypeScript, JavaScript, Swift, Kotlin, Objective-C, Java, SQL</p>
+  <p><strong>Mobile / React Native:</strong> New Architecture (Fabric, TurboModules, React Compiler), Expo and EAS, offline-first sync, push notifications, deep linking, biometric authentication; Redux, Zustand, TanStack Query, Zod; native iOS (SwiftUI, UIKit, Live Activities / WidgetKit, StoreKit, APNs) and Android (Jetpack Compose, Room, WorkManager, Bluetooth native modules)</p>
+  <p><strong>Web &amp; Backend:</strong> React, Next.js (App Router, SSR / ISR), Tailwind, accessibility (WCAG); Node, NestJS, Express, Fastify, tRPC, REST, OData, WebSocket, message queues (SQS, RabbitMQ, BullMQ), OAuth2 / OIDC, JWT, PKCE, TOTP</p>
+  <p><strong>Data:</strong> PostgreSQL, MySQL, SQL Server, MongoDB, Redis, RealmDB, expo-SQLite, Drizzle ORM, Prisma, schema design and migrations</p>
+  <p><strong>Testing &amp; CI/CD:</strong> TDD, Jest, React Native Testing Library, Maestro (E2E), Detox, Playwright, MSW, GitHub Actions, Bitrise, Fastlane, CodePush / EAS Update (OTA), Docker, Kubernetes, TestFlight and Play Console, feature flags, monorepo (Turborepo, Nx)</p>
+  <p><strong>Cloud, Services &amp; AI:</strong> AWS (S3, Lambda), Firebase, Supabase, Vercel, Sentry, RevenueCat, LaunchDarkly, Pluggy (Open Finance); LLM features in product (API, RAG, agents), LLM output evals, MCP, Claude Code, Cursor, Copilot</p>
+</div>
+
+<h2>Education &amp; Languages</h2>
 <div class="job">
   <div class="job-head">Bachelor's - Computer Science</div>
-  <div class="job-meta">University of Fortaleza (Unifor) &nbsp;|&nbsp; 2025</div>
+  <div class="job-meta">University of Fortaleza (Unifor) &nbsp;|&nbsp; 2025 &nbsp;·&nbsp; Portuguese (Native) · English (C1 Advanced, Fisk certificate 2018) · Spanish (Intermediate)</div>
 </div>
-
-<h2>Languages &amp; Certifications</h2>
-<p>Portuguese (Native) · English (C1, Advanced) · Spanish (Intermediate)<br>English Course Certificate (C1) · Fisk, Richard Hugh Fisk Foundation · 2018</p>
 
 </body>
 </html>
