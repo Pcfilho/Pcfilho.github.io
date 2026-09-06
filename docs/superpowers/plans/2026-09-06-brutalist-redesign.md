@@ -199,7 +199,7 @@ const TEXT = /\.(html|css|js|mjs|cjs|json|md)$/;
 
 test('no em-dash (U+2014) in tracked text files', () => {
   const files = execSync('git ls-files', { encoding: 'utf8' }).split('\n').filter(f => TEXT.test(f));
-  const offenders = files.filter(f => readFileSync(f, 'utf8').includes('—'));
+  const offenders = files.filter(f => readFileSync(f, 'utf8').includes('\u2014'));
   assert.deepEqual(offenders, []);
 });
 ```
