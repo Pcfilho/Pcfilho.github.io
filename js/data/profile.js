@@ -8,7 +8,7 @@ export const profile = {
   role: L('Senior React Native / Mobile Engineer', 'Engenheiro Mobile Sênior · React Native'),
   location: L('Based in Fortaleza, Brazil', 'De Fortaleza, Brasil'),
   tz: 'GMT-3',
-  tzOffsetHours: -3,
+  timeZone: 'America/Fortaleza',
   email: 'paulo.dev.85@gmail.com',
   phone: '+5585999209820',
   linkedin: 'https://www.linkedin.com/in/paulo-cesar-barroso/',

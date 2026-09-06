@@ -1,17 +1,13 @@
-import { t, state } from '../i18n.js';
+import { t, L, state } from '../i18n.js';
 import { esc } from '../dom.js';
 import { profile } from '../data/profile.js';
+import { formatClock } from '../clock.js';
 
 export const id = 'site-header';
 let timer = null;
 
 function clockText() {
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const local = new Date(utc + profile.tzOffsetHours * 3600000);
-  const hh = String(local.getHours()).padStart(2, '0');
-  const mm = String(local.getMinutes()).padStart(2, '0');
-  return `${hh}:${mm} ${profile.tz}`;
+  return formatClock(new Date(), profile.timeZone, profile.tz);
 }
 
 export function render(root) {
@@ -23,7 +19,7 @@ export function render(root) {
           <div class="hdr-loc-l">${esc(t(profile.location))}</div>
           <div class="mono" id="hdr-clock">${clockText()}</div>
         </div>
-        <div class="hdr-lang" role="group" aria-label="Language">
+        <div class="hdr-lang" role="group" aria-label="${esc(t(L('Language', 'Idioma')))}">
           <button type="button" data-lang="en" class="${state.lang === 'en' ? 'on' : ''}">EN</button>
           <button type="button" data-lang="pt" class="${state.lang === 'pt' ? 'on' : ''}">PT</button>
         </div>
