@@ -1,13 +1,13 @@
-import { t } from '../i18n.js';
+import { t, L } from '../i18n.js';
 import { esc } from '../dom.js';
 import { profile } from '../data/profile.js';
 
 export const id = 'hero';
 
 const copy = {
-  hi: { en: 'Hi there', pt: 'Olá' },
-  iam: { en: 'I am Paulo', pt: 'Sou o Paulo' },
-  since: { en: 'Shipping mobile apps since', pt: 'Publicando apps mobile desde' }
+  hi: L('Hi there', 'Olá'),
+  iam: L('I am Paulo', 'Sou o Paulo'),
+  since: L('Shipping mobile apps since', 'Publicando apps mobile desde')
 };
 
 export function render(root) {
@@ -19,7 +19,7 @@ export function render(root) {
         <span class="line"><span class="word" style="--d:.6s">${esc(t(copy.iam))}<span class="sq"></span></span></span>
       </h1>
       <p class="hero-sub" style="--d:2s">
-        <span class="hero-sub-l">${esc(t(copy.since))} <b>${profile.since}</b></span>
+        <span class="hero-sub-l">${esc(t(copy.since))} <b>${esc(profile.since)}</b></span>
         <span class="hero-sub-l">${esc(t(profile.role))}</span>
       </p>
     </div>`;
