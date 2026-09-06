@@ -61,7 +61,7 @@ function page0Apps(){
   }).join('');
   var edit = ps.editMode;
   var icons = orderedApps().map(function(app, idx){
-    var del = edit ? '<button class="pb-del" onclick="PB.tryDelete(\''+app.key+'\',event)" aria-label="remove" style="position:absolute;top:-7px;left:-7px;z-index:4;width:22px;height:22px;border-radius:50%;border:none;background:#ededed;color:#222;font-size:18px;font-weight:800;line-height:0;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:0;">−</button>' : '';
+    var del = edit ? '<button class="pb-del" onclick="PB.tryDelete(\''+app.key+'\',event)" aria-label="'+esc(t(L('Remove','Remover')))+'" style="position:absolute;top:-7px;left:-7px;z-index:4;width:22px;height:22px;border-radius:50%;border:none;background:#ededed;color:#222;font-size:18px;font-weight:800;line-height:0;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:0;">−</button>' : '';
     // Coach-mark on the first app (Collective Health, the most important role):
     // the OS 👆 emoji at the icon's bottom-right corner, tilted like a cursor,
     // with a looping tap. Stays until the visitor opens any app, then never again.
@@ -146,7 +146,7 @@ function page1Widgets(){
 
 function dotsView(){
   var dot = function(i){ var on = ps.page===i;
-    return '<button data-pbdot="'+i+'" onclick="PB.goPage('+i+')" class="pb-dot" aria-label="page '+(i+1)+'" style="cursor:pointer;border:none;padding:0;height:6px;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.45);width:'+(on?'18px':'6px')+';opacity:'+(on?'1':'.45')+';"></button>';
+    return '<button data-pbdot="'+i+'" onclick="PB.goPage('+i+')" class="pb-dot" aria-label="'+esc(t(L('Page','Página')))+' '+(i+1)+'" style="cursor:pointer;border:none;padding:0;height:6px;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.45);width:'+(on?'18px':'6px')+';opacity:'+(on?'1':'.45')+';"></button>';
   };
   return '<div style="position:absolute;left:0;right:0;bottom:114px;display:flex;gap:6px;justify-content:center;z-index:5;">'+dot(0)+dot(1)+'</div>';
 }

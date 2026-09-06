@@ -45,14 +45,23 @@ export function render(root) {
   wireKonami();
 }
 
+let counted = null;
 async function loadCount(el) {
+  if (counted !== null) {
+    el.querySelector('b').textContent = counted;
+    el.hidden = false;
+    return;
+  }
   try {
     const r = await fetch('https://pcfilho.goatcounter.com/counter/TOTAL.json');
     if (!r.ok) return;
     const j = await r.json();
     if (j && (typeof j.count === 'number' || (typeof j.count === 'string' && j.count.trim()))) {
-      el.querySelector('b').textContent = String(j.count).replace(/\s/g, '');
-      el.hidden = false;
+      counted = String(j.count).replace(/\s/g, '');
+      if (el.isConnected) {
+        el.querySelector('b').textContent = counted;
+        el.hidden = false;
+      }
     }
   } catch (_) { /* counter stays hidden */ }
 }
@@ -61,6 +70,7 @@ export function showPush(msg) {
   document.querySelector('.push-banner')?.remove();
   const el = document.createElement('div');
   el.className = 'push-banner';
+  el.setAttribute('role', 'status');
   el.innerHTML = `<img src="${profile.avatar}" alt="" width="38" height="38"><div><div class="push-t"><b>${esc(profile.name)}</b><span class="mono">${esc(t(c.now))}</span></div><div class="push-m">${esc(msg)}</div></div>`;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('in'));
@@ -70,13 +80,15 @@ export function showPush(msg) {
 function toast(msg) {
   const el = document.createElement('div');
   el.className = 'toast mono'; el.textContent = msg;
+  el.setAttribute('role', 'status');
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('in'));
   setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 300); }, 2700);
 }
 
 function confetti() {
-  const colors = ['#FF6A1A', '#ffffff', '#666666'];
+  const cs = getComputedStyle(document.documentElement);
+  const colors = [cs.getPropertyValue('--accent').trim(), cs.getPropertyValue('--white').trim(), cs.getPropertyValue('--grey').trim()];
   for (let i = 0; i < 110; i++) {
     const d = document.createElement('div');
     const sz = 6 + Math.random() * 8;

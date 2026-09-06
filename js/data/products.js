@@ -21,7 +21,7 @@ export const products = [
       'Digital pet companion: AI cartoon of your pet, vaccine wallet, and an AI vet.',
       'Companheiro digital do pet: cartoon por IA, carteira de vacinas e um veterinário IA.'
     ),
-    status: L('BUILDING · 600+ PRs merged', 'EM CONSTRUÇÃO · 600+ PRs'),
+    status: L('BUILDING · 600+ PRs merged', 'EM CONSTRUÇÃO · 600+ PRs integrados'),
     stack: 'Expo · NestJS · Postgres · Turborepo',
     url: 'https://github.com/Pcfilho'
   }

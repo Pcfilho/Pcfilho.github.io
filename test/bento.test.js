@@ -14,10 +14,10 @@ test('terminalScript: prompt line, check lines, done line, in the chosen languag
   assert.equal(pt.at(-1), 'Sucesso! Engenheiro publicado.');
 });
 
-test('numbersRows: "value  label · org" per entry', () => {
+test('numbersRows: "value label · org" per entry', () => {
   const rows = numbersRows(bento.numbers, 'en');
   assert.equal(rows.length, bento.numbers.length);
-  assert.equal(rows[0], '90%  fewer support tickets · Ploomes');
+  assert.equal(rows[0], '90% fewer support tickets · Ploomes');
 });
 
 test('terminalScript stays pure: repeated calls return equal output, independent of mountTerminal state', () => {

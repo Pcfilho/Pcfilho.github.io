@@ -2,7 +2,7 @@ import { esc } from '../dom.js';
 
 export function numbersRows(data, lang) {
   const pick = v => (typeof v === 'string' ? v : (v[lang] ?? v.en));
-  return data.map(n => `${n.v}  ${pick(n.l)} · ${n.org}`);
+  return data.map(n => `${n.v} ${pick(n.l)} · ${n.org}`);
 }
 
 // Vertical auto-scroll of the rows (duplicated for a seamless loop). Slows to 1/4 speed on hover.
@@ -22,9 +22,11 @@ export function mountNumbers(el, rows) {
   el.addEventListener('mouseenter', onEnter);
   el.addEventListener('mouseleave', onLeave);
 
+  let io = null;
   const dispose = () => {
     cancelled = true;
     cancelAnimationFrame(rafId);
+    if (io) io.disconnect();
     el.removeEventListener('mouseenter', onEnter);
     el.removeEventListener('mouseleave', onLeave);
   };
@@ -41,7 +43,21 @@ export function mountNumbers(el, rows) {
     track.style.transform = `translateY(${-y}px)`;
     rafId = requestAnimationFrame(step);
   };
-  rafId = requestAnimationFrame(step);
+
+  // Off-screen, the loop just burns frames: gate it on visibility.
+  if ('IntersectionObserver' in window) {
+    io = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        if (!rafId) { last = 0; rafId = requestAnimationFrame(step); }
+      } else {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    }, { threshold: 0.01 });
+    io.observe(el);
+  } else {
+    rafId = requestAnimationFrame(step);
+  }
 
   return dispose;
 }

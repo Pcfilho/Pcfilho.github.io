@@ -20,8 +20,8 @@ export function render(root) {
           <div class="mono" id="hdr-clock">${clockText()}</div>
         </div>
         <div class="hdr-lang" role="group" aria-label="${esc(t(L('Language', 'Idioma')))}">
-          <button type="button" data-lang="en" class="${state.lang === 'en' ? 'on' : ''}">EN</button>
-          <button type="button" data-lang="pt" class="${state.lang === 'pt' ? 'on' : ''}">PT</button>
+          <button type="button" data-lang="en" class="${state.lang === 'en' ? 'on' : ''}" aria-pressed="${state.lang === 'en'}">EN</button>
+          <button type="button" data-lang="pt" class="${state.lang === 'pt' ? 'on' : ''}" aria-pressed="${state.lang === 'pt'}">PT</button>
         </div>
       </div>
     </div>`;

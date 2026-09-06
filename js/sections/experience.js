@@ -6,7 +6,7 @@ export const id = 'experience';
 const title = L('Experience', 'Experiência');
 
 function logo(e) {
-  if (e.logo) return `<img class="xp-logo" src="${e.logo}" alt="${esc(t(e.org))} logo" width="48" height="48">`;
+  if (e.logo) return `<img class="xp-logo" src="${e.logo}" alt="" width="48" height="48">`;
   return `<span class="xp-logo xp-logo-mono">${esc(String(t(e.org)).slice(0, 1))}</span>`;
 }
 

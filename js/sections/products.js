@@ -8,7 +8,7 @@ const title = L('My products', 'Meus produtos');
 export function render(root) {
   const cards = products.map(p => `
     <a class="card prod" href="${p.url}" ${EXT}>
-      <img class="prod-icon" src="${p.icon}" alt="${esc(p.name)} icon" width="96" height="96">
+      <img class="prod-icon" src="${p.icon}" alt="" width="96" height="96">
       <div class="prod-body">
         <h3 class="prod-name">${esc(p.name)}</h3>
         <p class="prod-line">${esc(t(p.line))}</p>

@@ -184,7 +184,7 @@
 
   function spriteFor(stateKey) {
     var s = SPRITES.states[stateKey] || SPRITES.states.idle;
-    var i = Math.floor((Date.now() / 1000) * s.fps) % s.files.length;
+    var i = reduceMotion ? 0 : Math.floor((Date.now() / 1000) * s.fps) % s.files.length; // freeze on frame 0 (idle dog) under reduced motion
     return cache[s.files[i]] || null; // null while loading or on error -> mock fallback
   }
 
@@ -329,14 +329,20 @@
     ctx.beginPath(); ctx.arc(ball.x, ball.y, env.radius + 8 + (reduceMotion ? 0 : pulse * 4), 0, Math.PI * 2); ctx.stroke();
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'rgba(255,255,255,.92)';
-    ctx.font = '600 13px Manrope, system-ui, sans-serif'; ctx.textAlign = 'center';
+    ctx.font = '600 13px Inter, system-ui, sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(hintText(), ball.x, ball.y - env.radius - 16);
     ctx.restore();
   }
 
+  function ariaLabelText() {
+    return lang === 'pt' ? 'Cena de praia: Bull, o bulldog francês, buscando a bolinha' : 'Beach scene: Bull the French Bulldog fetching a ball';
+  }
+
   function mount(hostEl, initialLang) {
+    if (!hostEl) return;
     lang = initialLang || 'en';
     if (canvas) {
+      canvas.setAttribute('aria-label', ariaLabelText());
       if (hostEl !== host) {
         host = hostEl;
         host.appendChild(canvas); // section re-rendered: same canvas, new host node
@@ -352,6 +358,8 @@
     canvas = document.createElement('canvas');
     // pan-y keeps page scroll unless we grab the ball
     canvas.style.cssText = 'display:block;touch-action:pan-y;position:absolute;inset:0;';
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', ariaLabelText());
     host.appendChild(canvas);
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
@@ -370,11 +378,9 @@
     start();
   }
 
-  function updateCaption() {}
-
   window.DogGame = {
     mount: mount,
-    setLang: function (l) { lang = l; }
+    setLang: function (l) { lang = l; if (canvas) canvas.setAttribute('aria-label', ariaLabelText()); }
   };
 
   window.DogGame._debugThrow = function (vx, vy) {

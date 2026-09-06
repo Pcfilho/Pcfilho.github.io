@@ -27,7 +27,7 @@ dog-game.core.js            unchanged UMD physics core
 dog-game.js                 mounts the beach fetch game into the bento dog slot
 scripts/portrait.mjs        builds hero-portrait webp files from the source png
 scripts/shoot.mjs           serves the site and captures screenshots into shots/
-test/*.test.js              node --test suite (i18n, data, bento, clock, dog-game core, no-em-dash)
+test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-game core, no-em-dash)
 ```
 
 ## Conventions

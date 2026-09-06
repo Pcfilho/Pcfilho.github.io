@@ -9,8 +9,9 @@
 .ftr-r { display: flex; flex-direction: column; gap: 14px; }
 .ftr-r .slot-h { margin-top: 0; }
 .push-row { display: flex; gap: 8px; }
-.push-in { flex: 1; background: var(--bg); border: 1px solid var(--line); color: var(--fg); padding: 12px 14px; outline: none; }
+.push-in { flex: 1; background: var(--bg); border: 1px solid var(--line); color: var(--fg); padding: 12px 14px; }
 .push-in:focus { border-color: var(--fg-3); }
+.push-in:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .push-btn { background: var(--accent); color: var(--bg); font: 600 14px/1 var(--font-text); padding: 0 18px; }
 .push-banner { position: fixed; top: 12px; left: 50%; transform: translate(-50%, -140%); width: min(380px, calc(100vw - 24px)); z-index: 9999;
   display: flex; gap: 10px; align-items: center; padding: 11px 12px; background: rgba(31,31,31,.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);

@@ -2,11 +2,9 @@ import { loadLang, setLang, state } from './i18n.js';
 import * as header from './sections/header.js';
 
 const sections = [header];
-const listeners = new Set();
 
 // Later tasks push their modules here in page order.
 export function register(mod) { sections.push(mod); }
-export function onLangChange(fn) { listeners.add(fn); }
 
 export function renderAll() {
   document.documentElement.setAttribute('lang', state.lang);
@@ -14,7 +12,6 @@ export function renderAll() {
     const root = document.getElementById(mod.id);
     if (root) mod.render(root);
   }
-  listeners.forEach(fn => fn(state.lang));
 }
 
 export function switchLang(lang) {
@@ -24,22 +21,26 @@ export function switchLang(lang) {
   observeReveals();
 }
 
+let revealObserver = null;
 function observeReveals() {
+  if (revealObserver) revealObserver.disconnect();
   const nodes = document.querySelectorAll('.reveal:not(.in)');
   if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
     nodes.forEach(n => n.classList.add('in'));
     return;
   }
-  const io = new IntersectionObserver((entries) => {
+  revealObserver = new IntersectionObserver((entries) => {
     for (const e of entries) {
-      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); }
     }
   }, { threshold: 0.15 });
-  nodes.forEach(n => io.observe(n));
+  nodes.forEach(n => revealObserver.observe(n));
 }
 
 async function boot() {
   loadLang();
+  // Render the header first: a section that fails to import below still leaves a header.
+  header.render(document.getElementById(header.id));
   // Section modules are imported here so main.js stays the single place that knows page order.
   const mods = await Promise.all([
     import('./sections/hero.js'),
@@ -51,8 +52,8 @@ async function boot() {
     import('./sections/footer.js')
   ]);
   mods.forEach(register);
-  renderAll();
+  renderAll(); // re-renders the header too; harmless
   observeReveals();
 }
 
-boot();
+boot().catch(err => console.error('[boot] site failed to render', err));
