@@ -1,1 +1,7 @@
-/* filled in a later task */
+.recos { display: flex; flex-direction: column; }
+.reco { padding: 32px 0; border-top: 1px solid var(--hair); }
+.reco:last-child { border-bottom: 1px solid var(--hair); }
+.reco-q { font: 400 18px/1.5 var(--font-text); color: var(--fg); max-width: 880px; margin-bottom: 16px; }
+.reco-meta { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.reco-link { display: inline-flex; align-items: center; gap: 4px; color: var(--fg-2); }
+.reco-link .arrow { width: 14px; height: 14px; }
