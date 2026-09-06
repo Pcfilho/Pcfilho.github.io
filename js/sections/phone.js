@@ -1,4 +1,4 @@
-import { t, L, state } from '../i18n.js';
+import { t, L } from '../i18n.js';
 import { esc, EXT } from '../dom.js';
 import { profile } from '../data/profile.js';
 import { apps } from '../data/apps.js';
@@ -157,10 +157,10 @@ function dockView(){
   };
   var s = function(p){ return '<svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
   return '<div style="position:absolute;left:14px;right:14px;bottom:26px;height:78px;background:rgba(255,255,255,.12);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.18);border-radius:28px;display:flex;align-items:center;justify-content:space-around;padding:0 16px;box-shadow:0 8px 24px rgba(0,0,0,.22);z-index:5;">'
-    + dockIcon('mailto:'+profile.email,'title="Email"','#FF6A1A', s('<rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>'))
-    + dockIcon(profile.linkedin,EXT+' title="LinkedIn"','#1f6fe0', s('<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle>'))
-    + dockIcon('tel:'+profile.phone,'title="Call"','#27a34a', s('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>'))
-    + dockIcon(profile.github,EXT+' title="GitHub"','#2a2a2a', '<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.49 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/></svg>')
+    + dockIcon('mailto:'+profile.email,'title="'+esc(t(L('Email','E-mail')))+'"','#FF6A1A', s('<rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>'))
+    + dockIcon(profile.linkedin,EXT+' title="'+esc(t(L('LinkedIn','LinkedIn')))+'"','#1f6fe0', s('<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle>'))
+    + dockIcon('tel:'+profile.phone,'title="'+esc(t(L('Call','Ligar')))+'"','#27a34a', s('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>'))
+    + dockIcon(profile.github,EXT+' title="'+esc(t(L('GitHub','GitHub')))+'"','#2a2a2a', '<svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.49 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/></svg>')
     + '</div>';
 }
 
@@ -391,13 +391,12 @@ export function phoneNotify(msg){
   var screen = document.getElementById('pb-screen');
   if(!screen){ toast(msg); return; }
   var prev = screen.querySelector('.pb-push'); if(prev) prev.remove();
-  var pt = state.lang==='pt';
   var el = document.createElement('div');
   el.className = 'pb-push';
   el.style.cssText = 'position:absolute;top:54px;left:10px;right:10px;z-index:30;display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:20px;background:rgba(250,250,250,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 12px 32px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.55);transform:translateY(-170%);opacity:0;transition:transform .5s cubic-bezier(.2,.9,.3,1.25),opacity .3s ease;font-family:var(--font-text);';
   el.innerHTML = '<div style="width:38px;height:38px;border-radius:10px;flex:none;overflow:hidden;position:relative;background:linear-gradient(135deg,#ff8a3d,#ff6a1a);display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-weight:800;font-size:13px;">PB</span><img src="'+profile.avatar+'" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>'
     + '<div style="min-width:0;flex:1;">'
-    +   '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:12px;font-weight:800;color:#111;">'+esc(profile.name)+'</span><span style="font-size:11px;color:#666;font-weight:600;flex:none;">'+(pt?'agora':'now')+'</span></div>'
+    +   '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:12px;font-weight:800;color:#111;">'+esc(profile.name)+'</span><span style="font-size:11px;color:#666;font-weight:600;flex:none;">'+esc(t(L('now','agora')))+'</span></div>'
     +   '<div style="font-size:12.5px;line-height:1.35;color:#1c1c1c;margin-top:1px;">'+esc(msg)+'</div>'
     + '</div>';
   screen.appendChild(el);
@@ -424,11 +423,13 @@ window.PB = {
   exitEdit: function(ev){ if(ev && ev.stopPropagation) ev.stopPropagation(); if(ps.editMode){ ps.editMode = false; renderPhone(); } },
   tryDelete: function(key, ev){
     if(ev){ ev.stopPropagation(); ev.preventDefault(); }
-    var pt = state.lang==='pt';
-    var msgs = pt
-      ? ['🙅 Você não apaga a minha história!', '🚀 Esse foi publicado na App Store. Fica.', '😄 Boa tentativa! Esse aqui eu não deleto.', '❤️ Apagar anos de trabalho? Jamais.']
-      : ["🙅 You can't delete my story!", '🚀 That one shipped to the App Store. It stays.', '😄 Nice try! This app is here to stay.', '❤️ Erase years of work? Never.'];
-    phoneNotify(msgs[Math.floor(Math.random()*msgs.length)]);
+    var msgs = [
+      L("🙅 You can't delete my story!", '🙅 Você não apaga a minha história!'),
+      L('🚀 That one shipped to the App Store. It stays.', '🚀 Esse foi publicado na App Store. Fica.'),
+      L('😄 Nice try! This app is here to stay.', '😄 Boa tentativa! Esse aqui eu não deleto.'),
+      L('❤️ Erase years of work? Never.', '❤️ Apagar anos de trabalho? Jamais.')
+    ];
+    phoneNotify(t(msgs[Math.floor(Math.random()*msgs.length)]));
     var cell = document.querySelector('.pb-appicon[data-key="'+key+'"]');
     if(cell){ cell.classList.remove('pb-deny'); void cell.offsetWidth; cell.classList.add('pb-deny'); }
   },
@@ -438,7 +439,7 @@ window.PB = {
     if(!frame || frame.querySelector('.pb-island')) return;
     var el = document.createElement('div');
     el.className = 'pb-island';
-    el.textContent = state.lang==='pt' ? '🎧 codando • jazz' : '🎧 coding • jazz';
+    el.textContent = t(L('🎧 coding • jazz', '🎧 codando • jazz'));
     el.style.cssText = 'position:absolute;top:18px;left:50%;transform:translateX(-50%) scale(.85);background:#0b0b0d;color:#fff;font-size:12px;font-weight:700;padding:9px 16px;border-radius:999px;z-index:8;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.55);font-family:var(--font-text);opacity:0;transition:opacity .25s ease, transform .4s cubic-bezier(.22,1,.36,1);';
     frame.appendChild(el);
     requestAnimationFrame(function(){ el.style.opacity='1'; el.style.transform='translateX(-50%) scale(1)'; });
