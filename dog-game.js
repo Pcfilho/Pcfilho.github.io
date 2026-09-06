@@ -67,14 +67,12 @@
 
   var LAYOUT = { heightVH: 0.38, minH: 280, maxH: 420, groundRatio: 0.74, radiusRatio: 0.045, sideInset: 0.05, mouthRatio: 0.16 };
   var THEME = {
-    light: { sky0: '#ffe3bd', sky1: '#ffb38f', seaTop: '#ff9e86', sea1: '#5fa6ad', sand0: '#f7e3b8', sand1: '#e9cf95', text: 'rgba(60,40,20,.8)' },
-    dark:  { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
+    dark: { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
   };
 
-  var host, phoneEl, screenEl, canvas, ctx, caption, headEl, subEl, dpr = 1;
-  var PHONE = { maxW: 880, bezel: 14, aspect: 19.5 / 9 }; // landscape iPhone: screen w:h ratio
+  var host, canvas, ctx, ro = null, io = null, dpr = 1;
   var W = 0, H = 0, env = null;
-  var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
+  var lang = readLS('pb_lang', 'en');
   var played = readLS('pb_dog_played', '') === '1';
   var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hintT = 0;
@@ -83,12 +81,6 @@
   var aiming = false, aimPtr = null, aimStart = null, aimCur = null;
 
   function readLS(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
-
-  function captionText() {
-    return lang === 'pt'
-      ? 'Feito em Fortaleza, Ceará 🌴 · supervisionado por 2 pets'
-      : 'Built in Fortaleza, Ceará 🌴 · supervised by 2 pets';
-  }
 
   function computeEnv() {
     var groundY = H * LAYOUT.groundRatio;
@@ -105,11 +97,8 @@
 
   function resize() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
-    var outer = Math.min(PHONE.maxW, host.clientWidth - 32); // phone outer width, with page margin
-    W = Math.round(outer - 2 * PHONE.bezel);                 // screen (= canvas) width
-    H = Math.round(W / PHONE.aspect);                        // landscape screen height
-    screenEl.style.width = W + 'px';
-    screenEl.style.height = H + 'px';
+    W = Math.max(200, Math.round(host.clientWidth));
+    H = Math.max(120, Math.round(host.clientHeight));
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
     canvas.width = Math.round(W * dpr);
@@ -139,7 +128,7 @@
   }
 
   function drawBackground() {
-    var t = THEME[theme] || THEME.light;
+    var t = THEME.dark;
     var horizonY = env.groundY - H * 0.17;
     // sky gradient (warm, ties the site's cream/coral above)
     var sky = ctx.createLinearGradient(0, 0, 0, horizonY);
@@ -345,80 +334,47 @@
     ctx.restore();
   }
 
-  function mount() {
-    host = document.getElementById('pb-beach');
+  function mount(hostEl, initialLang) {
+    lang = initialLang || 'en';
+    if (canvas) {
+      if (hostEl !== host) {
+        host = hostEl;
+        host.appendChild(canvas); // section re-rendered: same canvas, new host node
+        if (ro) { ro.disconnect(); ro.observe(host); }
+        if (io) { io.disconnect(); io.observe(host); }
+        resize();
+      }
+      return; // idempotent: same host -> only the language changed
+    }
+    host = hostEl;
     if (!host) return;
-    // section: cream page bg, centers the phone, credit below it
-    // -webkit-touch-callout/user-select:none so dragging the ball doesn't trigger iOS text/image selection
-    host.style.cssText = 'position:relative;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:36px 16px 52px;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;';
-
-    // section header (same language as the other section titles, ties it to the page)
-    headEl = document.createElement('h2');
-    headEl.style.cssText = "font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-1px;margin:0 0 6px;text-align:center;color:var(--text);";
-    host.appendChild(headEl);
-    subEl = document.createElement('p');
-    subEl.style.cssText = 'color:var(--dim);font-size:15px;margin:0 0 22px;text-align:center;max-width:520px;';
-    host.appendChild(subEl);
-
-    // landscape iPhone body (bezel)
-    phoneEl = document.createElement('div');
-    phoneEl.style.cssText = 'position:relative;display:inline-block;background:linear-gradient(150deg,#3a3a3f,#0d0d10);' +
-      'padding:' + PHONE.bezel + 'px;border-radius:46px;box-sizing:border-box;' +
-      'box-shadow:0 26px 50px -18px rgba(40,20,10,.45), 0 0 0 2px rgba(255,255,255,.05) inset, 0 1px 2px rgba(255,255,255,.15);';
-    host.appendChild(phoneEl);
-
-    // screen (clips the game)
-    screenEl = document.createElement('div');
-    screenEl.style.cssText = 'position:relative;border-radius:32px;overflow:hidden;background:#000;display:block;';
-    phoneEl.appendChild(screenEl);
 
     canvas = document.createElement('canvas');
-    canvas.style.cssText = 'display:block;touch-action:pan-y;'; // pan-y keeps page scroll unless we grab the ball
-    screenEl.appendChild(canvas);
+    // pan-y keeps page scroll unless we grab the ball
+    canvas.style.cssText = 'display:block;touch-action:pan-y;position:absolute;inset:0;';
+    host.appendChild(canvas);
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerUp);
     ctx = canvas.getContext('2d');
 
-    // landscape Dynamic Island (left short edge) + home indicator (right)
-    var island = document.createElement('div');
-    island.style.cssText = 'position:absolute;left:9px;top:50%;transform:translateY(-50%);width:10px;height:62px;background:#000;border-radius:6px;z-index:6;pointer-events:none;';
-    screenEl.appendChild(island);
-    var homebar = document.createElement('div');
-    homebar.style.cssText = 'position:absolute;right:7px;top:50%;transform:translateY(-50%);width:4px;height:82px;background:rgba(255,255,255,.55);border-radius:3px;z-index:6;pointer-events:none;';
-    screenEl.appendChild(homebar);
-
-    // credit, on the cream below the phone
-    caption = document.createElement('div');
-    caption.style.cssText = 'margin-top:16px;text-align:center;font:600 12.5px Manrope,system-ui,sans-serif;';
-    host.appendChild(caption);
-
     resize();
-    updateCaption();
     window.addEventListener('resize', resize);
-    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(host);
+    if ('ResizeObserver' in window) { ro = new ResizeObserver(resize); ro.observe(host); }
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: 0.01 }).observe(host);
+      io = new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: 0.01 });
+      io.observe(host);
     }
     loadSprites();
     start();
   }
 
-  function updateCaption() {
-    var t = THEME[theme] || THEME.light;
-    var pt = lang === 'pt';
-    if (headEl) headEl.textContent = pt ? 'Hora do recreio 🎾' : 'Playtime 🎾';
-    if (subEl) subEl.textContent = pt
-      ? 'Experimente brincar com o Bull na praia!'
-      : 'Come play fetch with Bull on the beach!';
-    caption.textContent = captionText();
-    caption.style.color = t.text;
-  }
+  function updateCaption() {}
 
   window.DogGame = {
-    setLang: function (l) { lang = l; updateCaption(); },
-    setTheme: function (th) { theme = th; updateCaption(); }
+    mount: mount,
+    setLang: function (l) { lang = l; }
   };
 
   window.DogGame._debugThrow = function (vx, vy) {
@@ -426,7 +382,4 @@
     var r = Core.startThrow(dog, ball, { vx: vx, vy: vy });
     dog = r.dog; ball = r.ball;
   };
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
-  else mount();
 })();
