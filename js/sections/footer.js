@@ -1,4 +1,4 @@
-import { t, L, state } from '../i18n.js';
+import { t, L } from '../i18n.js';
 import { esc, EXT } from '../dom.js';
 import { profile } from '../data/profile.js';
 
@@ -20,10 +20,10 @@ export function render(root) {
         <div class="hdr-logo"><span class="logo-sq"></span><span class="ftr-site">${esc(profile.siteName)}</span></div>
         <p class="ftr-tag">${esc(t(c.tag))}</p>
         <div class="ftr-links mono">
-          <a href="mailto:${profile.email}">email</a><span>·</span>
-          <a href="${profile.linkedin}" ${EXT}>linkedin</a><span>·</span>
-          <a href="${profile.github}" ${EXT}>github</a><span>·</span>
-          <a href="${profile.cv}" ${EXT}>cv.pdf</a>
+          <a class="ulink" href="mailto:${profile.email}">email</a><span>·</span>
+          <a class="ulink" href="${profile.linkedin}" ${EXT}>linkedin</a><span>·</span>
+          <a class="ulink" href="${profile.github}" ${EXT}>github</a><span>·</span>
+          <a class="ulink" href="${profile.cv}" ${EXT}>cv.pdf</a>
         </div>
         <div class="mono ftr-count" id="ftr-count" hidden>${esc(t(c.visitor))} <b></b></div>
       </div>
@@ -50,7 +50,10 @@ async function loadCount(el) {
     const r = await fetch('https://pcfilho.goatcounter.com/counter/TOTAL.json');
     if (!r.ok) return;
     const j = await r.json();
-    if (j && j.count) { el.querySelector('b').textContent = String(j.count).replace(/\s/g, ''); el.hidden = false; }
+    if (j && (typeof j.count === 'number' || (typeof j.count === 'string' && j.count.trim()))) {
+      el.querySelector('b').textContent = String(j.count).replace(/\s/g, '');
+      el.hidden = false;
+    }
   } catch (_) { /* counter stays hidden */ }
 }
 
@@ -91,6 +94,7 @@ function wireKonami() {
   const SEQ = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
   let pos = 0;
   window.addEventListener('keydown', e => {
+    if (e.target && e.target.closest && e.target.closest('input,textarea')) return;
     const k = (e.key || '').toLowerCase();
     if (k === SEQ[pos]) { pos++; if (pos === SEQ.length) { pos = 0; confetti(); toast(t(c.secret)); } }
     else pos = k === SEQ[0] ? 1 : 0;
