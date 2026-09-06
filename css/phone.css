@@ -1,1 +1,44 @@
-/* filled in a later task */
+#phone { min-height: 100vh; }
+.phone-stage { display: flex; justify-content: center; }
+.phone-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.phone-annot { color: var(--accent); font-size: 12px; }
+.phone-device { width: 360px; height: 740px; background: #0b0b0d; border-radius: 52px; padding: 11px; border: 1px solid var(--line); position: relative; }
+.phone-island { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 118px; height: 30px; background: #0b0b0d; border-radius: 999px; z-index: 7; }
+.phone-screen { width: 100%; height: 100%; border-radius: 42px; overflow: hidden; position: relative;
+  background: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px) 0 0 / 24px 24px, radial-gradient(circle at 30% 20%, #1a1a1a, #000 70%); }
+.phone-screen, .phone-screen * { font-family: var(--font-text); }
+.pb-app { transition: transform .18s ease; touch-action: manipulation; }
+.pb-app:hover { transform: translateY(-4px) scale(1.05); }
+.pb-dock { transition: transform .18s ease; touch-action: manipulation; }
+.pb-dock:hover { transform: translateY(-4px) scale(1.06); }
+.pb-appicon, .pb-dock { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.pb-appicon img { pointer-events: none; }
+.pb-dot { transition: width .3s ease, opacity .3s ease; }
+@keyframes pb-fade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes pb-spin { to { transform: rotate(360deg); } }
+@keyframes pb-eq { 0%, 100% { transform: scaleY(.28); } 50% { transform: scaleY(1); } }
+@keyframes pb-tapring { 0% { transform: scale(.5); opacity: 0; } 18% { opacity: .9; } 100% { transform: scale(1.75); opacity: 0; } }
+@keyframes pb-poke-dl { 0%, 52%, 100% { transform: translate(0,0) scale(1); } 60% { transform: translate(4px,-5px) scale(.84); } 70% { transform: translate(0,0) scale(1); } }
+.pb-taphint { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.pb-taphint .ring { position: absolute; inset: -5px; border-radius: 19px; border: 2.5px solid #fff; animation: pb-tapring 1.7s ease-out infinite; }
+.pb-taphint .poke { position: absolute; }
+.pb-taphint .pk { display: inline-block; animation-duration: 1.7s; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+.pb-taphint .pk-emoji { display: block; font-size: 30px; line-height: 1; }
+@keyframes pb-jigA { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.7deg); } }
+@keyframes pb-jigB { 0%, 100% { transform: rotate(1.5deg); } 50% { transform: rotate(-1.8deg); } }
+.pb-jig { animation: pb-jigA .3s ease-in-out infinite; }
+.pb-appicon:nth-child(2n) .pb-jig { animation-name: pb-jigB; animation-duration: .34s; }
+.pb-appicon:nth-child(3n) .pb-jig { animation-duration: .27s; }
+.pb-appicon { transition: transform .2s cubic-bezier(.2,.8,.2,1); }
+@keyframes pb-deny { 0%, 100% { transform: translateX(0); } 15% { transform: translateX(-5px); } 30% { transform: translateX(5px); } 45% { transform: translateX(-4px); } 60% { transform: translateX(4px); } 75% { transform: translateX(-2px); } }
+.pb-deny { animation: pb-deny .42s ease; }
+/* under 640px the device disappears and the screen becomes a native block */
+@media (max-width: 640px) {
+  #phone { min-height: 0; }
+  /* .phone-wrap shrink-wraps by default, which leaves .phone-device's width:100%
+     with no definite containing-block width to resolve against; give it one. */
+  .phone-wrap { width: 100%; }
+  .phone-device { width: 100%; height: auto; min-height: 720px; padding: 0; border-radius: 0; border: 1px solid var(--line); background: #000; }
+  .phone-island { display: none; }
+  .phone-screen { border-radius: 0; min-height: 720px; }
+}
