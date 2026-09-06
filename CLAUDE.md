@@ -4,73 +4,86 @@ Guidance for Claude working in this repo.
 
 ## What this is
 
-A single-page portfolio for Paulo Barroso (senior mobile engineer). It was
-converted from a Claude Design prototype (`Portfolio.dc.html`) into a
-self-contained static site. There is **no build step** and no framework.
+A single-page portfolio for Paulo Barroso (senior mobile engineer): black,
+brutalist, developer-flavoured. Portrait hero, an interactive iPhone as
+centrepiece, a "My products" section, a bento of interactive fragments, an
+experience timeline, recommendations and a footer toy. There is **no build
+step** and no framework: native ES modules, plain CSS, `node --test`.
 
-## Architecture
+## File layout
 
-Everything lives in `index.html`:
-
-- **Markup + inline CSS** in `<head>`/`<style>`, plus a small set of utility
-  classes for hover/animation/edit-mode.
-- **One IIFE of vanilla JS** at the bottom holds all logic:
-  - `state` object (`lang`, `theme`, `page`, `openApp`, `journeyOpen`,
-    `editMode`, `appOrder`), persisted to `localStorage` (`pb_*` keys).
-  - `model()` builds the bilingual data via `L(en, pt)`.
-  - View functions return HTML strings (`heroView`, `phoneHomeView`,
-    `page0Apps`, `page1Widgets`, `journeyView`, etc.).
-  - `render()` rebuilds `#app` from state, then re-wires the pager and app grid.
-  - `window.PB` exposes the inline `onclick` handlers (survives re-render).
-- `assets/` holds all images (webp/png). Each `<img>` has an `onerror`
-  fallback so a missing file never shows a blank box.
-
-Interactive pieces: live status-bar clock, swipeable two-page home (apps +
-widgets) with page dots, tappable Dynamic Island, per-app case-study modals,
-iOS-style edit mode (long-press jiggle, drag to reorder, in-phone push
-notifications, frosted "OK" pill), and a Konami-code confetti easter egg
-(arrows + B + A).
+```
+index.html                 skeleton: head, header mount, main with 6 section mounts, footer mount
+css/tokens.css              custom properties, reset, type scale, shared utilities
+css/header.css, hero.css, phone.css, products.css, bento.css, experience.css, colleagues.css, footer.css
+js/i18n.js                  lang state, L(), t(), persistence
+js/dom.js                   esc(), arrowSvg, EXT
+js/clock.js                 pure DST-safe clock formatting
+js/main.js                  boot, render all sections, reveal observer
+js/data/*.js                profile, apps, products, experience, recos, bento
+js/sections/*.js            header, hero, phone, products, bento, experience, colleagues, footer
+js/slots/*.js                terminal, numbers bento sub-widgets
+dog-game.core.js            unchanged UMD physics core
+dog-game.js                 mounts the beach fetch game into the bento dog slot
+scripts/portrait.mjs        builds hero-portrait webp files from the source png
+scripts/shoot.mjs           serves the site and captures screenshots into shots/
+test/*.test.js              node --test suite (i18n, data, bento, clock, dog-game core, no-em-dash)
+```
 
 ## Conventions
 
-- **Bilingual** EN/PT through `L(en, pt)`. Add both languages for any new copy.
-- **No em-dashes** in user-facing copy (the long dash, Unicode U+2014). Use a
-  period, comma, or middot "·". Paulo treats that dash as a sign of AI-written
-  text.
-- Keep paths **relative** (`assets/...`, not `/assets/...`). The site is served
-  at the root `https://pcfilho.github.io/` (user-site repo `Pcfilho.github.io`);
-  relative paths also keep it portable if it ever moves to a subpath.
-- **External links and documents open in a new tab** (`target="_blank"
-  rel="noopener noreferrer"`) so a visitor never loses the portfolio. In-page
-  anchors (`#about`, `#contact`, `#roadmap`) and `mailto:` / `tel:` stay
-  same-tab (they do not navigate away).
-- Match the existing inline-style approach; do not introduce a framework or
-  build tooling without asking.
+- **Bilingual** EN/PT. Data modules build copy with `L(en, pt)` from
+  `js/i18n.js`; renderers resolve it with `t()`. EN is the default
+  (`loadLang()` falls back to `en`); the chosen language persists to
+  `localStorage['pb_lang']`.
+- **No em-dash** anywhere (the long dash, Unicode U+2014): not in copy, code,
+  comments, commits, or docs. Use a period, comma, colon, or middot `·`.
+  `test/no-emdash.test.js` guards every tracked `.html/.css/.js/.mjs/.cjs/.json/.md`
+  file.
+- **Tokens only.** Every colour and font comes from the custom properties in
+  `css/tokens.css` (`--bg`, `--fg`, `--accent`, `--font-display`, `--font-text`,
+  `--font-mono`, etc.). Do not hardcode a colour or font-family elsewhere.
+- **`border-radius: 0` everywhere**, except inside the simulated iOS device:
+  the phone screen, its app icons, and the in-phone push banner keep their
+  rounded corners. The device frame itself is also rounded. Nothing else is.
+- **No employer named for the current role.** The hero and profile copy stay
+  impersonal ("Senior React Native / Mobile Engineer", PT "Engenheiro Mobile
+  Sênior · React Native"), no company. Past, already-public roles (e.g.
+  Collective Health) are still named in the Experience timeline.
+- Keep paths **relative** (`assets/...`, `css/...`, not `/assets/...`). The
+  site is served at the root `https://pcfilho.github.io/`; relative paths
+  keep it portable if it ever moves to a subpath.
+- **External links open in a new tab** (`target="_blank" rel="noopener
+  noreferrer"`, exported as `EXT` from `js/dom.js`). `mailto:`, `tel:` and
+  in-page anchors stay same tab.
+- Every section module in `js/sections/*.js` exports `id` (the mount element's
+  id) and `render(root)` (writes `root.innerHTML` and wires events). A module
+  that starts its own animation (bento's terminal typing and numbers
+  auto-scroll, the header clock interval) must dispose the previous instance
+  at the top of `render()` before mounting a new one, since `render()` runs
+  again on every language switch.
+- `js/main.js` is the single place that knows page order and boots every
+  section; a failed section import now fails the boot loudly (no silent
+  `.catch(() => null)`).
 
-## Run / preview
+## Run / verify
 
 ```bash
-python3 -m http.server 8000   # then open http://localhost:8000
-# or just: open index.html
+npm run serve     # python3 -m http.server 8000, then open http://localhost:8000
+npm test          # node --test, 34 tests
+npm run shoot     # headless Chrome, captures shots/{desktop,mobile}-{fold,full}.png
+npm run portrait  # rebuilds the hero portrait webp files from the source png
 ```
 
-For visual verification, render with **local headless Chrome** (the
-claude-in-chrome browser tool drives a different machine here):
-
-```bash
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless=new --disable-gpu --user-data-dir="$(mktemp -d)" \
-  --window-size=1280,1080 --screenshot=/tmp/shot.png \
-  http://localhost:8000/index.html
-```
-
-Interaction-heavy changes (drag, long-press, taps) are best verified by driving
-Chrome over the DevTools Protocol (`--remote-debugging-port`) and dispatching
-`Input.dispatchMouseEvent`. Note: for held drags, `mouseMoved` must use
-`button:"none"` with `buttons:1`.
+For a live preview while iterating, drive local headless Chrome (via
+`npm run shoot`) or the Maestri browser portal. `npm run shoot` also logs any
+browser console error; the only expected line is a GoatCounter CORS/403 on
+the visitor counter fetch (the dashboard is private, so the counter line
+stays hidden by design). Anything else printed there is a real regression.
 
 ## Deploy
 
-Live at https://pcfilho.github.io/ via GitHub Pages from `main` (root), user-site
-repo `Pcfilho.github.io`. `.nojekyll` disables Jekyll so files serve as-is. No
-build, no env vars. `main` is protected (no force-push, no deletion).
+Live at https://pcfilho.github.io/ via GitHub Pages from `main` (root),
+user-site repo `Pcfilho.github.io`. `.nojekyll` disables Jekyll so files
+serve as-is. No build, no env vars. `main` is protected (no force-push, no
+deletion).

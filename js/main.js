@@ -49,8 +49,8 @@ async function boot() {
     import('./sections/experience.js'),
     import('./sections/colleagues.js'),
     import('./sections/footer.js')
-  ].map(p => p.catch(() => null)));
-  mods.filter(Boolean).forEach(register);
+  ]);
+  mods.forEach(register);
   renderAll();
   observeReveals();
 }
