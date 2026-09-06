@@ -6,3 +6,7 @@ _preview_variant.html
 *.log
 
 .superpowers/
+
+node_modules/
+shots/
+package-lock.json

@@ -23,17 +23,17 @@
 
 ## File Structure
 
-- Create `dog-game.core.js` — pure logic. UMD: `module.exports` in Node, `window.DogGameCore` in browser. Exports `DEFAULTS, clamp, len, launchVelocity, stepBall, createDog, startThrow, stepDog`.
-- Create `test/dog-game.core.test.js` — Node `node:test` unit tests for the core.
-- Create `dog-game.js` — browser orchestrator. Self-mounts on DOM ready into `#pb-beach`. Owns canvas, env/layout, rAF loop, pause logic, input, drawing, sprite engine, bilingual caption + hint, and `window.DogGame` bridge.
-- Create `assets/beach/SPRITES.md` — sprite sheet manifest + AI generation prompt (handed to Paulo).
-- Modify `index.html` — add `#pb-beach` after `#app` (line 100), add two `<script defer>` tags before `</head>` (line 98), wire `window.DogGame.setLang/setTheme` into `render()` (lines 580-589) and `PB.toggleTheme` (lines 820-826).
+- Create `dog-game.core.js`, pure logic. UMD: `module.exports` in Node, `window.DogGameCore` in browser. Exports `DEFAULTS, clamp, len, launchVelocity, stepBall, createDog, startThrow, stepDog`.
+- Create `test/dog-game.core.test.js`, Node `node:test` unit tests for the core.
+- Create `dog-game.js`, browser orchestrator. Self-mounts on DOM ready into `#pb-beach`. Owns canvas, env/layout, rAF loop, pause logic, input, drawing, sprite engine, bilingual caption + hint, and `window.DogGame` bridge.
+- Create `assets/beach/SPRITES.md`, sprite sheet manifest + AI generation prompt (handed to Paulo).
+- Modify `index.html`, add `#pb-beach` after `#app` (line 100), add two `<script defer>` tags before `</head>` (line 98), wire `window.DogGame.setLang/setTheme` into `render()` (lines 580-589) and `PB.toggleTheme` (lines 820-826).
 
 Interfaces are validated in Node for the core; the orchestrator is validated visually with local headless Chrome (see CLAUDE.md "Run / preview") and, for the throw, a programmatic `window.DogGame._debugThrow()` hook plus a real-iPhone scroll check.
 
 ---
 
-### Task 1: Core — slingshot vector + ball physics
+### Task 1: Core, slingshot vector + ball physics
 
 **Files:**
 - Create: `dog-game.core.js`
@@ -199,7 +199,7 @@ git commit -m "feat(game): core slingshot + ball physics with tests"
 
 ---
 
-### Task 2: Core — dog state machine (fetch loop)
+### Task 2: Core, dog state machine (fetch loop)
 
 **Files:**
 - Modify: `dog-game.core.js` (add `createDog`, `startThrow`, `stepDog` to the returned API)
@@ -355,7 +355,7 @@ git commit -m "feat(game): dog fetch state machine with tests"
 
 ---
 
-### Task 3: Browser scaffold — host, canvas, loop, beach background
+### Task 3: Browser scaffold, host, canvas, loop, beach background
 
 **Files:**
 - Create: `dog-game.js`
