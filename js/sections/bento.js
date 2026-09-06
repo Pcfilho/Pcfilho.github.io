@@ -12,11 +12,18 @@ const c = {
   dogC: L('Throw the ball. He never misses.', 'Joga a bola. Ele nunca erra.'),
   numH: L('Numbers I stand behind', 'Números que eu assino'),
   locH: L('Remote from the coast', 'Remoto, do litoral'),
+  loc: L('Fortaleza · 3.7°S 38.5°W · GMT-3', 'Fortaleza · 3.7°S 38.5°W · GMT-3'),
   stackH: L('Stack', 'Stack'),
   stackC: L('What I reach for.', 'O que eu uso.')
 };
 
+// Slot animations (terminal typing, numbers auto-scroll) run outside the render() lifecycle,
+// so each render must dispose the previous ones before mounting new ones on the fresh DOM.
+let disposers = [];
+
 export function render(root) {
+  disposers.forEach(dispose => dispose());
+  disposers = [];
   const chips = bento.stack.map(s => `<span class="chip mono">${esc(s)}</span>`).join('');
   root.innerHTML = `
     <div class="container">
@@ -36,13 +43,14 @@ export function render(root) {
         </div>
         <div class="slot slot-thinker"><div class="thinker"><span>thinker.</span><span>builder.</span><span>shipper.</span></div></div>
         <div class="slot slot-location">
-          <div class="loc dots"><span class="loc-pin"></span><span class="mono loc-lbl">Fortaleza · 3.7°S 38.5°W · GMT-3</span></div>
+          <div class="loc dots"><span class="loc-pin"></span><span class="mono loc-lbl">${esc(t(c.loc))}</span></div>
           <h3 class="slot-h">${esc(t(c.locH))}</h3>
         </div>
         <div class="slot slot-stack"><div class="chips">${chips}</div><h3 class="slot-h">${esc(t(c.stackH))}</h3><p class="slot-c">${esc(t(c.stackC))}</p></div>
       </div>
     </div>`;
-  mountTerminal(root.querySelector('#slot-terminal'), terminalScript(bento.terminal, state.lang));
-  mountNumbers(root.querySelector('#slot-numbers'), numbersRows(bento.numbers, state.lang));
+  const disposeTerminal = mountTerminal(root.querySelector('#slot-terminal'), terminalScript(bento.terminal, state.lang));
+  const disposeNumbers = mountNumbers(root.querySelector('#slot-numbers'), numbersRows(bento.numbers, state.lang));
+  disposers.push(disposeTerminal, disposeNumbers);
   if (window.DogGame && window.DogGame.mount) window.DogGame.mount(root.querySelector('#slot-dog'), state.lang);
 }

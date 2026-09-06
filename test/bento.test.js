@@ -19,3 +19,9 @@ test('numbersRows: "value  label · org" per entry', () => {
   assert.equal(rows.length, bento.numbers.length);
   assert.equal(rows[0], '90%  fewer support tickets · Ploomes');
 });
+
+test('terminalScript stays pure: repeated calls return equal output, independent of mountTerminal state', () => {
+  const first = terminalScript(bento.terminal, 'en');
+  const second = terminalScript(bento.terminal, 'en');
+  assert.deepEqual(first, second);
+});

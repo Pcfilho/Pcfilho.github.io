@@ -17,7 +17,7 @@
 .term-cursor.idle { animation-duration: 1.6s; }
 @keyframes blink { to { opacity: 0; } }
 .slot-dog-host { flex: 1; min-height: 0; position: relative; }
-.num-view { flex: 1; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent); mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent); }
+.num-view { flex: 1; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, var(--bg) 15%, var(--bg) 85%, transparent); mask-image: linear-gradient(transparent, var(--bg) 15%, var(--bg) 85%, transparent); }
 .num-track { will-change: transform; }
 .num-row { padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--fg-2); white-space: nowrap; font-size: 10.5px; letter-spacing: 0; }
 .thinker { margin: auto; display: flex; flex-direction: column; align-items: center; font: 600 28px/1.25 var(--font-display); }
