@@ -76,7 +76,7 @@ npm run serve     # python3 -m http.server 8000, then open http://localhost:8000
 npm test          # node --test, 36 tests
 npm run shoot     # headless Chrome, captures shots/{desktop,mobile}-{fold,full}.png
 npm run portrait  # rebuilds the hero portrait webp files from the source png
-npm run og        # renders assets/og.png (1200x630 link preview) in the site style
+npm run og        # renders assets/og-card.png (1200x630 link preview) in the site style
 npm run maps      # regenerates assets/map-world.svg and assets/map-brazil.svg from Natural Earth (needs network)
 ```
 

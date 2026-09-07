@@ -1,4 +1,4 @@
-// Renders assets/og.png (1200x630) for link previews as a brutalist business card. Run: npm run og
+// Renders assets/og-card.png (1200x630) for link previews as a brutalist business card. Run: npm run og
 import { chromium } from 'playwright-core';
 import { readFileSync } from 'node:fs';
 
@@ -57,6 +57,6 @@ try {
   await page.setContent(html, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(500);
-  await page.screenshot({ path: new URL('../assets/og.png', import.meta.url).pathname, type: 'png' });
-  console.log('og.png written');
+  await page.screenshot({ path: new URL('../assets/og-card.png', import.meta.url).pathname, type: 'png' });
+  console.log('og-card.png written');
 } finally { await browser.close(); }
