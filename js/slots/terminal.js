@@ -1,13 +1,13 @@
 export function terminalScript(data, lang) {
   const pick = v => (typeof v === 'string' ? v : (v[lang] ?? v.en));
-  const t = data.terminal;
+  const term = data.terminal;
   const body = [
-    ...t.intro,
-    ...t.numberKeys.map(i => data.numbers[i].line),
-    ...t.productLines,
-    ...t.outro
+    ...term.intro,
+    ...term.numberKeys.map(i => data.numbers[i].line),
+    ...term.productLines,
+    ...term.outro
   ].map(l => '✓ ' + pick(l));
-  return ['> ' + t.cmd, ...body, pick(t.done)];
+  return ['> ' + term.cmd, ...body, pick(term.done)];
 }
 
 // Once the full script has typed out once (in any language), later mounts just print it:

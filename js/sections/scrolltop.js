@@ -3,7 +3,7 @@ import { esc } from '../dom.js';
 
 export const id = 'scrolltop';
 const label = L('Back to top', 'Voltar ao topo');
-const SIZE = 48, PERIM = SIZE * 4;
+const SIZE = 48, PERIM = 4 * (SIZE - 2);
 let wired = false, raf = 0;
 
 export function render(root) {

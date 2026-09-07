@@ -1,4 +1,4 @@
-.stt { position: fixed; right: 24px; bottom: 24px; width: 48px; height: 48px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); z-index: 90; display: grid; place-items: center; opacity: 1; transition: opacity .3s ease; }
+.stt { position: fixed; right: 24px; bottom: 24px; width: 48px; height: 48px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); z-index: 90; display: grid; place-items: center; }
 .stt[hidden] { display: none; }
 .stt-ring { position: absolute; inset: 0; }
 .stt-glyph { font: 500 16px/1 var(--font-mono); position: relative; }
