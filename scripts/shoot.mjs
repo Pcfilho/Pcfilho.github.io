@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const MOUNT_IDS = ['site-header', 'hero', 'phone', 'products', 'bento', 'experience', 'colleagues', 'site-footer'];
+const MOUNT_IDS = ['site-header', 'hero', 'phone', 'products', 'bento', 'experience', 'colleagues', 'site-footer', 'scrolltop'];
 mkdirSync('shots', { recursive: true });
 const server = spawn('python3', ['-m', 'http.server', '8123'], { stdio: 'ignore' });
 await new Promise(r => setTimeout(r, 800));

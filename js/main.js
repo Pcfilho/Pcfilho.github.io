@@ -49,7 +49,8 @@ async function boot() {
     import('./sections/bento.js'),
     import('./sections/experience.js'),
     import('./sections/colleagues.js'),
-    import('./sections/footer.js')
+    import('./sections/footer.js'),
+    import('./sections/scrolltop.js')
   ]);
   mods.forEach(register);
   renderAll(); // re-renders the header too; harmless
