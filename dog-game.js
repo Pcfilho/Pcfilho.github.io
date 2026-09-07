@@ -63,6 +63,7 @@
 
   var host, canvas, ctx, ro = null, io = null, dpr = 1;
   var W = 0, H = 0, env = null;
+  var dotPattern = null; // 20x20 offscreen tile, rebuilt in resize()
   var lang = readLS('pb_lang', 'en');
   var played = readLS('pb_dog_played', '') === '1';
   var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -110,7 +111,17 @@
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     env = computeEnv();
+    buildDotPattern();
     onResize();
+  }
+
+  function buildDotPattern() {
+    var tile = document.createElement('canvas');
+    tile.width = 20; tile.height = 20;
+    var tctx = tile.getContext('2d');
+    tctx.fillStyle = PAL.line;
+    tctx.fillRect(10, 10, 1, 1);
+    dotPattern = ctx.createPattern(tile, 'repeat');
   }
 
   function resetIdle() {
@@ -126,11 +137,10 @@
 
   function drawBackground() {
     ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, W, H);
-    // dot grid, 20px pitch, same as the site's .dots panels
-    ctx.fillStyle = PAL.line;
-    for (var gy = 10; gy < H; gy += 20) for (var gx = 10; gx < W; gx += 20) ctx.fillRect(gx, gy, 1.5, 1.5);
+    // dot grid, 20px pitch, same as the site's .dots panels (tiled pattern, one fillRect per frame)
+    if (dotPattern) { ctx.fillStyle = dotPattern; ctx.fillRect(0, 0, W, H); }
     // ground: one hairline
-    ctx.fillStyle = PAL.line; ctx.fillRect(0, Math.round(env.groundY) + 0.5, W, 1);
+    ctx.fillStyle = PAL.line; ctx.fillRect(0, Math.round(env.groundY), W, 1);
   }
 
   function update(dt) {
@@ -163,7 +173,7 @@
     ctx.lineTo(ball.x - pullX, ball.y - pullY); // launch direction (opposite the pull)
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.fillStyle = PAL.fg;
     ctx.beginPath(); ctx.arc(ball.x - pullX, ball.y - pullY, 4 + 3 * power, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
@@ -174,16 +184,10 @@
     return cache[s.files[i]] || null; // null while loading or on error -> mock fallback
   }
 
-  function drawDog() {
-    var key = SPRITES.states[dog.state] ? dog.state : 'idle';
-    var rec = USE_SPRITE ? spriteFor(key) : null;
+  function drawDog(rec) {
     if (rec && rec.img) {
       var S = (H * SPRITES.hRatio) / (refBH || 0.66); // ONE scale for all poses (idle bbox = reference), so the dog never grows/shrinks between frames
       var fy = env.groundY + H * DOG_SINK; // feet sit a touch below the ground line
-      ctx.save(); // soft contact shadow for grounding
-      ctx.fillStyle = 'rgba(255,255,255,.08)';
-      ctx.beginPath(); ctx.ellipse(dog.x, fy, S * 0.22, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
       ctx.save();
       ctx.translate(dog.x, fy);
       ctx.scale(dog.dir, 1);
@@ -194,13 +198,17 @@
     }
   }
 
+  function drawDogShadow(rec) { // soft contact shadow for grounding (sprite poses only)
+    if (!(rec && rec.img)) return;
+    var S = (H * SPRITES.hRatio) / (refBH || 0.66);
+    var fy = env.groundY + H * DOG_SINK;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.beginPath(); ctx.ellipse(dog.x, fy, S * 0.22, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   function drawBall() {
-    if (!ball.carried) { // ground-line contact shadow; skipped while the dog carries the ball
-      ctx.save();
-      ctx.fillStyle = 'rgba(255,255,255,.08)';
-      ctx.beginPath(); ctx.ellipse(ball.x, env.groundY + H * BALL_SINK, env.radius * 1.1, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    }
     if (USE_SPRITE && ballImg) {
       if (ball.carried) return; // the carry frames already hold the ball in the mouth
       var d = env.radius * 2 * SPRITES.ballScale;
@@ -214,9 +222,22 @@
     }
   }
 
+  function drawBallShadow() { // ground-line contact shadow; skipped while the dog carries the ball
+    if (ball.carried) return;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.beginPath(); ctx.ellipse(ball.x, env.groundY + H * BALL_SINK, env.radius * 1.1, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   function drawScene() {
     if (!ball || !dog) return;
-    drawDog();
+    var key = SPRITES.states[dog.state] ? dog.state : 'idle';
+    var rec = USE_SPRITE ? spriteFor(key) : null;
+    // both ground shadows first, so neither ever paints over the other's sprite
+    drawDogShadow(rec);
+    drawBallShadow();
+    drawDog(rec);
     drawBall();
     drawAim();
     drawHint();
@@ -227,7 +248,7 @@
     ctx.save();
     ctx.translate(ball.x, ball.y);
     ctx.rotate(ball.angle || 0);
-    ctx.fillStyle = '#b6e034';
+    ctx.fillStyle = PAL.accent;
     ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = Math.max(1, r * 0.18);
     ctx.beginPath(); ctx.arc(-r * 0.2, 0, r * 1.1, -0.9, 0.9); ctx.stroke();
@@ -245,18 +266,18 @@
     ctx.translate(bx, by);
     ctx.scale(dog.dir, 1);              // face direction
     // legs
-    ctx.strokeStyle = '#8a5a2b'; ctx.lineWidth = s * 0.12; ctx.lineCap = 'round';
+    ctx.strokeStyle = PAL.fg; ctx.lineWidth = s * 0.12; ctx.lineCap = 'round';
     [-0.5, -0.2, 0.2, 0.5].forEach(function (o, i) {
       var swing = run ? Math.sin(now / 70 + i) * s * 0.18 : 0;
       ctx.beginPath(); ctx.moveTo(o * s, -s * 0.55); ctx.lineTo(o * s + swing, 0); ctx.stroke();
     });
     // body
-    ctx.fillStyle = '#a9712f';
+    ctx.fillStyle = PAL.line;
     ctx.beginPath(); ctx.ellipse(0, -s * 0.7 + phase * 2, s * 0.7, s * 0.42, 0, 0, Math.PI * 2); ctx.fill();
     // head
     ctx.beginPath(); ctx.ellipse(s * 0.62, -s * 0.95, s * 0.32, s * 0.30, 0, 0, Math.PI * 2); ctx.fill();
     // ear + tail
-    ctx.fillStyle = '#8a5a2b';
+    ctx.fillStyle = PAL.line;
     ctx.beginPath(); ctx.ellipse(s * 0.5, -s * 1.1, s * 0.12, s * 0.22, 0.3, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(-s * 0.72, -s * 0.95, s * 0.1, s * 0.22, -0.6, 0, Math.PI * 2); ctx.fill();
     ctx.restore();

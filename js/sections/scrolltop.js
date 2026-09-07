@@ -5,6 +5,7 @@ export const id = 'scrolltop';
 const label = L('Back to top', 'Voltar ao topo');
 const SIZE = 48, PERIM = 4 * (SIZE - 2);
 let wired = false, raf = 0;
+let max = 0; // scrollHeight - innerHeight, recomputed on resize/load so update() never re-measures layout
 
 export function render(root) {
   root.innerHTML = `
@@ -16,16 +17,26 @@ export function render(root) {
     </button>`;
   root.querySelector('#stt').addEventListener('click', () => {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('site-header')?.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
   });
+  updateMax();
   update();
-  if (!wired) { wired = true; window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; update(); }); }, { passive: true }); }
+  if (!wired) {
+    wired = true;
+    window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; update(); }); }, { passive: true });
+    window.addEventListener('resize', () => { updateMax(); update(); });
+    window.addEventListener('load', () => { updateMax(); update(); });
+  }
+}
+
+function updateMax() {
+  max = document.documentElement.scrollHeight - innerHeight;
 }
 
 function update() {
   const btn = document.getElementById('stt');
   if (!btn) return;
-  const max = document.documentElement.scrollHeight - innerHeight;
   const y = scrollY, p = max > 0 ? Math.min(1, y / max) : 0;
   btn.hidden = y < innerHeight * 0.4;
   const rect = btn.querySelector('rect');

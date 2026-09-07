@@ -13,21 +13,24 @@ step** and no framework: native ES modules, plain CSS, `node --test`.
 ## File layout
 
 ```
-index.html                 skeleton: head, header mount, main with 6 section mounts, footer mount
+index.html                 skeleton: head, 7 section mounts (header, hero, phone, products, bento,
+                            experience, colleagues), footer mount, scrolltop mount
 css/tokens.css              custom properties, reset, type scale, shared utilities
-css/header.css, hero.css, phone.css, products.css, bento.css, experience.css, colleagues.css, footer.css
+css/header.css, hero.css, phone.css, products.css, bento.css, experience.css, colleagues.css, footer.css, scrolltop.css
 js/i18n.js                  lang state, L(), t(), persistence
 js/dom.js                   esc(), arrowSvg, EXT
 js/clock.js                 pure DST-safe clock formatting
+js/maps.js                  WORLD/BRAZIL projection constants, worldXY(), brazilXY()
 js/main.js                  boot, render all sections, reveal observer
 js/data/*.js                profile, apps, products, experience, recos, bento
-js/sections/*.js            header, hero, phone, products, bento, experience, colleagues, footer
+js/sections/*.js            header, hero, phone, products, bento, experience, colleagues, footer, scrolltop
 js/slots/*.js                terminal, numbers bento sub-widgets
 dog-game.core.js            unchanged UMD physics core
 dog-game.js                 mounts the beach fetch game into the bento dog slot
 scripts/portrait.mjs        builds hero-portrait webp files from the source png
 scripts/shoot.mjs           serves the site and captures screenshots into shots/
-test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-game core, no-em-dash)
+scripts/maps.mjs            regenerates assets/map-world.svg and assets/map-brazil.svg from Natural Earth
+test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-game core, maps, no-em-dash)
 ```
 
 ## Conventions
@@ -70,9 +73,10 @@ test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-gam
 
 ```bash
 npm run serve     # python3 -m http.server 8000, then open http://localhost:8000
-npm test          # node --test, 34 tests
+npm test          # node --test, 36 tests
 npm run shoot     # headless Chrome, captures shots/{desktop,mobile}-{fold,full}.png
 npm run portrait  # rebuilds the hero portrait webp files from the source png
+npm run maps      # regenerates assets/map-world.svg and assets/map-brazil.svg from Natural Earth (needs network)
 ```
 
 For a live preview while iterating, drive local headless Chrome (via

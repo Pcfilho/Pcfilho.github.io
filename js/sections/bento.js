@@ -26,7 +26,7 @@ export function render(root) {
   const chips = bento.stack.map(s => `<span class="chip mono">${esc(s)}</span>`).join('');
   const worldPins = bento.world.cities.map(ct => {
     const p = worldXY(ct.lon, ct.lat);
-    return `<span class="pin${ct.home ? ' home' : ''}" style="left:${p.x.toFixed(2)}%;top:${p.y.toFixed(2)}%" title="${esc(ct.name)}"></span>`;
+    return `<span class="pin${ct.home ? ' home' : ''}" style="left:${p.x.toFixed(2)}%;top:${p.y.toFixed(2)}%" title="${esc(ct.name)}" aria-hidden="true"></span>`;
   }).join('');
   const brazilPin = brazilXY(bento.brazil.lon, bento.brazil.lat);
   root.innerHTML = `
@@ -42,11 +42,11 @@ export function render(root) {
           <h3 class="slot-h">${esc(t(c.dogH))}</h3><p class="slot-c">${esc(t(c.dogC))}</p>
         </div>
         <div class="slot slot-world">
-          <div class="map"><img src="assets/map-world.svg" alt="" width="720" height="360">${worldPins}</div>
+          <div class="map"><img src="assets/map-world.svg" alt="" width="720" height="360" loading="lazy">${worldPins}</div>
           <h3 class="slot-h">${esc(t(bento.world.h))}</h3><p class="slot-c">${esc(t(bento.world.c))}</p>
         </div>
         <div class="slot slot-brazil">
-          <div class="map"><img src="assets/map-brazil.svg" alt="" width="300" height="300"><span class="pin home" style="left:${brazilPin.x.toFixed(2)}%;top:${brazilPin.y.toFixed(2)}%" title="Fortaleza"></span><span class="mono map-lbl">${esc(bento.brazil.label)}</span></div>
+          <div class="map"><img src="assets/map-brazil.svg" alt="" width="300" height="300" loading="lazy"><span class="pin home" style="left:${brazilPin.x.toFixed(2)}%;top:${brazilPin.y.toFixed(2)}%" title="Fortaleza" aria-hidden="true"></span><span class="mono map-lbl">${esc(bento.brazil.label)}</span></div>
           <h3 class="slot-h">${esc(t(bento.brazil.h))}</h3>
         </div>
         <div class="slot slot-numbers" id="slot-numbers">
@@ -55,7 +55,7 @@ export function render(root) {
         </div>
         <div class="slot slot-thinker"><div class="thinker"><span>thinker.</span><span>builder.</span><span>shipper.</span></div></div>
         <div class="slot slot-pets">
-          <div class="pets">${bento.pets.list.map(p => `<figure class="pet"><img src="assets/${p.key}.webp" alt="" width="96" height="96"><figcaption class="mono">${esc(p.name)}</figcaption></figure>`).join('')}</div>
+          <div class="pets">${bento.pets.list.map(p => `<figure class="pet"><img src="assets/${esc(p.key)}.webp" alt="" width="96" height="96" loading="lazy"><figcaption class="mono">${esc(p.name)}</figcaption></figure>`).join('')}</div>
           <h3 class="slot-h">${esc(t(bento.pets.h))}</h3><p class="slot-c">${esc(t(bento.pets.c))}</p>
         </div>
         <div class="slot slot-stack">

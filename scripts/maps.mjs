@@ -2,8 +2,8 @@
 import { writeFileSync } from 'node:fs';
 import { WORLD, BRAZIL } from '../js/maps.js';
 
-const URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
-const res = await fetch(URL);
+const SRC = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
+const res = await fetch(SRC);
 if (!res.ok) throw new Error('download failed ' + res.status);
 const geo = await res.json();
 
@@ -45,7 +45,7 @@ for (let y = 3; y < WORLD.h; y += 6) for (let x = 3; x < WORLD.w; x += 6) {
   const lon = (x / WORLD.w) * 360 - 180, lat = 90 - (y / WORLD.h) * 180;
   if (inLand(land, lon, lat)) worldDots.push([x, y]);
 }
-writeFileSync('assets/map-world.svg', svg(WORLD.w, WORLD.h, worldDots, 1.4));
+writeFileSync(new URL('../assets/map-world.svg', import.meta.url), svg(WORLD.w, WORLD.h, worldDots, 1.4));
 
 // Brazil: bounding-box fit, 8px pitch.
 const brazil = geo.features.filter(f => f.properties.ADMIN === 'Brazil' || f.properties.NAME === 'Brazil');
@@ -58,5 +58,5 @@ for (let y = 4; y < BRAZIL.h; y += 8) for (let x = 4; x < BRAZIL.w; x += 8) {
   const lon = BRAZIL.lon0 + (x - ox) / scale, lat = BRAZIL.lat1 - (y - oy) / scale;
   if (inLand(brazil, lon, lat)) brDots.push([x, y]);
 }
-writeFileSync('assets/map-brazil.svg', svg(BRAZIL.w, BRAZIL.h, brDots, 1.8));
+writeFileSync(new URL('../assets/map-brazil.svg', import.meta.url), svg(BRAZIL.w, BRAZIL.h, brDots, 1.8));
 console.log('world dots', worldDots.length, 'brazil dots', brDots.length);

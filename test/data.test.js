@@ -46,7 +46,13 @@ test('recos and bento are bilingual', () => {
   recos.forEach(r => assert.ok(isL(r.quote) && isL(r.rel)));
   assert.ok(bento.terminal.intro.length >= 2);
   bento.terminal.intro.forEach(l => assert.ok(isL(l)));
+  bento.terminal.productLines.forEach(l => assert.ok(isL(l)));
+  bento.terminal.outro.forEach(l => assert.ok(isL(l)));
+  bento.terminal.numberKeys.forEach(i => assert.ok(i < bento.numbers.length, 'numberKeys index ' + i + ' out of range'));
   assert.ok(bento.numbers.length >= 5);
   bento.numbers.forEach(n => assert.ok(isL(n.l) && typeof n.v === 'string' && isL(n.line)));
   assert.ok(bento.stack.length >= 20);
+  assert.ok(isL(bento.world.h) && isL(bento.world.c));
+  assert.ok(isL(bento.brazil.h));
+  assert.ok(isL(bento.pets.h) && isL(bento.pets.c));
 });

@@ -14,7 +14,7 @@ export function terminalScript(data, lang) {
 // the type-out is a one-time introduction, not something to replay on every language switch.
 let completed = false;
 
-// Types the lines into el once it is on screen. 20ms per char, 250ms between lines.
+// Types the lines into el once it is on screen. 15ms per char, 200ms between lines.
 // Returns dispose(): stops any pending IntersectionObserver and cancels in-flight typing
 // so a re-render (language switch) never leaves an orphaned loop writing into detached nodes.
 export function mountTerminal(el, lines) {
@@ -32,7 +32,12 @@ export function mountTerminal(el, lines) {
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced || completed) {
-    out.textContent = lines.join('\n');
+    // same DOM shape as the typed path (one <div> per line), so `.term-out div:first-child` still applies
+    lines.forEach(line => {
+      const row = document.createElement('div');
+      row.textContent = line;
+      out.appendChild(row);
+    });
     finish();
     completed = true;
     return dispose;
@@ -46,10 +51,10 @@ export function mountTerminal(el, lines) {
       for (const ch of line) {
         if (cancelled) return;
         row.textContent += ch;
-        await wait(20);
+        await wait(15);
       }
       if (cancelled) return;
-      await wait(250);
+      await wait(200);
     }
     if (cancelled) return;
     completed = true;
