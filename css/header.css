@@ -1,0 +1,15 @@
+#site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--header-h); background: var(--bg); }
+#site-header::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 24px; background: linear-gradient(var(--bg), transparent); pointer-events: none; }
+.hdr { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+.hdr-logo { display: flex; align-items: center; gap: 10px; }
+.logo-sq { position: relative; width: 24px; height: 24px; background: var(--accent); display: inline-block; }
+.logo-sq::after { content: ''; position: absolute; right: -4px; bottom: -4px; width: 10px; height: 10px; background: var(--white); }
+.hdr-name { font: 700 16px/1 var(--font-display); color: var(--fg); }
+.hdr-right { display: flex; align-items: center; gap: 24px; }
+.hdr-loc { text-align: right; }
+.hdr-loc-l { font: 600 13px/1.3 var(--font-text); color: var(--fg); }
+.hdr-lang { display: flex; border: 1px solid var(--line); }
+.hdr-lang button { font: 500 12px/1 var(--font-mono); padding: 8px 10px; color: var(--fg-3); }
+.hdr-lang button + button { border-left: 1px solid var(--line); }
+.hdr-lang button.on { color: var(--fg); }
+@media (max-width: 640px) { .hdr-loc-l { display: none; } .hdr-right { gap: 12px; } }

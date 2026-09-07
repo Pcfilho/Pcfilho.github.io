@@ -21,8 +21,8 @@
   };
   var cache = {}, ballImg = null;          // fileName -> {img, cx, top, bottom} (bbox fractions)
   var refBH = 0;                            // reference body height (idle bbox) so the dog keeps ONE size across poses
-  var LAYER = { p1: null, p2: null }; // corner palms
-  var DOG_SINK = 0.055, BALL_SINK = 0.035, PALM_SINK = 0.05; // sink into the sand (fraction of band height)
+  var DOG_SINK = 0.055, BALL_SINK = 0.035; // sink into the ground line (fraction of band height)
+  var PAL = { bg: '#000', line: 'rgba(255,255,255,.10)', accent: '#FF6A1A', fg: 'rgba(255,255,255,.9)', mono: "'JetBrains Mono', ui-monospace, monospace" }; // theme tokens, read once in mount()
 
   // Opaque bounding box of a frame, so any pose (even an airborne carry frame with
   // no planted feet) is anchored by its real feet and center, not the padded frame.
@@ -57,24 +57,14 @@
     b.onload = function () { ballImg = b; };
     b.onerror = function () { ballImg = null; };
     b.src = 'assets/beach/ball.png';
-    [['p1', 'palm-1'], ['p2', 'palm-2']].forEach(function (p) {
-      var im = new Image();
-      im.onload = function () { LAYER[p[0]] = im; };
-      im.onerror = function () { LAYER[p[0]] = null; }; // missing -> gradient fallback
-      im.src = 'assets/beach/' + p[1] + '.png';
-    });
   }
 
   var LAYOUT = { heightVH: 0.38, minH: 280, maxH: 420, groundRatio: 0.74, radiusRatio: 0.045, sideInset: 0.05, mouthRatio: 0.16 };
-  var THEME = {
-    light: { sky0: '#ffe3bd', sky1: '#ffb38f', seaTop: '#ff9e86', sea1: '#5fa6ad', sand0: '#f7e3b8', sand1: '#e9cf95', text: 'rgba(60,40,20,.8)' },
-    dark:  { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
-  };
 
-  var host, phoneEl, screenEl, canvas, ctx, caption, headEl, subEl, dpr = 1;
-  var PHONE = { maxW: 880, bezel: 14, aspect: 19.5 / 9 }; // landscape iPhone: screen w:h ratio
+  var host, canvas, ctx, ro = null, io = null, dpr = 1;
   var W = 0, H = 0, env = null;
-  var lang = readLS('pb_lang', 'en'), theme = readLS('pb_theme', 'light');
+  var dotPattern = null; // 20x20 offscreen tile, rebuilt in resize()
+  var lang = readLS('pb_lang', 'en');
   var played = readLS('pb_dog_played', '') === '1';
   var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hintT = 0;
@@ -84,10 +74,18 @@
 
   function readLS(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
 
-  function captionText() {
-    return lang === 'pt'
-      ? 'Feito em Fortaleza, Ceará 🌴 · supervisionado por 2 pets'
-      : 'Built in Fortaleza, Ceará 🌴 · supervised by 2 pets';
+  function cssVar(name, fallback) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return v || fallback;
+    } catch (e) { return fallback; }
+  }
+  function readPAL() { // tokens read once, in mount(); a live theme swap would need a reload
+    PAL.bg = cssVar('--bg', PAL.bg);
+    PAL.line = cssVar('--line', PAL.line);
+    PAL.accent = cssVar('--accent', PAL.accent);
+    PAL.fg = cssVar('--fg', PAL.fg);
+    PAL.mono = cssVar('--font-mono', PAL.mono);
   }
 
   function computeEnv() {
@@ -105,18 +103,25 @@
 
   function resize() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
-    var outer = Math.min(PHONE.maxW, host.clientWidth - 32); // phone outer width, with page margin
-    W = Math.round(outer - 2 * PHONE.bezel);                 // screen (= canvas) width
-    H = Math.round(W / PHONE.aspect);                        // landscape screen height
-    screenEl.style.width = W + 'px';
-    screenEl.style.height = H + 'px';
+    W = Math.max(200, Math.round(host.clientWidth));
+    H = Math.max(120, Math.round(host.clientHeight));
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     env = computeEnv();
+    buildDotPattern();
     onResize();
+  }
+
+  function buildDotPattern() {
+    var tile = document.createElement('canvas');
+    tile.width = 20; tile.height = 20;
+    var tctx = tile.getContext('2d');
+    tctx.fillStyle = PAL.line;
+    tctx.fillRect(10, 10, 1, 1);
+    dotPattern = ctx.createPattern(tile, 'repeat');
   }
 
   function resetIdle() {
@@ -130,32 +135,12 @@
     if (dog.state === 'idle') resetIdle();
   }
 
-  function drawPalm(img, side, hFrac) { // corner palm; side -1 = left, +1 = right
-    var dh = H * hFrac, scale = dh / img.height, dw = img.width * scale;
-    var ox = side < 0 ? -dw * 0.16 : W - dw * 0.84;        // hug the edge, trunk slightly off-screen
-    var oy = (env.groundY + H * PALM_SINK) - 0.97 * dh;    // trunk base sunk into the sand
-    if (side > 0) { ctx.save(); ctx.translate(ox + dw, oy); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, dw, dh); ctx.restore(); }
-    else ctx.drawImage(img, ox, oy, dw, dh);
-  }
-
   function drawBackground() {
-    var t = THEME[theme] || THEME.light;
-    var horizonY = env.groundY - H * 0.17;
-    // sky gradient (warm, ties the site's cream/coral above)
-    var sky = ctx.createLinearGradient(0, 0, 0, horizonY);
-    sky.addColorStop(0, t.sky0); sky.addColorStop(1, t.sky1);
-    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, horizonY + 1);
-    // sea gradient (a soft sunset reflection: warm at the horizon into a muted teal)
-    var sea = ctx.createLinearGradient(0, horizonY, 0, env.groundY);
-    sea.addColorStop(0, t.seaTop); sea.addColorStop(1, t.sea1);
-    ctx.fillStyle = sea; ctx.fillRect(0, horizonY, W, env.groundY - horizonY + 2);
-    // corner palms (behind the sand so their sunk trunk bases get hidden)
-    if (LAYER.p1) drawPalm(LAYER.p1, -1, 0.85); // left corner
-    if (LAYER.p2) drawPalm(LAYER.p2, 1, 0.95);  // right corner
-    // sand gradient, last, so it occludes the buried palm bases
-    var sand = ctx.createLinearGradient(0, env.groundY - H * 0.04, 0, H);
-    sand.addColorStop(0, t.sand0); sand.addColorStop(1, t.sand1);
-    ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
+    ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, W, H);
+    // dot grid, 20px pitch, same as the site's .dots panels (tiled pattern, one fillRect per frame)
+    if (dotPattern) { ctx.fillStyle = dotPattern; ctx.fillRect(0, 0, W, H); }
+    // ground: one hairline
+    ctx.fillStyle = PAL.line; ctx.fillRect(0, Math.round(env.groundY), W, 1);
   }
 
   function update(dt) {
@@ -188,42 +173,46 @@
     ctx.lineTo(ball.x - pullX, ball.y - pullY); // launch direction (opposite the pull)
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.fillStyle = PAL.fg;
     ctx.beginPath(); ctx.arc(ball.x - pullX, ball.y - pullY, 4 + 3 * power, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
 
   function spriteFor(stateKey) {
     var s = SPRITES.states[stateKey] || SPRITES.states.idle;
-    var i = Math.floor((Date.now() / 1000) * s.fps) % s.files.length;
+    var i = reduceMotion ? 0 : Math.floor((Date.now() / 1000) * s.fps) % s.files.length; // freeze on frame 0 (idle dog) under reduced motion
     return cache[s.files[i]] || null; // null while loading or on error -> mock fallback
   }
 
-  function drawDog() {
-    var key = SPRITES.states[dog.state] ? dog.state : 'idle';
-    var rec = USE_SPRITE ? spriteFor(key) : null;
+  function drawDog(rec) {
     if (rec && rec.img) {
       var S = (H * SPRITES.hRatio) / (refBH || 0.66); // ONE scale for all poses (idle bbox = reference), so the dog never grows/shrinks between frames
-      var fy = env.groundY + H * DOG_SINK; // feet sit a touch into the sand
-      ctx.save(); // soft contact shadow for grounding
-      ctx.fillStyle = 'rgba(60,40,20,.18)';
-      ctx.beginPath(); ctx.ellipse(dog.x, fy, S * 0.22, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
+      var fy = env.groundY + H * DOG_SINK; // feet sit a touch below the ground line
       ctx.save();
       ctx.translate(dog.x, fy);
       ctx.scale(dog.dir, 1);
-      ctx.drawImage(rec.img, -rec.cx * S, -rec.bottom * S, S, S); // bbox center -> dog.x, bbox feet -> sand
+      ctx.drawImage(rec.img, -rec.cx * S, -rec.bottom * S, S, S); // bbox center -> dog.x, bbox feet -> ground line
       ctx.restore();
     } else {
       drawDogMock();
     }
   }
 
+  function drawDogShadow(rec) { // soft contact shadow for grounding (sprite poses only)
+    if (!(rec && rec.img)) return;
+    var S = (H * SPRITES.hRatio) / (refBH || 0.66);
+    var fy = env.groundY + H * DOG_SINK;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.beginPath(); ctx.ellipse(dog.x, fy, S * 0.22, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   function drawBall() {
     if (USE_SPRITE && ballImg) {
       if (ball.carried) return; // the carry frames already hold the ball in the mouth
       var d = env.radius * 2 * SPRITES.ballScale;
-      var by = ball.y + (ball.resting ? H * BALL_SINK : 0); // nestle into the sand at rest
+      var by = ball.y + (ball.resting ? H * BALL_SINK : 0); // nestle onto the ground line at rest
       ctx.save();
       ctx.translate(ball.x, by); ctx.rotate(ball.angle || 0);
       ctx.drawImage(ballImg, -d / 2, -d / 2, d, d);
@@ -233,9 +222,22 @@
     }
   }
 
+  function drawBallShadow() { // ground-line contact shadow; skipped while the dog carries the ball
+    if (ball.carried) return;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.beginPath(); ctx.ellipse(ball.x, env.groundY + H * BALL_SINK, env.radius * 1.1, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   function drawScene() {
     if (!ball || !dog) return;
-    drawDog();
+    var key = SPRITES.states[dog.state] ? dog.state : 'idle';
+    var rec = USE_SPRITE ? spriteFor(key) : null;
+    // both ground shadows first, so neither ever paints over the other's sprite
+    drawDogShadow(rec);
+    drawBallShadow();
+    drawDog(rec);
     drawBall();
     drawAim();
     drawHint();
@@ -246,7 +248,7 @@
     ctx.save();
     ctx.translate(ball.x, ball.y);
     ctx.rotate(ball.angle || 0);
-    ctx.fillStyle = '#b6e034';
+    ctx.fillStyle = PAL.accent;
     ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = Math.max(1, r * 0.18);
     ctx.beginPath(); ctx.arc(-r * 0.2, 0, r * 1.1, -0.9, 0.9); ctx.stroke();
@@ -264,18 +266,18 @@
     ctx.translate(bx, by);
     ctx.scale(dog.dir, 1);              // face direction
     // legs
-    ctx.strokeStyle = '#8a5a2b'; ctx.lineWidth = s * 0.12; ctx.lineCap = 'round';
+    ctx.strokeStyle = PAL.fg; ctx.lineWidth = s * 0.12; ctx.lineCap = 'round';
     [-0.5, -0.2, 0.2, 0.5].forEach(function (o, i) {
       var swing = run ? Math.sin(now / 70 + i) * s * 0.18 : 0;
       ctx.beginPath(); ctx.moveTo(o * s, -s * 0.55); ctx.lineTo(o * s + swing, 0); ctx.stroke();
     });
     // body
-    ctx.fillStyle = '#a9712f';
+    ctx.fillStyle = PAL.line;
     ctx.beginPath(); ctx.ellipse(0, -s * 0.7 + phase * 2, s * 0.7, s * 0.42, 0, 0, Math.PI * 2); ctx.fill();
     // head
     ctx.beginPath(); ctx.ellipse(s * 0.62, -s * 0.95, s * 0.32, s * 0.30, 0, 0, Math.PI * 2); ctx.fill();
     // ear + tail
-    ctx.fillStyle = '#8a5a2b';
+    ctx.fillStyle = PAL.line;
     ctx.beginPath(); ctx.ellipse(s * 0.5, -s * 1.1, s * 0.12, s * 0.22, 0.3, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(-s * 0.72, -s * 0.95, s * 0.1, s * 0.22, -0.6, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
@@ -336,89 +338,63 @@
     var pulse = reduceMotion ? 1 : (0.6 + 0.4 * Math.abs(Math.sin(hintT * 2)));
     ctx.save();
     ctx.globalAlpha = pulse;
-    ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 2;
+    ctx.strokeStyle = PAL.accent; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(ball.x, ball.y, env.radius + 8 + (reduceMotion ? 0 : pulse * 4), 0, Math.PI * 2); ctx.stroke();
     ctx.globalAlpha = 1;
-    ctx.fillStyle = 'rgba(255,255,255,.92)';
-    ctx.font = '600 13px Manrope, system-ui, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = PAL.accent;
+    ctx.font = '500 12px ' + PAL.mono; ctx.textAlign = 'center';
     ctx.fillText(hintText(), ball.x, ball.y - env.radius - 16);
     ctx.restore();
   }
 
-  function mount() {
-    host = document.getElementById('pb-beach');
+  function ariaLabelText() {
+    return lang === 'pt' ? 'Cena de praia: Bull, o bulldog francês, buscando a bolinha' : 'Beach scene: Bull the French Bulldog fetching a ball';
+  }
+
+  function mount(hostEl, initialLang) {
+    if (!hostEl) return;
+    lang = initialLang || 'en';
+    if (canvas) {
+      canvas.setAttribute('aria-label', ariaLabelText());
+      if (hostEl !== host) {
+        host = hostEl;
+        host.appendChild(canvas); // section re-rendered: same canvas, new host node
+        if (ro) { ro.disconnect(); ro.observe(host); }
+        if (io) { io.disconnect(); io.observe(host); }
+        resize();
+      }
+      return; // idempotent: same host -> only the language changed
+    }
+    host = hostEl;
     if (!host) return;
-    // section: cream page bg, centers the phone, credit below it
-    // -webkit-touch-callout/user-select:none so dragging the ball doesn't trigger iOS text/image selection
-    host.style.cssText = 'position:relative;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:36px 16px 52px;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;';
-
-    // section header (same language as the other section titles, ties it to the page)
-    headEl = document.createElement('h2');
-    headEl.style.cssText = "font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-1px;margin:0 0 6px;text-align:center;color:var(--text);";
-    host.appendChild(headEl);
-    subEl = document.createElement('p');
-    subEl.style.cssText = 'color:var(--dim);font-size:15px;margin:0 0 22px;text-align:center;max-width:520px;';
-    host.appendChild(subEl);
-
-    // landscape iPhone body (bezel)
-    phoneEl = document.createElement('div');
-    phoneEl.style.cssText = 'position:relative;display:inline-block;background:linear-gradient(150deg,#3a3a3f,#0d0d10);' +
-      'padding:' + PHONE.bezel + 'px;border-radius:46px;box-sizing:border-box;' +
-      'box-shadow:0 26px 50px -18px rgba(40,20,10,.45), 0 0 0 2px rgba(255,255,255,.05) inset, 0 1px 2px rgba(255,255,255,.15);';
-    host.appendChild(phoneEl);
-
-    // screen (clips the game)
-    screenEl = document.createElement('div');
-    screenEl.style.cssText = 'position:relative;border-radius:32px;overflow:hidden;background:#000;display:block;';
-    phoneEl.appendChild(screenEl);
+    readPAL();
 
     canvas = document.createElement('canvas');
-    canvas.style.cssText = 'display:block;touch-action:pan-y;'; // pan-y keeps page scroll unless we grab the ball
-    screenEl.appendChild(canvas);
+    // pan-y keeps page scroll unless we grab the ball
+    canvas.style.cssText = 'display:block;touch-action:pan-y;position:absolute;inset:0;';
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', ariaLabelText());
+    host.appendChild(canvas);
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerUp);
     ctx = canvas.getContext('2d');
 
-    // landscape Dynamic Island (left short edge) + home indicator (right)
-    var island = document.createElement('div');
-    island.style.cssText = 'position:absolute;left:9px;top:50%;transform:translateY(-50%);width:10px;height:62px;background:#000;border-radius:6px;z-index:6;pointer-events:none;';
-    screenEl.appendChild(island);
-    var homebar = document.createElement('div');
-    homebar.style.cssText = 'position:absolute;right:7px;top:50%;transform:translateY(-50%);width:4px;height:82px;background:rgba(255,255,255,.55);border-radius:3px;z-index:6;pointer-events:none;';
-    screenEl.appendChild(homebar);
-
-    // credit, on the cream below the phone
-    caption = document.createElement('div');
-    caption.style.cssText = 'margin-top:16px;text-align:center;font:600 12.5px Manrope,system-ui,sans-serif;';
-    host.appendChild(caption);
-
     resize();
-    updateCaption();
     window.addEventListener('resize', resize);
-    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(host);
+    if ('ResizeObserver' in window) { ro = new ResizeObserver(resize); ro.observe(host); }
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: 0.01 }).observe(host);
+      io = new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }, { threshold: 0.01 });
+      io.observe(host);
     }
     loadSprites();
     start();
   }
 
-  function updateCaption() {
-    var t = THEME[theme] || THEME.light;
-    var pt = lang === 'pt';
-    if (headEl) headEl.textContent = pt ? 'Hora do recreio 🎾' : 'Playtime 🎾';
-    if (subEl) subEl.textContent = pt
-      ? 'Experimente brincar com o Bull na praia!'
-      : 'Come play fetch with Bull on the beach!';
-    caption.textContent = captionText();
-    caption.style.color = t.text;
-  }
-
   window.DogGame = {
-    setLang: function (l) { lang = l; updateCaption(); },
-    setTheme: function (th) { theme = th; updateCaption(); }
+    mount: mount,
+    setLang: function (l) { lang = l; if (canvas) canvas.setAttribute('aria-label', ariaLabelText()); }
   };
 
   window.DogGame._debugThrow = function (vx, vy) {
@@ -426,7 +402,4 @@
     var r = Core.startThrow(dog, ball, { vx: vx, vy: vy });
     dog = r.dog; ball = r.ball;
   };
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
-  else mount();
 })();

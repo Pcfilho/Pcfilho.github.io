@@ -1,0 +1,15 @@
+{
+  "name": "pcfilho-portfolio",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8000",
+    "shoot": "node scripts/shoot.mjs",
+    "portrait": "node scripts/portrait.mjs",
+    "maps": "node scripts/maps.mjs",
+    "og": "node scripts/og.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.50.0"
+  }
+}

@@ -4,3 +4,8 @@
 # local preview / throwaway artifacts
 _preview_variant.html
 *.log
+
+.superpowers/
+
+node_modules/
+shots/

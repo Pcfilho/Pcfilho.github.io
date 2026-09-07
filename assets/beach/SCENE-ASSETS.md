@@ -1,5 +1,11 @@
 # Assets do cenário da praia (parallax / efeito 3D)
 
+**Obsoleto**: a redesign brutalista trocou o fundo por um grid de pontos escuro
+(`drawBackground` em `dog-game.js`), sem cenário de praia. Os PNGs listados abaixo
+(`bg-sky.png`, `bg-palms.png`, `bg-sand.png`, `palm-1.png`, `palm-2.png`) foram
+removidos do repositório; o pedido original fica registrado aqui só como
+histórico, caso o parallax volte a fazer sentido no futuro.
+
 Objetivo: trocar o fundo desenhado em código por camadas de imagem que se movem em
 velocidades diferentes (parallax) conforme o mouse / a bola, dando uma profundidade
 3D leve. Entregue **camadas separadas em PNG transparente**, eu empilho e dou o

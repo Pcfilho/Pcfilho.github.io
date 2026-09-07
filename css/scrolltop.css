@@ -1,0 +1,7 @@
+.stt { position: fixed; right: 24px; bottom: 24px; width: 48px; height: 48px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); z-index: 90; display: grid; place-items: center; }
+.stt[hidden] { display: none; }
+.stt-ring { position: absolute; inset: 0; }
+.stt-glyph { font: 500 16px/1 var(--font-mono); position: relative; }
+.stt:hover { background: var(--fill-hover-2); }
+.stt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 640px) { .stt { right: 16px; bottom: 16px; } }
