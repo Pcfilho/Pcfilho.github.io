@@ -21,8 +21,8 @@
   };
   var cache = {}, ballImg = null;          // fileName -> {img, cx, top, bottom} (bbox fractions)
   var refBH = 0;                            // reference body height (idle bbox) so the dog keeps ONE size across poses
-  var LAYER = { p1: null, p2: null }; // corner palms
-  var DOG_SINK = 0.055, BALL_SINK = 0.035, PALM_SINK = 0.05; // sink into the sand (fraction of band height)
+  var DOG_SINK = 0.055, BALL_SINK = 0.035; // sink into the ground line (fraction of band height)
+  var PAL = { bg: '#000', line: 'rgba(255,255,255,.10)', accent: '#FF6A1A', fg: 'rgba(255,255,255,.9)', mono: "'JetBrains Mono', ui-monospace, monospace" }; // theme tokens, read once in mount()
 
   // Opaque bounding box of a frame, so any pose (even an airborne carry frame with
   // no planted feet) is anchored by its real feet and center, not the padded frame.
@@ -57,18 +57,9 @@
     b.onload = function () { ballImg = b; };
     b.onerror = function () { ballImg = null; };
     b.src = 'assets/beach/ball.png';
-    [['p1', 'palm-1'], ['p2', 'palm-2']].forEach(function (p) {
-      var im = new Image();
-      im.onload = function () { LAYER[p[0]] = im; };
-      im.onerror = function () { LAYER[p[0]] = null; }; // missing -> gradient fallback
-      im.src = 'assets/beach/' + p[1] + '.png';
-    });
   }
 
   var LAYOUT = { heightVH: 0.38, minH: 280, maxH: 420, groundRatio: 0.74, radiusRatio: 0.045, sideInset: 0.05, mouthRatio: 0.16 };
-  var THEME = {
-    dark: { sky0: '#33263f', sky1: '#7a4b6b', seaTop: '#6b4b66', sea1: '#2e6b73', sand0: '#caa86f', sand1: '#a8854f', text: 'rgba(255,255,255,.7)' }
-  };
 
   var host, canvas, ctx, ro = null, io = null, dpr = 1;
   var W = 0, H = 0, env = null;
@@ -81,6 +72,20 @@
   var aiming = false, aimPtr = null, aimStart = null, aimCur = null;
 
   function readLS(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } }
+
+  function cssVar(name, fallback) {
+    try {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return v || fallback;
+    } catch (e) { return fallback; }
+  }
+  function readPAL() { // tokens read once, in mount(); a live theme swap would need a reload
+    PAL.bg = cssVar('--bg', PAL.bg);
+    PAL.line = cssVar('--line', PAL.line);
+    PAL.accent = cssVar('--accent', PAL.accent);
+    PAL.fg = cssVar('--fg', PAL.fg);
+    PAL.mono = cssVar('--font-mono', PAL.mono);
+  }
 
   function computeEnv() {
     var groundY = H * LAYOUT.groundRatio;
@@ -119,32 +124,13 @@
     if (dog.state === 'idle') resetIdle();
   }
 
-  function drawPalm(img, side, hFrac) { // corner palm; side -1 = left, +1 = right
-    var dh = H * hFrac, scale = dh / img.height, dw = img.width * scale;
-    var ox = side < 0 ? -dw * 0.16 : W - dw * 0.84;        // hug the edge, trunk slightly off-screen
-    var oy = (env.groundY + H * PALM_SINK) - 0.97 * dh;    // trunk base sunk into the sand
-    if (side > 0) { ctx.save(); ctx.translate(ox + dw, oy); ctx.scale(-1, 1); ctx.drawImage(img, 0, 0, dw, dh); ctx.restore(); }
-    else ctx.drawImage(img, ox, oy, dw, dh);
-  }
-
   function drawBackground() {
-    var t = THEME.dark;
-    var horizonY = env.groundY - H * 0.17;
-    // sky gradient (warm, ties the site's cream/coral above)
-    var sky = ctx.createLinearGradient(0, 0, 0, horizonY);
-    sky.addColorStop(0, t.sky0); sky.addColorStop(1, t.sky1);
-    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, horizonY + 1);
-    // sea gradient (a soft sunset reflection: warm at the horizon into a muted teal)
-    var sea = ctx.createLinearGradient(0, horizonY, 0, env.groundY);
-    sea.addColorStop(0, t.seaTop); sea.addColorStop(1, t.sea1);
-    ctx.fillStyle = sea; ctx.fillRect(0, horizonY, W, env.groundY - horizonY + 2);
-    // corner palms (behind the sand so their sunk trunk bases get hidden)
-    if (LAYER.p1) drawPalm(LAYER.p1, -1, 0.85); // left corner
-    if (LAYER.p2) drawPalm(LAYER.p2, 1, 0.95);  // right corner
-    // sand gradient, last, so it occludes the buried palm bases
-    var sand = ctx.createLinearGradient(0, env.groundY - H * 0.04, 0, H);
-    sand.addColorStop(0, t.sand0); sand.addColorStop(1, t.sand1);
-    ctx.fillStyle = sand; ctx.fillRect(0, env.groundY, W, H - env.groundY);
+    ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, W, H);
+    // dot grid, 20px pitch, same as the site's .dots panels
+    ctx.fillStyle = PAL.line;
+    for (var gy = 10; gy < H; gy += 20) for (var gx = 10; gx < W; gx += 20) ctx.fillRect(gx, gy, 1.5, 1.5);
+    // ground: one hairline
+    ctx.fillStyle = PAL.line; ctx.fillRect(0, Math.round(env.groundY) + 0.5, W, 1);
   }
 
   function update(dt) {
@@ -193,15 +179,15 @@
     var rec = USE_SPRITE ? spriteFor(key) : null;
     if (rec && rec.img) {
       var S = (H * SPRITES.hRatio) / (refBH || 0.66); // ONE scale for all poses (idle bbox = reference), so the dog never grows/shrinks between frames
-      var fy = env.groundY + H * DOG_SINK; // feet sit a touch into the sand
+      var fy = env.groundY + H * DOG_SINK; // feet sit a touch below the ground line
       ctx.save(); // soft contact shadow for grounding
-      ctx.fillStyle = 'rgba(60,40,20,.18)';
+      ctx.fillStyle = 'rgba(255,255,255,.08)';
       ctx.beginPath(); ctx.ellipse(dog.x, fy, S * 0.22, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
       ctx.save();
       ctx.translate(dog.x, fy);
       ctx.scale(dog.dir, 1);
-      ctx.drawImage(rec.img, -rec.cx * S, -rec.bottom * S, S, S); // bbox center -> dog.x, bbox feet -> sand
+      ctx.drawImage(rec.img, -rec.cx * S, -rec.bottom * S, S, S); // bbox center -> dog.x, bbox feet -> ground line
       ctx.restore();
     } else {
       drawDogMock();
@@ -209,10 +195,16 @@
   }
 
   function drawBall() {
+    if (!ball.carried) { // ground-line contact shadow; skipped while the dog carries the ball
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,.08)';
+      ctx.beginPath(); ctx.ellipse(ball.x, env.groundY + H * BALL_SINK, env.radius * 1.1, H * 0.022, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
     if (USE_SPRITE && ballImg) {
       if (ball.carried) return; // the carry frames already hold the ball in the mouth
       var d = env.radius * 2 * SPRITES.ballScale;
-      var by = ball.y + (ball.resting ? H * BALL_SINK : 0); // nestle into the sand at rest
+      var by = ball.y + (ball.resting ? H * BALL_SINK : 0); // nestle onto the ground line at rest
       ctx.save();
       ctx.translate(ball.x, by); ctx.rotate(ball.angle || 0);
       ctx.drawImage(ballImg, -d / 2, -d / 2, d, d);
@@ -325,11 +317,11 @@
     var pulse = reduceMotion ? 1 : (0.6 + 0.4 * Math.abs(Math.sin(hintT * 2)));
     ctx.save();
     ctx.globalAlpha = pulse;
-    ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 2;
+    ctx.strokeStyle = PAL.accent; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(ball.x, ball.y, env.radius + 8 + (reduceMotion ? 0 : pulse * 4), 0, Math.PI * 2); ctx.stroke();
     ctx.globalAlpha = 1;
-    ctx.fillStyle = 'rgba(255,255,255,.92)';
-    ctx.font = '600 13px Inter, system-ui, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = PAL.accent;
+    ctx.font = '500 12px ' + PAL.mono; ctx.textAlign = 'center';
     ctx.fillText(hintText(), ball.x, ball.y - env.radius - 16);
     ctx.restore();
   }
@@ -354,6 +346,7 @@
     }
     host = hostEl;
     if (!host) return;
+    readPAL();
 
     canvas = document.createElement('canvas');
     // pan-y keeps page scroll unless we grab the ball
