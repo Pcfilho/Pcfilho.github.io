@@ -49,10 +49,10 @@ test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-gam
 - **`border-radius: 0` everywhere**, except inside the simulated iOS device:
   the phone screen, its app icons, and the in-phone push banner keep their
   rounded corners. The device frame itself is also rounded. Nothing else is.
-- **No employer named for the current role.** The hero and profile copy stay
-  impersonal ("Senior React Native / Mobile Engineer", PT "Engenheiro Mobile
-  Sênior · React Native"), no company. Past, already-public roles (e.g.
-  Collective Health) are still named in the Experience timeline.
+- **Role copy is generic.** The hero and the phone profile card say only the
+  role ("Senior React Native / Mobile Engineer", PT "Engenheiro Mobile Sênior
+  · React Native"), no company. Companies appear only in the Experience
+  timeline, each with an explicit start and end month.
 - Keep paths **relative** (`assets/...`, `css/...`, not `/assets/...`). The
   site is served at the root `https://pcfilho.github.io/`; relative paths
   keep it portable if it ever moves to a subpath.

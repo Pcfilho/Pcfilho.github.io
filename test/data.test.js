@@ -28,7 +28,7 @@ test('products: Daily Logs and Nino with status, stack and icon', () => {
   }
 });
 
-test('experience: newest first, max 3 bullets, no Present, no employer beyond the list', () => {
+test('experience: newest first, max 3 bullets, explicit periods', () => {
   assert.equal(experience[0].key, 'collective');
   assert.equal(experience[0].period, '01/2026 · 2026');
   for (const e of experience) {
@@ -37,8 +37,6 @@ test('experience: newest first, max 3 bullets, no Present, no employer beyond th
     assert.ok(!/present|atual/i.test(e.period), e.key + ' period');
     assert.ok(isL(e.role));
   }
-  const all = JSON.stringify([apps, products, experience, recos, bento]);
-  assert.ok(!/feeld/i.test(all), 'employer must not be named');
 });
 
 test('recos and bento are bilingual', () => {

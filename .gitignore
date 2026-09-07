@@ -9,3 +9,6 @@ _preview_variant.html
 
 node_modules/
 shots/
+
+# design notes and plans stay local
+docs/superpowers/
