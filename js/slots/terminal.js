@@ -1,13 +1,20 @@
 export function terminalScript(data, lang) {
   const pick = v => (typeof v === 'string' ? v : (v[lang] ?? v.en));
-  return ['> ' + data.cmd, ...data.lines.map(l => '✓ ' + pick(l)), pick(data.done)];
+  const t = data.terminal;
+  const body = [
+    ...t.intro,
+    ...t.numberKeys.map(i => data.numbers[i].line),
+    ...t.productLines,
+    ...t.outro
+  ].map(l => '✓ ' + pick(l));
+  return ['> ' + t.cmd, ...body, pick(t.done)];
 }
 
 // Once the full script has typed out once (in any language), later mounts just print it:
 // the type-out is a one-time introduction, not something to replay on every language switch.
 let completed = false;
 
-// Types the lines into el once it is on screen. 30ms per char, 350ms between lines.
+// Types the lines into el once it is on screen. 20ms per char, 250ms between lines.
 // Returns dispose(): stops any pending IntersectionObserver and cancels in-flight typing
 // so a re-render (language switch) never leaves an orphaned loop writing into detached nodes.
 export function mountTerminal(el, lines) {
@@ -39,10 +46,10 @@ export function mountTerminal(el, lines) {
       for (const ch of line) {
         if (cancelled) return;
         row.textContent += ch;
-        await wait(30);
+        await wait(20);
       }
       if (cancelled) return;
-      await wait(350);
+      await wait(250);
     }
     if (cancelled) return;
     completed = true;

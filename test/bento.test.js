@@ -4,14 +4,14 @@ import { terminalScript } from '../js/slots/terminal.js';
 import { numbersRows } from '../js/slots/numbers.js';
 import { bento } from '../js/data/bento.js';
 
-test('terminalScript: prompt line, check lines, done line, in the chosen language', () => {
-  const en = terminalScript(bento.terminal, 'en');
+test('terminalScript: 11 lines from intro, numbers, products, outro, done', () => {
+  const en = terminalScript(bento, 'en');
+  assert.equal(en.length, 11);
   assert.equal(en[0], '> npx paulo@stack init');
-  assert.equal(en.length, 2 + bento.terminal.lines.length);
-  assert.ok(en[1].startsWith('✓ '));
+  assert.ok(en.slice(1, 10).every(l => l.startsWith('✓ ')));
+  assert.ok(en[3].includes('90%'));
   assert.equal(en.at(-1), 'Success! Engineer deployed.');
-  const pt = terminalScript(bento.terminal, 'pt');
-  assert.equal(pt.at(-1), 'Sucesso! Engenheiro publicado.');
+  assert.equal(terminalScript(bento, 'pt').at(-1), 'Sucesso! Engenheiro publicado.');
 });
 
 test('numbersRows: "value label · org" per entry', () => {
@@ -21,7 +21,7 @@ test('numbersRows: "value label · org" per entry', () => {
 });
 
 test('terminalScript stays pure: repeated calls return equal output, independent of mountTerminal state', () => {
-  const first = terminalScript(bento.terminal, 'en');
-  const second = terminalScript(bento.terminal, 'en');
+  const first = terminalScript(bento, 'en');
+  const second = terminalScript(bento, 'en');
   assert.deepEqual(first, second);
 });

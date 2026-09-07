@@ -1,14 +1,17 @@
-.bento { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 200px) auto; gap: 24px; }
+.bento { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 220px 220px auto auto auto; gap: 24px; }
 .slot { border: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; gap: 12px; min-width: 0; overflow: hidden; }
 .slot-h { font: 600 18px/1.3 var(--font-text); color: var(--fg); margin-top: auto; }
+.slot-h.top { margin-top: 0; }
 .slot-c { font-size: 15px; color: var(--fg-2); }
 .slot-terminal { grid-column: 1; grid-row: 1 / span 2; }
 .slot-dog { grid-column: 2 / span 2; grid-row: 1 / span 2; }
-.slot-numbers { grid-column: 1; grid-row: 3; }
-.slot-thinker { grid-column: 2; grid-row: 3; }
-.slot-location { grid-column: 3; grid-row: 3; }
-.slot-stack { grid-column: 1 / span 3; grid-row: 4; }
-.term { flex: 1; position: relative; border: 1px solid var(--line); padding: 12px; min-height: 0; }
+.slot-world { grid-column: 1 / span 2; grid-row: 3; }
+.slot-brazil { grid-column: 3; grid-row: 3; }
+.slot-numbers { grid-column: 1; grid-row: 4; }
+.slot-thinker { grid-column: 2; grid-row: 4; }
+.slot-pets { grid-column: 3; grid-row: 4; }
+.slot-stack { grid-column: 1 / span 3; grid-row: 5; }
+.term { flex: 1 1 auto; position: relative; border: 1px solid var(--line); padding: 12px; min-height: 0; }
 .term-bar { display: flex; gap: 6px; margin-bottom: 12px; }
 .term-bar i { width: 8px; height: 8px; background: var(--fg-3); display: block; }
 .term-out { margin: 0; white-space: pre-wrap; color: var(--fg-2); font-size: 12px; line-height: 1.6; }
@@ -22,20 +25,31 @@
 .num-row { padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--fg-2); white-space: nowrap; font-size: 10.5px; letter-spacing: 0; }
 .thinker { margin: auto; display: flex; flex-direction: column; align-items: center; font: 600 28px/1.25 var(--font-display); }
 .thinker span:nth-child(1) { color: var(--fg-3); } .thinker span:nth-child(2) { color: var(--fg-2); } .thinker span:nth-child(3) { color: var(--fg); }
-.loc { flex: 1; position: relative; border: 1px solid var(--line); }
-.loc-pin { position: absolute; left: 62%; top: 48%; width: 8px; height: 8px; background: var(--accent); transform: translate(-50%, -50%); }
-.loc-lbl { position: absolute; left: 12px; bottom: 10px; }
+.map { position: relative; flex: 1; min-height: 0; border: 1px solid var(--line); overflow: hidden; }
+.map img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.pin { position: absolute; width: 6px; height: 6px; background: var(--white); transform: translate(-50%, -50%); box-shadow: 0 0 8px var(--white); }
+.pin.home { width: 8px; height: 8px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.map-lbl { position: absolute; left: 12px; bottom: 10px; }
+.slot-world .map { aspect-ratio: 2 / 1; flex: none; max-height: 100%; align-self: center; width: 100%; }
+.slot-brazil .map { aspect-ratio: 1 / 1; flex: none; max-height: 100%; align-self: center; width: 100%; }
+.pets { flex: 1 1 auto; display: flex; align-items: center; justify-content: space-around; }
+.pet { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.pet img { width: 96px; height: 96px; object-fit: contain; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { border: 1px solid var(--line); padding: 6px 10px; color: var(--fg-2); }
 @media (max-width: 1024px) {
-  .bento { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 220px) auto; }
+  .bento { grid-template-columns: repeat(2, 1fr); grid-template-rows: 240px 240px auto auto auto auto; }
   .slot-terminal { grid-column: 1; grid-row: 1 / span 2; }
   .slot-dog { grid-column: 2; grid-row: 1 / span 2; }
-  .slot-numbers { grid-column: 1; grid-row: 3; } .slot-thinker { grid-column: 2; grid-row: 3; }
-  .slot-location { grid-column: 1; grid-row: 4; } .slot-stack { grid-column: 1 / span 2; grid-row: 5; }
+  .slot-world { grid-column: 1 / span 2; grid-row: 3; }
+  .slot-brazil { grid-column: 1; grid-row: 4; } .slot-numbers { grid-column: 2; grid-row: 4; }
+  .slot-thinker { grid-column: 1; grid-row: 5; } .slot-pets { grid-column: 2; grid-row: 5; }
+  .slot-stack { grid-column: 1 / span 2; grid-row: 6; }
 }
 @media (max-width: 640px) {
-  .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
+  .bento { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-rows: auto; }
   .slot { grid-column: 1 !important; grid-row: auto !important; min-height: 240px; }
   .slot-dog { min-height: 300px; }
+  .slot-world { min-height: 280px; }
+  .slot-terminal { min-height: 400px; }
 }

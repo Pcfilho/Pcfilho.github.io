@@ -44,9 +44,9 @@ test('experience: newest first, max 3 bullets, no Present, no employer beyond th
 test('recos and bento are bilingual', () => {
   assert.equal(recos.length, 3);
   recos.forEach(r => assert.ok(isL(r.quote) && isL(r.rel)));
-  assert.ok(bento.terminal.lines.length >= 4);
-  bento.terminal.lines.forEach(l => assert.ok(isL(l)));
+  assert.ok(bento.terminal.intro.length >= 2);
+  bento.terminal.intro.forEach(l => assert.ok(isL(l)));
   assert.ok(bento.numbers.length >= 5);
-  bento.numbers.forEach(n => assert.ok(isL(n.l) && typeof n.v === 'string'));
+  bento.numbers.forEach(n => assert.ok(isL(n.l) && typeof n.v === 'string' && isL(n.line)));
   assert.ok(bento.stack.length >= 20);
 });
