@@ -16,12 +16,15 @@ step** and no framework: native ES modules, plain CSS, `node --test`.
 index.html                 skeleton: head, 7 section mounts (header, hero, phone, products, bento,
                             experience, colleagues), footer mount, scrolltop mount
 css/tokens.css              custom properties, reset, type scale, shared utilities
+css/smoke.css               fixed smoke canvas + the black band over the content column
 css/header.css, hero.css, phone.css, products.css, bento.css, experience.css, colleagues.css, footer.css, scrolltop.css
 js/i18n.js                  lang state, L(), t(), persistence
 js/dom.js                   esc(), arrowSvg, EXT
 js/clock.js                 pure DST-safe clock formatting
 js/maps.js                  WORLD/BRAZIL projection constants, worldXY(), brazilXY()
 js/main.js                  boot, render all sections, reveal observer
+js/smoke.js                 pixel smoke background (WebGL), mounted once from main.js
+js/smoke.core.js            pure helpers for it (grid size, colour parsing, blade trail, topness)
 js/data/*.js                profile, apps, products, experience, recos, bento
 js/sections/*.js            header, hero, phone, products, bento, experience, colleagues, footer, scrolltop
 js/slots/*.js                terminal, numbers bento sub-widgets
@@ -30,7 +33,7 @@ dog-game.js                 mounts the beach fetch game into the bento dog slot
 scripts/portrait.mjs        builds hero-portrait webp files from the source png
 scripts/shoot.mjs           serves the site and captures screenshots into shots/
 scripts/maps.mjs            regenerates assets/map-world.svg and assets/map-brazil.svg from Natural Earth
-test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-game core, maps, no-em-dash)
+test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-game core, maps, smoke, no-em-dash)
 ```
 
 ## Conventions
@@ -65,6 +68,11 @@ test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-gam
   auto-scroll, the header clock interval) must dispose the previous instance
   at the top of `render()` before mounting a new one, since `render()` runs
   again on every language switch.
+- The **pixel smoke** (`js/smoke.js`) is decoration behind everything: `body` is
+  transparent so the fixed canvas shows over `html`'s `--bg`, and `.smoke-band` covers
+  the content column, so smoke only appears in the side gutters (none below 1140px).
+  It is not a section and does not re-render on language switch. The cursor slices it
+  like a blade; no loose debris pixels.
 - `js/main.js` is the single place that knows page order and boots every
   section; a failed section import now fails the boot loudly (no silent
   `.catch(() => null)`).
@@ -73,7 +81,7 @@ test/*.test.{js,cjs}        node --test suite (i18n, data, bento, clock, dog-gam
 
 ```bash
 npm run serve     # python3 -m http.server 8000, then open http://localhost:8000
-npm test          # node --test, 36 tests
+npm test          # node --test, 41 tests
 npm run shoot     # headless Chrome, captures shots/{desktop,mobile}-{fold,full}.png
 npm run portrait  # rebuilds the hero portrait webp files from the source png
 npm run og        # renders assets/og-card.png (1200x630 link preview) in the site style

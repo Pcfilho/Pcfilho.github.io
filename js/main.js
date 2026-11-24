@@ -1,5 +1,6 @@
 import { loadLang, setLang, state } from './i18n.js';
 import * as header from './sections/header.js';
+import { mountSmoke } from './smoke.js';
 
 const sections = [header];
 
@@ -39,6 +40,7 @@ function observeReveals() {
 
 async function boot() {
   loadLang();
+  try { mountSmoke(); } catch (err) { console.error('[smoke] background failed', err); } // decoration: never blocks the page
   // Render the header first: a section that fails to import below still leaves a header.
   header.render(document.getElementById(header.id));
   // Section modules are imported here so main.js stays the single place that knows page order.
