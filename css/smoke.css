@@ -1,0 +1,19 @@
+/* Pixel smoke background (js/smoke.js). Sits under every section: body is transparent,
+   html keeps --bg, so a z-index -1 fixed canvas paints between the two. A black band the
+   width of the content column covers the middle: smoke only shows in the side gutters. */
+.smoke {
+  position: fixed; left: 0; top: 0; z-index: -1;
+  width: 100vw; height: 100vh; height: 100lvh;
+  image-rendering: pixelated; image-rendering: crisp-edges;
+  pointer-events: none;
+  opacity: 0; animation: smoke-in 2.4s ease .6s forwards;
+}
+@keyframes smoke-in { to { opacity: var(--smoke-opacity); } }
+.smoke-band {
+  position: fixed; top: 0; bottom: 0; left: 50%; z-index: -1;
+  width: min(100%, var(--container)); transform: translateX(-50%);
+  background: var(--bg); border-inline: 1px solid var(--line);
+  pointer-events: none;
+}
+@media (max-width: 1140px) { .smoke-band { border-inline: 0; } } /* no gutters left: no edge lines on the screen sides */
+@media (prefers-reduced-motion: reduce) { .smoke { opacity: var(--smoke-opacity); animation: none; } }

@@ -18,10 +18,13 @@
   --pad: 24px;
   --header-h: 60px;
   --ease-out: cubic-bezier(.15,.8,.25,1);
+  --smoke-opacity: .85;
 }
 *, *::before, *::after { box-sizing: border-box; border-radius: 0; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+html, body { margin: 0; padding: 0; color: var(--fg); }
+html { background: var(--bg); }
+body { background: transparent; } /* lets the fixed smoke canvas (css/smoke.css) show through */
 body { font: 400 16px/1.55 var(--font-text); overflow-x: clip; }
 img { max-width: 100%; display: block; -webkit-user-drag: none; user-select: none; }
 a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
